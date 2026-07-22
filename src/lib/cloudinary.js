@@ -1,10 +1,12 @@
 // Unsigned Cloudinary upload (same approach as the portfolio).
-// Set REACT_APP_CLOUDINARY_CLOUD_NAME and REACT_APP_CLOUDINARY_UPLOAD_PRESET
+// Set PUBLIC_CLOUDINARY_CLOUD_NAME and PUBLIC_CLOUDINARY_UPLOAD_PRESET
 // in Netlify. If they are missing, uploadImage throws a friendly error and the
 // admin can still paste an image URL by hand.
+//
+// NOTE: Astro exposes browser env vars prefixed PUBLIC_ (CRA used REACT_APP_).
 
-const CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+const CLOUD_NAME = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export function cloudinaryConfigured() {
   return Boolean(CLOUD_NAME && UPLOAD_PRESET);
@@ -13,7 +15,7 @@ export function cloudinaryConfigured() {
 export async function uploadImage(file) {
   if (!cloudinaryConfigured()) {
     throw new Error(
-      "Cloudinary is not configured. Add REACT_APP_CLOUDINARY_CLOUD_NAME and REACT_APP_CLOUDINARY_UPLOAD_PRESET, or paste an image URL instead."
+      "Cloudinary is not configured. Add PUBLIC_CLOUDINARY_CLOUD_NAME and PUBLIC_CLOUDINARY_UPLOAD_PRESET, or paste an image URL instead."
     );
   }
   const form = new FormData();

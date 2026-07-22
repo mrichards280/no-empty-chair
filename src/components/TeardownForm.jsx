@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChairMark } from "./Site";
+import { ChairMark } from "./ChairMark";
 
 function encode(data) {
   return Object.keys(data)

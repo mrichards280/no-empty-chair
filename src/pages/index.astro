@@ -1,0 +1,343 @@
+---
+import Base from "../layouts/Base.astro";
+import ChairMark from "../components/ChairMark.astro";
+import ContactSection from "../components/ContactSection.jsx";
+import RadarModal from "../components/RadarModal.jsx";
+import { bookingHref } from "../lib/booking.js";
+import content from "../../public/content.json";
+
+const c = content;
+const year = new Date().getFullYear();
+---
+<Base>
+  <nav>
+    <div class="wrap">
+      <div class="logo">{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <ul>
+        <li class="hasmenu">
+          <a href="#services" class="menutop">Services <span class="caret" aria-hidden="true">▾</span></a>
+          <ul class="submenu">
+            <li><a href="#services">Full Packages</a></li>
+            <li><a href="#consults">Consulting Only</a></li>
+            <li><a href="#alacarte">Individual Offerings</a></li>
+          </ul>
+        </li>
+        <li><a href="#proof">Results</a></li>
+        <li><a href="#demos">Demos</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li class="cta"><a href="#contact" class="navbtn">Book a call</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {/* HERO */}
+  <header class="hero">
+    <div class="wrap">
+      <div class="glasscore">
+        <div class="chairmark"><ChairMark size={58} /></div>
+        <div class="eyebrow">{c.hero.eyebrow}</div>
+        <h1>{c.hero.title}<br /><em>{c.hero.titleEm}</em></h1>
+        <p class="sub">{c.hero.sub}</p>
+        <div class="actions">
+          <a href={c.hero.primaryCtaHref} class="btn">{c.hero.primaryCtaLabel}</a>
+          <a href={c.hero.secondaryCtaHref} class="btn ghost">{c.hero.secondaryCtaLabel}</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="strip">{c.strip.text}<b>{c.strip.bold}</b>{c.strip.tail}</div>
+
+  {/* PROBLEM / PROMISE */}
+  <section id="why">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">{c.gap.kicker}</div>
+        <h2>{c.gap.title}</h2>
+        <p>{c.gap.intro}</p>
+      </div>
+      <div class="split">
+        <div class="col now">
+          <h3>{c.gap.nowTitle}</h3>
+          <ul>{c.gap.now.map((x) => <li>{x}</li>)}</ul>
+        </div>
+        <div class="col after glass">
+          <h3>{c.gap.afterTitle}</h3>
+          <ul>{c.gap.after.map((x) => <li>{x}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* PACKAGES */}
+  <section id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">{c.packages.kicker}</div>
+        <h2>{c.packages.title}</h2>
+        <p>{c.packages.intro}</p>
+      </div>
+      <div class="svc">
+        {c.packages.items.map((p) => (
+          <div class={"card glass" + (p.featured ? " feat" : "")}>
+            {p.tag ? <span class="tag">{p.tag}</span> : null}
+            <h3>{p.name}</h3>
+            <div class="from">{p.from}</div>
+            <ul>{p.bullets.map((b) => <li>{b}</li>)}</ul>
+            <a class="btn" style="margin-top:18px;display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book {p.name}</a>
+          </div>
+        ))}
+      </div>
+      <div class="retainer-note"><b>{c.packages.retainerNote}</b></div>
+    </div>
+  </section>
+
+  {/* CONSULTS */}
+  <section id="consults">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">{c.consults.kicker}</div>
+        <h2>{c.consults.title}</h2>
+        <p>{c.consults.intro}</p>
+      </div>
+      <div class="svc">
+        {c.consults.items.map((p) => (
+          <div class="card glass">
+            <h3>{p.name}</h3>
+            <div class="from">{p.from}</div>
+            <ul>{p.bullets.map((b) => <li>{b}</li>)}</ul>
+            <a class="btn" style="margin-top:18px;display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book the {p.name}</a>
+          </div>
+        ))}
+      </div>
+      <div class="retainer-note"><b>{c.consults.intensiveNote}</b></div>
+      {c.consults.addonNote ? <div class="addon-note">{c.consults.addonNote}</div> : null}
+    </div>
+  </section>
+
+  {/* À LA CARTE */}
+  {c.alacarte ? (
+    <section id="alacarte">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">{c.alacarte.kicker}</div>
+          <h2>{c.alacarte.title}</h2>
+          <p>{c.alacarte.intro}</p>
+        </div>
+        <div class="ala">
+          {c.alacarte.items.map((a) => (
+            <div class="ala-item glass">
+              <h3>{a.name}</h3>
+              <p>{a.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style="text-align:center;margin-top:30px">
+          <a href={c.alacarte.ctaHref} class="btn">{c.alacarte.ctaLabel}</a>
+        </div>
+      </div>
+    </section>
+  ) : null}
+
+  {/* RESULTS + WORK (merged) */}
+  <section id="proof">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">{c.proof.kicker}</div>
+        <h2>{c.proof.title}</h2>
+        <p>{c.proof.intro}</p>
+      </div>
+      <div class="stats">
+        {c.proof.stats.map((s) => (
+          <div class="stat glass">
+            <div class="n">{s.n}</div>
+            <div class="l">{s.l}</div>
+          </div>
+        ))}
+      </div>
+      <p class="proof-note">{c.proof.awardsLine}</p>
+
+      <div class="sec-head" style="margin-top:64px">
+        <div class="kicker">{c.work.kicker}</div>
+        <h2>{c.work.title}</h2>
+        <p>{c.work.intro}</p>
+      </div>
+      <div class="svc">
+        {c.work.items.map((w) => (
+          <a class="card glass work-card" href={w.href} target="_blank" rel="noopener noreferrer">
+            {w.image ? <img src={w.image} alt={w.title} style="border-radius:14px;margin-bottom:14px" /> : null}
+            <div class="n">{w.n}</div>
+            <div class="meta">{w.meta}</div>
+            <h3>{w.title}</h3>
+            <p>{w.desc}</p>
+            <span class="go">Watch the reel →</span>
+          </a>
+        ))}
+      </div>
+      <p class="proof-note">{c.work.note}</p>
+    </div>
+  </section>
+
+  {/* DEMOS */}
+  {c.demos ? (
+    <section id="demos">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">{c.demos.kicker}</div>
+          <h2>{c.demos.title}</h2>
+          <p>{c.demos.intro}</p>
+        </div>
+        <div class="demogrid">
+          {c.demos.items.map((d) => (
+            <a class="democard glass" href={d.href} target="_blank" rel="noopener noreferrer">
+              <div class="demothumb" style={`background-image:url(${d.image})`}>
+                <span class="demopill">Live demo</span>
+              </div>
+              <div class="demobody">
+                <h3>{d.name}</h3>
+                <div class="demotag">{d.tagline}</div>
+                <p>{d.desc}</p>
+                <span class="go">View the demo →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : null}
+
+  {/* FOUNDER */}
+  <section id="about" class="founder">
+    <div class="wrap">
+      <div class="portrait">
+        {c.founder.photo ? <img src={c.founder.photo} alt={c.founder.name} /> : <div class="mono">{c.founder.monogram}</div>}
+      </div>
+      <div>
+        <div class="kicker">{c.founder.kicker}</div>
+        <h2>{c.founder.name}</h2>
+        <div class="badges">
+          {c.founder.badges.map((b) => <span>{b}</span>)}
+        </div>
+        {c.founder.paragraphs.map((p) => <p>{p}</p>)}
+        <a href={c.founder.ctaHref} class="btn dark" style="margin-top:12px">{c.founder.ctaLabel}</a>
+      </div>
+    </div>
+  </section>
+
+  {/* PROCESS */}
+  <section id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">{c.process.kicker}</div>
+        <h2>{c.process.title}</h2>
+      </div>
+      <div class="proc">
+        {c.process.steps.map((s) => (
+          <div class="pstep">
+            <div class="num">{s.num}</div>
+            <h3>{s.title}</h3>
+            <p>{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* FAQ — static copy + tiny enhancement script (see script below) */}
+  {c.faq ? (
+    <section id="faq">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">{c.faq.kicker}</div>
+          <h2>{c.faq.title}</h2>
+          <p>{c.faq.intro}</p>
+        </div>
+        <div class="faq">
+          {c.faq.items.map((f, i) => (
+            <div class="faq-item glass" data-faq={i}>
+              <button type="button" class="faq-q" aria-expanded="false">
+                <span>{f.q}</span>
+                <span class="faq-icon" aria-hidden="true">+</span>
+              </button>
+              <div class="faq-a" hidden>
+                <p>{f.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : null}
+
+  {/* CONTACT — React island */}
+  <ContactSection contact={c.contact} client:visible />
+
+  <footer>
+    <div class="wrap">
+      <div class="logo">{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <p>{c.footer.tagline}</p>
+      <div class="socials">
+        <a href={c.footer.ig} target="_blank" rel="noopener noreferrer">IG</a>
+        <a href={`mailto:${c.footer.email}`}>@</a>
+      </div>
+      <div class="info">
+        <a href={`mailto:${c.footer.email}`}>{c.footer.email}</a> · {c.footer.site}
+      </div>
+      <div class="fine">
+        © {year} No Empty Chair. Founded by Makayla Richards. · <a class="adminlink" href="/admin">Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  {/* Radar lead-capture popup — React island */}
+  <RadarModal radar={c.radar} client:idle />
+</Base>
+
+{/* FAQ accordion: all answers are already in the HTML (collapsed via `hidden`
+    so crawlers read them). This script toggles open/closed and persists the
+    open set to localStorage["nec-faq-open"], reproducing the old React behavior
+    with almost no JS. */}
+<script is:inline>
+  (function () {
+    var KEY = "nec-faq-open";
+    var items = Array.prototype.slice.call(document.querySelectorAll(".faq-item[data-faq]"));
+    if (!items.length) return;
+
+    var open;
+    try {
+      var saved = JSON.parse(window.localStorage.getItem(KEY) || "[]");
+      open = new Set(Array.isArray(saved) ? saved : []);
+    } catch (e) {
+      open = new Set();
+    }
+
+    function apply(item, i, isOpen) {
+      var btn = item.querySelector(".faq-q");
+      var ans = item.querySelector(".faq-a");
+      var icon = item.querySelector(".faq-icon");
+      item.classList.toggle("open", isOpen);
+      if (btn) btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      if (ans) ans.hidden = !isOpen;
+      if (icon) icon.textContent = isOpen ? "–" : "+";
+    }
+
+    items.forEach(function (item) {
+      var i = Number(item.getAttribute("data-faq"));
+      apply(item, i, open.has(i));
+      var btn = item.querySelector(".faq-q");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        var isOpen = !open.has(i);
+        if (isOpen) open.add(i);
+        else open.delete(i);
+        apply(item, i, isOpen);
+        try {
+          window.localStorage.setItem(KEY, JSON.stringify(Array.from(open)));
+        } catch (e) {
+          /* storage unavailable — accordion still works, just won't persist */
+        }
+      });
+    });
+  })();
+</script>

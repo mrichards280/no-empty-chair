@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { ChairMark } from "./Site";
+import { ChairMark } from "./ChairMark";
 
 // URL-encode a flat object for Netlify Forms submission.
 function encode(data) {

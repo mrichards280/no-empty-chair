@@ -1,0 +1,142 @@
+---
+import "../styles/index.css";
+import content from "../../public/content.json";
+
+const {
+  title = "Salon Branding, Websites & Reels | No Empty Chair · Atlanta",
+  description = "No Empty Chair is an Atlanta brand and content studio for salons, stylists, braiders, and barbers. It builds premium branding, booking-ready websites, and short-form content that keep your chair full. Every project starts with a $200 teardown.",
+  ogDescription = "An Atlanta brand and content studio that keeps talented salons fully booked — premium branding, booking-ready websites, and short-form content.",
+} = Astro.props;
+
+// Static structured-data nodes (ProfessionalService + Person). The FAQ node is
+// derived from content.json below so the schema can never drift from the visible FAQ.
+const businessNode = {
+  "@type": "ProfessionalService",
+  "@id": "https://noemptychair.co/#business",
+  name: "No Empty Chair",
+  alternateName: "No Empty Chair Brand & Content Studio",
+  description:
+    "Atlanta brand and content studio that keeps talented salons, stylists, braiders, and barbers fully booked through premium branding, booking-ready websites, and short-form video content.",
+  url: "https://noemptychair.co/",
+  email: "hello@noemptychair.co",
+  priceRange: "$100–$5,500+",
+  areaServed: [
+    { "@type": "City", name: "Atlanta" },
+    { "@type": "Country", name: "United States" },
+  ],
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Atlanta",
+    addressRegion: "GA",
+    addressCountry: "US",
+  },
+  sameAs: ["https://instagram.com/noemptychair"],
+  founder: { "@id": "https://noemptychair.co/#makayla" },
+  knowsAbout: [
+    "Salon branding",
+    "Salon website design",
+    "Short-form video content",
+    "Instagram marketing for salons",
+    "Local SEO for salons",
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Packages",
+    itemListElement: [
+      { "@type": "Offer", name: "The Refresh — salon brand polish + one-page booking-ready website", price: "1500", priceCurrency: "USD" },
+      { "@type": "Offer", name: "The Signature — full salon website, brand identity, Instagram kit + promo reel", price: "3000", priceCurrency: "USD" },
+      { "@type": "Offer", name: "The Statement — full rebrand, content shoot direction + 30 days of content", price: "5500", priceCurrency: "USD" },
+      { "@type": "Offer", name: "$200 Teardown — video breakdown of your highest-impact fixes (starts every project)", price: "200", priceCurrency: "USD" },
+    ],
+  },
+};
+
+const personNode = {
+  "@type": "Person",
+  "@id": "https://noemptychair.co/#makayla",
+  name: "Makayla Richards",
+  jobTitle: "Founder & Content Strategist",
+  worksFor: { "@id": "https://noemptychair.co/#business" },
+  description:
+    "Founder of No Empty Chair. Award-winning short-form video strategist — 2× Emmy-nominated, Regional Murrow Award winner, and a top 2% producer across TEGNA.",
+  award: ["Regional Murrow Award", "2× Emmy nomination", "Top 2% producer across TEGNA"],
+  sameAs: ["https://instagram.com/noemptychair"],
+};
+
+// Derive the FAQPage node from content.faq.items so it always matches the copy.
+const faqNode = {
+  "@type": "FAQPage",
+  "@id": "https://noemptychair.co/#faq",
+  mainEntity: (content.faq?.items || []).map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [businessNode, personNode, faqNode],
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#413645" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href="https://noemptychair.co/" />
+
+    <!-- Open Graph / social preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="No Empty Chair" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content="https://noemptychair.co/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content="An Atlanta brand and content studio that keeps talented salons fully booked." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Marcellus&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured data for Google rich results + AI search engines -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <!-- Hidden static forms so Netlify detects "leads" and "teardown" at build
+         time and captures submissions from the React islands. Field names must
+         match the islands. -->
+    <form name="leads" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="business" />
+      <input type="text" name="instagram" />
+      <input type="text" name="contact" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <form name="teardown" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="text" name="salon" />
+      <input type="text" name="email" />
+      <input type="text" name="years" />
+      <input type="text" name="website" />
+      <input type="text" name="instagram" />
+      <input type="text" name="socials" />
+      <input type="text" name="stats" />
+      <input type="text" name="voice" />
+      <input type="text" name="issue" />
+      <input type="text" name="audience" />
+      <input type="text" name="vision" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <slot />
+  </body>
+</html>

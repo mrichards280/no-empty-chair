@@ -1,15 +1,10 @@
 [build]
   command = "npm run build"
-  publish = "build"
+  publish = "dist"
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "18"
-  # CI=true makes CRA treat lint warnings as errors. Set CI=false in Netlify env
-  # if a harmless warning ever blocks a deploy.
+  NODE_VERSION = "20"
 
-# SPA routing: let React Router handle client-side routes (e.g. /admin)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# No SPA redirect: Astro emits real routes (/, /teardown/, /admin/, /demos/*).
+# A catch-all /* -> /index.html would shadow those, so it is intentionally absent.
