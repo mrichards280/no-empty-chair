@@ -12,6 +12,16 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <!-- Hidden static form so Netlify detects "leads" at build time and captures
+         submissions from the React popup. Field names must match the popup. -->
+    <form name="leads" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="business" />
+      <input type="text" name="instagram" />
+      <input type="text" name="contact" />
+      <input type="text" name="bot-field" />
+    </form>
+
     <div id="root"></div>
   </body>
 </html>

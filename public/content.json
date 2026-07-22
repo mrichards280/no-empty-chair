@@ -194,5 +194,19 @@
     "email": "hello@noemptychair.co",
     "site": "noemptychair.co",
     "ig": "https://instagram.com/noemptychair"
+  },
+  "radar": {
+    "enabled": true,
+    "eyebrow": "Psst…",
+    "headline": "Are you on our radar yet?",
+    "sub": "We're always scouting salons doing incredible work. Drop your details and find out if No Empty Chair already has its eye on you.",
+    "businessLabel": "Salon / business name",
+    "instagramLabel": "Instagram handle",
+    "contactLabel": "Best email or phone",
+    "button": "Check now",
+    "successHeadline": "Oh, we've noticed you.",
+    "successBody": "You're officially on our radar. Keep an eye on your inbox — we'll be in touch soon.",
+    "delaySeconds": 8,
+    "reopenLabel": "On our radar?"
   }
 }

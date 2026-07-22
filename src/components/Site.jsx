@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useContent } from "../hooks/useContent";
+import RadarModal from "./RadarModal";
 
 // The filled-chair brand mark. stroke uses currentColor unless overridden.
 export function ChairMark({ size = 58, orb = "#a85a76", stroke = "#413645" }) {
@@ -241,6 +242,8 @@ export default function Site() {
           </div>
         </div>
       </footer>
+
+      <RadarModal radar={c.radar} />
     </>
   );
 }

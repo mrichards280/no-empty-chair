@@ -204,3 +204,125 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
 
 /* loading */
 .loading { min-height: 60vh; display: flex; align-items: center; justify-content: center; font-family: "Marcellus", serif; color: var(--plum-soft); font-size: 18px; }
+
+/* ============================================================
+   "On our radar?" lead-capture popup
+   ============================================================ */
+.radar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(65, 54, 69, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: radar-fade 0.25s ease;
+}
+@keyframes radar-fade { from { opacity: 0; } to { opacity: 1; } }
+.radar-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 24px;
+  padding: 34px 30px 30px;
+  text-align: center;
+  animation: radar-rise 0.32s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes radar-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.radar-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--plum-soft);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.radar-close:hover { background: rgba(255, 255, 255, 0.95); color: var(--plum); }
+.radar-mark { display: flex; justify-content: center; margin-bottom: 8px; }
+.radar-eyebrow {
+  font-family: "Marcellus", serif;
+  font-style: italic;
+  color: var(--rose);
+  letter-spacing: 1px;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.radar-headline {
+  font-family: "Marcellus", serif;
+  font-size: 27px;
+  color: var(--plum);
+  margin-bottom: 10px;
+  line-height: 1.15;
+}
+.radar-sub {
+  color: var(--plum-soft);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin: 0 auto 20px;
+  max-width: 340px;
+}
+.radar-form { display: grid; gap: 11px; }
+.radar-form input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  background: var(--white);
+  color: var(--ink);
+}
+.radar-form input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px rgba(168, 90, 118, 0.14); }
+.radar-form .btn { width: 100%; margin-top: 4px; cursor: pointer; border: none; font-size: 15px; }
+.radar-form .btn:disabled { opacity: 0.6; cursor: default; }
+.radar-hp { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0; }
+.radar-err { color: #b5434f; font-size: 13px; margin-top: 2px; }
+.radar-done { padding: 6px 4px; }
+.radar-eyes { font-size: 46px; line-height: 1; margin-bottom: 8px; }
+.radar-done h3 { font-family: "Marcellus", serif; font-size: 25px; color: var(--plum); margin-bottom: 10px; }
+.radar-done p { color: var(--plum-soft); font-size: 14.5px; line-height: 1.6; margin: 0 auto 20px; max-width: 320px; }
+.radar-done .btn { border: none; cursor: pointer; }
+
+/* Floating re-open tab */
+.radar-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 17px 11px 14px;
+  border: 1px solid var(--glass-brd);
+  border-radius: 100px;
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 10px 30px rgba(65, 54, 69, 0.18);
+  color: var(--plum);
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.radar-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(65, 54, 69, 0.24); }
+.radar-fab-eyes { font-size: 18px; line-height: 1; }
+@media (max-width: 520px) {
+  .radar-fab-text { display: none; }
+  .radar-fab { padding: 13px; }
+  .radar-headline { font-size: 24px; }
+}
