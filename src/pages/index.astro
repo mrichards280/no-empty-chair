@@ -85,7 +85,7 @@ const year = new Date().getFullYear();
             <h3>{p.name}</h3>
             <div class="from">{p.from}</div>
             <ul>{p.bullets.map((b) => <li>{b}</li>)}</ul>
-            <a class="btn" style="margin-top:18px;display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book {p.name}</a>
+            <a class="btn" style="display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book {p.name}</a>
           </div>
         ))}
       </div>
@@ -107,7 +107,7 @@ const year = new Date().getFullYear();
             <h3>{p.name}</h3>
             <div class="from">{p.from}</div>
             <ul>{p.bullets.map((b) => <li>{b}</li>)}</ul>
-            <a class="btn" style="margin-top:18px;display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book the {p.name}</a>
+            <a class="btn" style="display:block;text-align:center" href={bookingHref(c.contact.bookingEmail, p.name)}>Book the {p.name}</a>
           </div>
         ))}
       </div>

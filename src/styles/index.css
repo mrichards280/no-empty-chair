@@ -166,7 +166,10 @@ h2 { font-size: 46px; color: var(--plum); margin-bottom: 12px; }
 
 /* services / packages */
 .svc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.card { border-radius: 22px; padding: 34px 28px; transition: 0.25s; position: relative; }
+.card { border-radius: 22px; padding: 34px 28px; transition: 0.25s; position: relative; display: flex; flex-direction: column; }
+/* push the "Book" button to the bottom so buttons line up across cards */
+.card .btn { margin-top: auto; }
+.card ul { margin-bottom: 18px; }
 .card.feat { border: 2px solid var(--rose); }
 .card .tag { position: absolute; top: -12px; right: 22px; background: var(--gold); color: #fff; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; font-weight: 600; }
 .card .ico { display: inline-flex; margin-bottom: 16px; }
