@@ -143,6 +143,43 @@ export default function Site() {
         </div>
       </section>
 
+      {/* À LA CARTE */}
+      {c.alacarte ? (
+        <section id="alacarte">
+          <div className="wrap">
+            <div className="sec-head">
+              <div className="kicker">{c.alacarte.kicker}</div>
+              <h2>{c.alacarte.title}</h2>
+              <p>{c.alacarte.intro}</p>
+            </div>
+            <div className="ala">
+              {c.alacarte.items.map((a, i) => (
+                <div className="ala-item glass" key={i}>
+                  <h3>{a.name}</h3>
+                  <p>{a.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 30 }}>
+              <a href={c.alacarte.ctaHref} className="btn">{c.alacarte.ctaLabel}</a>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* THE HONEST PART */}
+      {c.honest ? (
+        <section id="honest" className="honest-sec">
+          <div className="wrap">
+            <div className="honest-card glass">
+              <div className="kicker">{c.honest.kicker}</div>
+              <h2>{c.honest.title}</h2>
+              <p>{c.honest.body}</p>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {/* RESULTS + WORK (merged) */}
       <section id="proof">
         <div className="wrap">
@@ -320,8 +357,8 @@ function ContactSection({ contact }) {
         <div className="kicker">{contact.kicker}</div>
         <h2>{contact.title}</h2>
         <p>{contact.sub}</p>
-        <a href={bookingHref(contact.bookingEmail || contact.email, "the $100 Glow-Up Teardown")} className="btn">
-          {contact.teardownCtaLabel || "Book my $100 teardown"}
+        <a href="/teardown" className="btn">
+          {contact.teardownCtaLabel || "Book my $200 teardown"}
         </a>
         <p style={{ marginTop: 24, fontSize: 14 }}>
           Or DM <a href={contact.ig} target="_blank" rel="noopener noreferrer" style={{ color: "var(--rose-deep)", fontWeight: 600 }}>{contact.igLabel}</a> on Instagram

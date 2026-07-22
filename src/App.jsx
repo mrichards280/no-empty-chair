@@ -4,6 +4,7 @@ import Site from "./components/Site";
 
 // Admin is lazy-loaded so its editor code never ships to normal visitors.
 const Admin = lazy(() => import("./admin/Admin"));
+const Teardown = lazy(() => import("./components/TeardownForm"));
 
 export default function App() {
   return (
@@ -14,6 +15,14 @@ export default function App() {
         element={
           <Suspense fallback={<div className="loading">Loading editor…</div>}>
             <Admin />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/teardown"
+        element={
+          <Suspense fallback={<div className="loading">Loading…</div>}>
+            <Teardown />
           </Suspense>
         }
       />

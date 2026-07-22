@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#413645" />
 
     <title>Salon Branding, Websites &amp; Reels | No Empty Chair · Atlanta</title>
-    <meta name="description" content="No Empty Chair is an Atlanta brand and content studio for salons, stylists, braiders, and barbers. We build premium branding, booking-ready websites, and short-form content that keep your chair full. Start with a $100 Glow-Up Teardown." />
+    <meta name="description" content="No Empty Chair is an Atlanta brand and content studio for salons, stylists, braiders, and barbers. We build premium branding, booking-ready websites, and short-form content that keep your chair full. Start with a $200 Glow-Up Teardown." />
     <link rel="canonical" href="https://noemptychair.co/" />
 
     <!-- Open Graph / social preview -->
@@ -57,7 +57,7 @@
               { "@type": "Offer", "name": "The Refresh — salon brand polish + one-page booking-ready website", "price": "1500", "priceCurrency": "USD" },
               { "@type": "Offer", "name": "The Signature — full salon website, brand identity, Instagram kit + promo reel", "price": "3000", "priceCurrency": "USD" },
               { "@type": "Offer", "name": "The Statement — full rebrand, content shoot direction + 30 days of content", "price": "5500", "priceCurrency": "USD" },
-              { "@type": "Offer", "name": "$100 Glow-Up Teardown — video breakdown of your highest-impact fixes", "price": "100", "priceCurrency": "USD" }
+              { "@type": "Offer", "name": "$200 Glow-Up Teardown — video breakdown of your highest-impact fixes", "price": "200", "priceCurrency": "USD" }
             ]
           }
         },
@@ -83,12 +83,12 @@
             {
               "@type": "Question",
               "name": "How much does a salon website and brand cost?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Packages run from $1,500 for a focused refresh to $5,500+ for a full rebrand with content. Most salons start with the $100 Glow-Up Teardown — a short video breaking down your highest-impact fixes — and that $100 credits toward whatever you build next." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Packages run from $1,500 for a focused refresh to $5,500+ for a full rebrand with content. Most salons start with the $200 Glow-Up Teardown — a short video breaking down your highest-impact fixes — and that $100 credits toward whatever you build next." }
             },
             {
               "@type": "Question",
-              "name": "What's the $100 Glow-Up Teardown?",
-              "acceptedAnswer": { "@type": "Answer", "text": "A short, honest video where Makayla breaks down what's quietly costing you bookings — your feed, your site, your booking flow — and the three changes that would move the needle first. It's $100, and it credits toward any package." }
+              "name": "What's the $200 Glow-Up Teardown?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A short, honest video where Makayla breaks down what's quietly costing you bookings — your feed, your site, your booking flow — and the three changes that would move the needle first. It's $200, and it credits toward any package." }
             },
             {
               "@type": "Question",
@@ -125,6 +125,23 @@
       <input type="text" name="business" />
       <input type="text" name="instagram" />
       <input type="text" name="contact" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <!-- Hidden static form so Netlify detects "teardown" and captures the intake. -->
+    <form name="teardown" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="text" name="salon" />
+      <input type="text" name="email" />
+      <input type="text" name="years" />
+      <input type="text" name="website" />
+      <input type="text" name="instagram" />
+      <input type="text" name="socials" />
+      <input type="text" name="stats" />
+      <input type="text" name="voice" />
+      <input type="text" name="issue" />
+      <input type="text" name="audience" />
+      <input type="text" name="vision" />
       <input type="text" name="bot-field" />
     </form>
 

@@ -135,6 +135,12 @@
   .chatbubble .ai .d{width:8px;height:8px;border-radius:50%;background:var(--lime);}
   @media(max-width:600px){.chatbubble{display:none;}}
 
+  .gtk{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .gtk .card{background:#fff;border:2px solid var(--ink);border-radius:20px;padding:22px;box-shadow:5px 5px 0 var(--violet);}
+  .gtk .card h4{font-family:'Fredoka';font-size:18px;font-weight:600;margin-bottom:8px;}
+  .gtk .card p{font-size:13.5px;color:#5a4a68;}
+  @media(max-width:820px){.gtk{grid-template-columns:1fr 1fr;}}
+  @media(max-width:520px){.gtk{grid-template-columns:1fr;}}
   footer{background:var(--ink);color:#c9b8d6;padding:50px 26px 34px;text-align:center;}
   footer .logo{margin-bottom:10px;}
   footer .socials{display:flex;gap:14px;justify-content:center;margin:16px 0;}
@@ -251,6 +257,22 @@
       <div class="review"><div class="stars">★★★★★</div><p>"I've never had a set last this long AND get this many compliments. POPPI is the only spot now."</p><div class="who"><div class="av"></div><div><b>Tierra J.</b><small>Booked 6× this year</small></div></div></div>
       <div class="review"><div class="stars">★★★★★</div><p>"Booked in like 20 seconds on my phone during my lunch break. Walked out obsessed. The vibe is unmatched."</p><div class="who"><div class="av"></div><div><b>Destiny M.</b><small>New client</small></div></div></div>
       <div class="review"><div class="stars">★★★★★</div><p>"Did our whole bridal party's color party. On time, gorgeous, and SO fun. Already rebooked."</p><div class="who"><div class="av"></div><div><b>Alanna P.</b><small>Group booking</small></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GOOD TO KNOW -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker" style="background:var(--tangerine);color:#fff;">Good to know</span>
+      <h2>The not-boring fine print</h2>
+    </div>
+    <div class="gtk">
+      <div class="card"><h4>Full set vs. fill</h4><p>New set from $85. Already have a base? Fills start at $55 every 2–3 weeks. We'll help you pick the right one when you book.</p></div>
+      <div class="card"><h4>Length, shape &amp; art</h4><p>Short to XL, almond to coffin, a little art or a lot — length and design set the price, and it's all on the booking screen before you confirm.</p></div>
+      <div class="card"><h4>Deposit &amp; reschedule</h4><p>A $20 deposit holds your seat and comes right off your total. Life happens — just give us 24 hours to move it.</p></div>
+      <div class="card"><h4>Come bare (or don't)</h4><p>Bare nails are perfect — or add a Soak-Off ($10) and we'll remove your last set. After: cuticle oil daily, gloves for dishes, and you're golden.</p></div>
     </div>
   </div>
 </section>

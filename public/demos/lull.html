@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lull — Day Spa | Atlanta</title>
+<meta name="description" content="Lull is a quiet day spa in Inman Park, Atlanta. Facials, massage, and body treatments, unhurried. Reserve your hour.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f3ee; --bg2:#efeae1; --white:#fffdfa;
+    --ink:#37372f; --muted:#8a8779; --sage:#7d8b76; --sage-d:#5f6c59;
+    --sand:#c7b299; --gold:#a98d63; --line:#e4ddd2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Jost',sans-serif;color:var(--ink);background:var(--bg);line-height:1.75;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  .serif{font-family:'Cormorant Garamond',serif;}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 34px;}
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+
+  .announce{background:var(--sage-d);color:#eef1ea;text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:9px;font-weight:400;}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(246,243,238,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:80px;}
+  .logo{font-family:'Cormorant Garamond';font-weight:600;font-size:32px;letter-spacing:4px;text-transform:uppercase;}
+  .logo span{color:var(--sage);}
+  nav ul{display:flex;gap:34px;align-items:center;list-style:none;}
+  nav ul a{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);transition:.2s;}
+  nav ul a:hover{color:var(--ink);}
+  .reserve{border:1px solid var(--sage);color:var(--sage-d) !important;padding:11px 24px;letter-spacing:2px;font-size:11px;text-transform:uppercase;transition:.3s;border-radius:2px;}
+  .reserve:hover{background:var(--sage);color:#fff !important;}
+  @media(max-width:900px){nav ul li:not(.cta){display:none;}}
+
+  /* HERO */
+  .hero{padding:70px 0 40px;}
+  .hero .grid{display:grid;grid-template-columns:1fr .82fr;gap:56px;align-items:center;}
+  .eyebrow{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:26px;}
+  .hero h1{font-family:'Cormorant Garamond';font-weight:500;font-size:82px;line-height:1;letter-spacing:.5px;margin-bottom:24px;}
+  .hero h1 em{font-style:italic;color:var(--sage-d);}
+  .hero p{font-size:17px;color:#63625a;max-width:420px;margin-bottom:36px;}
+  .hero .actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  .btn{background:var(--sage-d);color:#fff;padding:16px 36px;letter-spacing:2px;text-transform:uppercase;font-size:12px;border-radius:2px;transition:.3s;}
+  .btn:hover{background:var(--ink);}
+  .btn-text{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px;transition:.2s;}
+  .btn-text:hover{color:var(--ink);border-color:var(--ink);}
+  .hero .art{aspect-ratio:3/4;border-radius:4px;background-size:cover;background-position:center;box-shadow:0 30px 60px -30px rgba(55,55,47,.4);}
+  @media(max-width:820px){.hero .grid{grid-template-columns:1fr;gap:32px;} .hero h1{font-size:58px;} .hero .art{max-width:420px;}}
+
+  /* PHILOSOPHY */
+  .phil{padding:80px 0;text-align:center;}
+  .phil p{font-family:'Cormorant Garamond';font-style:italic;font-size:32px;line-height:1.4;max-width:760px;margin:0 auto;color:#4a4a41;}
+  .phil p b{font-style:normal;font-weight:500;color:var(--sage-d);}
+
+  section{padding:88px 0;}
+  .sec-head{max-width:600px;margin:0 auto 56px;text-align:center;}
+  .kicker{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+  h2{font-family:'Cormorant Garamond';font-weight:500;font-size:52px;line-height:1.05;}
+  h2 em{font-style:italic;color:var(--sage-d);}
+  .sec-head p{color:var(--muted);margin-top:14px;font-size:15px;}
+
+  /* TREATMENTS */
+  .treat{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .menu{max-width:840px;margin:0 auto;}
+  .menu .group + .group{margin-top:52px;}
+  .menu .glabel{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--sage);border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:8px;}
+  .row{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid #f0ebe2;}
+  .row .t{font-family:'Cormorant Garamond';font-size:25px;color:var(--ink);}
+  .row .d{font-size:13px;color:var(--muted);margin-top:2px;}
+  .row .p{font-family:'Cormorant Garamond';font-size:22px;color:var(--sage-d);white-space:nowrap;text-align:right;}
+  .row .p small{display:block;font-family:'Jost';font-size:11px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+  .addons{margin-top:40px;background:var(--bg2);border-radius:6px;padding:26px 30px;font-size:14px;color:#5a594f;}
+  .addons b{font-family:'Cormorant Garamond';font-size:19px;color:var(--ink);display:block;margin-bottom:8px;font-weight:600;}
+  .addons span{color:var(--sage-d);}
+
+  /* GALLERY */
+  .egrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;grid-auto-rows:150px;}
+  .ph{border-radius:4px;background-size:cover;background-position:center;}
+  .p-a{grid-column:span 3;grid-row:span 2;} .p-b{grid-column:span 3;} .p-c{grid-column:span 3;}
+  .p-d{grid-column:span 2;grid-row:span 2;} .p-e{grid-column:span 2;} .p-f{grid-column:span 2;}
+  @media(max-width:820px){.egrid{grid-template-columns:repeat(2,1fr);} .ph{grid-column:span 1 !important;grid-row:span 1 !important;}}
+  .imgnote{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;font-style:italic;letter-spacing:.5px;}
+
+  /* THE VISIT */
+  .visit{background:var(--bg2);}
+  .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+  .vcard{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:30px 28px;}
+  .vcard .n{font-family:'Cormorant Garamond';font-style:italic;font-size:34px;color:var(--sage);line-height:1;margin-bottom:14px;}
+  .vcard h4{font-family:'Cormorant Garamond';font-size:22px;font-weight:600;margin-bottom:8px;}
+  .vcard p{font-size:14px;color:#63625a;}
+  @media(max-width:820px){.vgrid{grid-template-columns:1fr;}}
+  .policy{max-width:820px;margin:40px auto 0;text-align:center;font-size:13.5px;color:var(--muted);line-height:2;}
+  .policy b{color:var(--sage-d);font-weight:500;}
+
+  /* MEMBERSHIP */
+  .mem{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;max-width:920px;margin:0 auto;}
+  .mcard{border:1px solid var(--line);border-radius:8px;padding:40px 36px;background:var(--white);}
+  .mcard.feat{background:var(--sage-d);color:#eef1ea;border-color:var(--sage-d);}
+  .mcard .tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+  .mcard.feat .tag{color:#d9c9aa;}
+  .mcard h3{font-family:'Cormorant Garamond';font-size:34px;font-weight:500;margin-bottom:6px;}
+  .mcard .price{font-family:'Cormorant Garamond';font-size:26px;color:var(--sage-d);margin-bottom:20px;}
+  .mcard.feat .price{color:#dfe6d9;}
+  .mcard ul{list-style:none;display:grid;gap:12px;}
+  .mcard li{font-size:14px;padding-left:22px;position:relative;color:#5a594f;}
+  .mcard.feat li{color:#dfe4d9;}
+  .mcard li:before{content:"—";position:absolute;left:0;color:var(--sage);}
+  .mcard.feat li:before{color:#b9c7b0;}
+  @media(max-width:820px){.mem{grid-template-columns:1fr;}}
+
+  /* RESERVE */
+  .reserve-sec{text-align:center;background:var(--white);border-top:1px solid var(--line);}
+  .reserve-sec h2{font-size:56px;margin-bottom:14px;}
+  .reserve-sec p{color:var(--muted);max-width:440px;margin:0 auto 30px;}
+  .reserve-sec .fine{margin-top:26px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+
+  footer{background:var(--ink);color:#c7c4b6;padding:60px 34px 44px;text-align:center;}
+  footer .logo{color:#fff;margin-bottom:14px;}
+  footer .logo span{color:#a9b3a1;}
+  footer .socials{display:flex;gap:22px;justify-content:center;margin:18px 0;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+  footer .info{font-size:13px;color:#918e82;line-height:2;letter-spacing:.5px;}
+
+  .demo-band{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(233,185,196,.5),rgba(205,196,236,.46),rgba(194,214,238,.5));
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#413645;text-align:center;
+    font-family:'Marcellus',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.55);}
+  .demo-band svg{flex:0 0 auto;}
+</style>
+</head>
+<body>
+
+<div class="demo-band"><svg width="15" height="15" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#413645" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M45 40 L21 40 L21 20 Q21 15 26 15"/><path d="M44 40 L46 55"/><path d="M22 40 L20 55"/></g><circle cx="31" cy="29" r="8.5" fill="#a85a76"/></svg> Demo concept by No Empty Chair · Light, clean &amp; elegant direction · your treatments &amp; details drop right in</div>
+
+<div class="announce">Now reserving · Inman Park, Atlanta · Open Tuesday–Sunday</div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Lu<span>l</span>l</div>
+    <ul>
+      <li><a href="#treatments">Treatments</a></li>
+      <li><a href="#visit">The Visit</a></li>
+      <li><a href="#memberships">Memberships</a></li>
+      <li class="cta"><a href="#reserve" class="reserve">Reserve</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <div class="eyebrow">Day Spa · Inman Park</div>
+        <h1 class="serif">Rest,<br><em>on purpose.</em></h1>
+        <p>A quiet, unhurried spa in the middle of the city. Facials, massage, and body treatments — no rushing, no upselling, just the hour you keep meaning to give yourself.</p>
+        <div class="actions">
+          <a href="#reserve" class="btn">Reserve your hour</a>
+          <a href="#treatments" class="btn-text">View treatments</a>
+        </div>
+      </div>
+      <div class="art" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_760,q_auto,f_auto/noemptychair/demos/lull/detail');"></div>
+    </div>
+  </div>
+</header>
+
+<!-- PHILOSOPHY -->
+<div class="phil">
+  <div class="wrap">
+    <p>You don't need a reason and you don't need a special occasion. You just need <b>an hour that belongs to you.</b></p>
+  </div>
+</div>
+
+<!-- TREATMENTS -->
+<section id="treatments" class="treat">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The Menu</div>
+      <h2>Treatments, <em>unhurried</em></h2>
+      <p>Prices are starting rates. Your therapist confirms after a short intake — never a surprise at checkout.</p>
+    </div>
+    <div class="menu">
+      <div class="group">
+        <div class="glabel">Facials</div>
+        <div class="row"><div><div class="t serif">The Signature Facial</div><div class="d">Cleanse, exfoliate, extract, mask, massage — tailored to your skin.</div></div><div class="p">$120<small>60 min · $165 / 90</small></div></div>
+        <div class="row"><div><div class="t serif">The Deep Cleanse</div><div class="d">Focused extractions and decongesting for skin that needs a reset.</div></div><div class="p">$145<small>75 min</small></div></div>
+        <div class="row"><div><div class="t serif">Gua Sha Glow</div><div class="d">Lift, sculpt, and drain with stone and slow, intentional hands.</div></div><div class="p">$130<small>60 min</small></div></div>
+      </div>
+      <div class="group">
+        <div class="glabel">Massage</div>
+        <div class="row"><div><div class="t serif">Swedish</div><div class="d">Long, flowing pressure to quiet the nervous system.</div></div><div class="p">$110<small>60 min · $150 / 90</small></div></div>
+        <div class="row"><div><div class="t serif">Deep Tissue</div><div class="d">Slower and firmer, working the knots you've been carrying.</div></div><div class="p">$125<small>60 min · $170 / 90</small></div></div>
+        <div class="row"><div><div class="t serif">Prenatal</div><div class="d">Side-lying and fully supported, after your first trimester.</div></div><div class="p">$120<small>60 min</small></div></div>
+      </div>
+      <div class="group">
+        <div class="glabel">Body</div>
+        <div class="row"><div><div class="t serif">Salt Polish + Wrap</div><div class="d">Exfoliate, wrap, and hydrate head to toe. You'll glow for days.</div></div><div class="p">$155<small>75 min</small></div></div>
+        <div class="row"><div><div class="t serif">The Reset</div><div class="d">A 60-min massage and an express facial, back to back.</div></div><div class="p">$210<small>120 min</small></div></div>
+      </div>
+      <div class="addons">
+        <b>Add to any treatment</b>
+        Hot stones <span>+$25</span> &nbsp;·&nbsp; CBD balm <span>+$20</span> &nbsp;·&nbsp; Scalp &amp; neck <span>+$20</span> &nbsp;·&nbsp; Brightening eye treatment <span>+$18</span> &nbsp;·&nbsp; Extra 30 min <span>+$55</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The Space</div>
+      <h2>Quiet, by design</h2>
+    </div>
+    <div class="egrid">
+      <div class="ph p-a" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_900,q_auto,f_auto/noemptychair/demos/lull/hero');"></div>
+      <div class="ph p-b" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_900,q_auto,f_auto/noemptychair/demos/lull/facial');"></div>
+      <div class="ph p-d" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_700,q_auto,f_auto/noemptychair/demos/lull/glow');"></div>
+      <div class="ph p-c" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_900,q_auto,f_auto/noemptychair/demos/lull/massage');"></div>
+      <div class="ph p-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_700,q_auto,f_auto/noemptychair/demos/lull/skincare');"></div>
+    </div>
+    <p class="imgnote">Demo imagery — replaced with photos of your actual space and treatments in the live build.</p>
+  </div>
+</section>
+
+<!-- THE VISIT -->
+<section id="visit" class="visit">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The Visit</div>
+      <h2>What to <em>expect</em></h2>
+      <p>A first visit should feel easy. Here's how yours will go.</p>
+    </div>
+    <div class="vgrid">
+      <div class="vcard"><div class="n serif">i</div><h4>Before you come</h4><p>Book online in a minute, then fill out a short health &amp; skin intake so we can tailor your treatment. Arrive 15 minutes early to change and settle in.</p></div>
+      <div class="vcard"><div class="n serif">ii</div><h4>While you're here</h4><p>Phones rest in your locker. We keep the room quiet, the pressure to your liking, and the upselling at zero. This hour is yours.</p></div>
+      <div class="vcard"><div class="n serif">iii</div><h4>After</h4><p>Water, a moment on the relaxation bench, and simple aftercare notes. Rebook at the desk for member pricing on your next visit.</p></div>
+    </div>
+    <div class="policy">
+      <b>Good to know.</b> Reserving requires a card on file — no charge unless there's a late cancel.<br>
+      Please give <b>24 hours' notice</b> to change or cancel (<b>48 hours</b> for packages &amp; groups); later than that is charged 50%.<br>
+      Gratuity isn't included; 18–20% is customary. Gift cards never expire. We love new guests and quiet returners alike.
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERSHIPS -->
+<section id="memberships">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Come Back Often</div>
+      <h2>Memberships &amp; <em>gifting</em></h2>
+    </div>
+    <div class="mem">
+      <div class="mcard feat">
+        <div class="tag">Most loved</div>
+        <h3 class="serif">The Monthly</h3>
+        <div class="price serif">$99 / month</div>
+        <ul>
+          <li>One 60-minute facial or massage every month</li>
+          <li>Member pricing on every additional treatment</li>
+          <li>Unused months roll over — never lose a visit</li>
+          <li>10% off retail and gift cards · cancel anytime</li>
+        </ul>
+      </div>
+      <div class="mcard">
+        <div class="tag">No commitment</div>
+        <h3 class="serif">Series &amp; Gift Cards</h3>
+        <div class="price serif">Save 10%</div>
+        <ul>
+          <li>Buy a series of three, save 10% up front</li>
+          <li>Gift cards in any amount — they never expire</li>
+          <li>Couples &amp; small-group bookings on request</li>
+          <li>Corporate &amp; bridal-party rest days available</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVE -->
+<section id="reserve" class="reserve-sec">
+  <div class="wrap">
+    <div class="kicker">Reserve</div>
+    <h2 class="serif">Your hour is <em>waiting.</em></h2>
+    <p>Real-time availability, instant confirmation, and a gentle reminder the day before. No account required.</p>
+    <a href="#" class="btn">Book your treatment</a>
+    <div class="fine">1029 Edgewood Ave · Inman Park, Atlanta · Tue–Sun · (404) 555-0168</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo serif" style="font-size:30px;letter-spacing:4px;text-transform:uppercase;">Lu<span>l</span>l</div>
+    <div class="socials"><a href="#">Instagram</a><a href="#">Newsletter</a></div>
+    <div class="info">Day Spa · 1029 Edgewood Ave, Inman Park, Atlanta<br>Tuesday–Sunday · Reserve online 24/7 · (404) 555-0168</div>
+  </div>
+</footer>
+
+</body>
+</html>
