@@ -47,6 +47,7 @@ export default function Site() {
             <li><a href="#proof">Results</a></li>
             <li><a href="#work">Work</a></li>
             <li><a href="#about">About</a></li>
+            <li><a href="#faq">FAQ</a></li>
             <li className="cta"><a href="#contact" className="navbtn">Book a call</a></li>
           </ul>
         </div>
@@ -222,6 +223,27 @@ export default function Site() {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      {c.faq ? (
+        <section id="faq">
+          <div className="wrap">
+            <div className="sec-head">
+              <div className="kicker">{c.faq.kicker}</div>
+              <h2>{c.faq.title}</h2>
+              <p>{c.faq.intro}</p>
+            </div>
+            <div className="faq">
+              {c.faq.items.map((f, i) => (
+                <div className="faq-item glass" key={i}>
+                  <h3>{f.q}</h3>
+                  <p>{f.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* CONTACT */}
       <ContactSection contact={c.contact} />
