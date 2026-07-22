@@ -60,9 +60,10 @@ h1, h2, h3 { font-family: "Marcellus", serif; font-weight: 400; letter-spacing: 
   color: #fff;
   padding: 15px 34px;
   border-radius: 100px;
-  font-size: 14px;
-  letter-spacing: 1px;
-  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  font-weight: 600;
   border: 1px solid var(--rose);
   cursor: pointer;
   transition: 0.25s;
@@ -86,9 +87,41 @@ nav .wrap { display: flex; align-items: center; justify-content: space-between; 
 nav ul { display: flex; gap: 26px; align-items: center; list-style: none; }
 nav ul a { font-size: 13.5px; letter-spacing: 0.5px; color: var(--plum-soft); font-weight: 500; }
 nav ul a:hover { color: var(--rose); }
-nav .navbtn { background: var(--rose); color: #fff; padding: 10px 22px; border-radius: 100px; }
+nav .navbtn { background: var(--rose); color: #fff; padding: 10px 22px; border-radius: 100px; text-transform: uppercase; letter-spacing: 1.2px; font-size: 12.5px; font-weight: 600; }
 nav .navbtn:hover { background: var(--rose-deep); }
+
+/* services dropdown */
+nav .hasmenu { position: relative; }
+nav .hasmenu .menutop { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+nav .hasmenu .caret { font-size: 10px; transition: transform 0.2s; }
+nav .hasmenu:hover .caret, nav .hasmenu:focus-within .caret { transform: rotate(180deg); }
+nav .submenu {
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(6px);
+  display: block; flex-direction: column; gap: 0; min-width: 208px; padding: 8px;
+  background: rgba(255, 253, 251, 0.98); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(65, 54, 69, 0.14);
+  opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+nav .hasmenu:hover .submenu, nav .hasmenu:focus-within .submenu {
+  opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
+}
+nav .submenu::before { content: ""; position: absolute; top: -12px; left: 0; right: 0; height: 12px; }
+nav .submenu li { width: 100%; }
+nav .submenu a {
+  display: block; padding: 10px 14px; border-radius: 10px;
+  font-size: 13.5px; color: var(--plum); font-weight: 500; letter-spacing: 0.3px;
+}
+nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 @media (max-width: 820px) { nav ul li:not(.cta) { display: none; } }
+
+/* consult add-on note */
+.addon-note {
+  margin: 16px auto 0; max-width: 720px; text-align: center;
+  font-size: 14.5px; line-height: 1.7; color: var(--plum-soft);
+  background: rgba(255, 253, 251, 0.6); border: 1px dashed var(--line);
+  border-radius: 16px; padding: 20px 26px;
+}
 
 /* hero */
 .hero { position: relative; overflow: hidden; }
@@ -338,24 +371,47 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
 }
 .faq-item {
   border-radius: 18px;
-  padding: 22px 24px;
+  overflow: hidden;
 }
-.faq-item h3 {
+.faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 22px 24px;
   font-family: "Marcellus", serif;
   font-size: 19px;
   color: var(--plum);
-  margin-bottom: 8px;
   line-height: 1.25;
 }
-.faq-item p {
+.faq-q:hover { color: var(--rose-deep); }
+.faq-icon {
+  flex: none;
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--rose);
+  transition: transform 0.25s;
+}
+.faq-item.open .faq-icon { color: var(--rose-deep); }
+.faq-a {
+  padding: 0 24px 22px;
+}
+.faq-a p {
   color: var(--plum-soft);
   font-size: 15px;
   line-height: 1.65;
   margin: 0;
 }
 @media (max-width: 520px) {
-  .faq-item { padding: 18px 18px; }
-  .faq-item h3 { font-size: 17px; }
+  .faq-q { padding: 18px 18px; font-size: 17px; }
+  .faq-a { padding: 0 18px 18px; }
 }
 
 /* ============================================================

@@ -42,8 +42,14 @@ export default function Site() {
             {c.brand.name} <span>{c.brand.nameAccent}</span>
           </div>
           <ul>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#consults">Consults</a></li>
+            <li className="hasmenu">
+              <a href="#services" className="menutop">Services <span className="caret" aria-hidden="true">▾</span></a>
+              <ul className="submenu">
+                <li><a href="#services">Full Packages</a></li>
+                <li><a href="#consults">Consulting Only</a></li>
+                <li><a href="#alacarte">Individual Offerings</a></li>
+              </ul>
+            </li>
             <li><a href="#proof">Results</a></li>
             <li><a href="#demos">Demos</a></li>
             <li><a href="#about">About</a></li>
@@ -140,6 +146,9 @@ export default function Site() {
             ))}
           </div>
           <div className="retainer-note"><b>{c.consults.intensiveNote}</b></div>
+          {c.consults.addonNote ? (
+            <div className="addon-note">{c.consults.addonNote}</div>
+          ) : null}
         </div>
       </section>
 
@@ -162,19 +171,6 @@ export default function Site() {
             </div>
             <div style={{ textAlign: "center", marginTop: 30 }}>
               <a href={c.alacarte.ctaHref} className="btn">{c.alacarte.ctaLabel}</a>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {/* THE HONEST PART */}
-      {c.honest ? (
-        <section id="honest" className="honest-sec">
-          <div className="wrap">
-            <div className="honest-card glass">
-              <div className="kicker">{c.honest.kicker}</div>
-              <h2>{c.honest.title}</h2>
-              <p>{c.honest.body}</p>
             </div>
           </div>
         </section>
@@ -293,14 +289,7 @@ export default function Site() {
               <h2>{c.faq.title}</h2>
               <p>{c.faq.intro}</p>
             </div>
-            <div className="faq">
-              {c.faq.items.map((f, i) => (
-                <div className="faq-item glass" key={i}>
-                  <h3>{f.q}</h3>
-                  <p>{f.a}</p>
-                </div>
-              ))}
-            </div>
+            <FaqList faq={c.faq} />
           </div>
         </section>
       ) : null}
@@ -327,6 +316,58 @@ export default function Site() {
 
       <RadarModal radar={c.radar} />
     </>
+  );
+}
+
+// FAQ accordion. Each question opens independently, and the set of open
+// questions is remembered across reloads via localStorage.
+function FaqList({ faq }) {
+  const STORAGE_KEY = "nec-faq-open";
+  const [open, setOpen] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
+      return new Set(Array.isArray(saved) ? saved : []);
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggle = (i) => {
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]));
+      } catch {
+        /* storage unavailable — accordion still works, just won't persist */
+      }
+      return next;
+    });
+  };
+
+  return (
+    <div className="faq">
+      {faq.items.map((f, i) => {
+        const isOpen = open.has(i);
+        return (
+          <div className={"faq-item glass" + (isOpen ? " open" : "")} key={i}>
+            <button
+              type="button"
+              className="faq-q"
+              aria-expanded={isOpen}
+              onClick={() => toggle(i)}
+            >
+              <span>{f.q}</span>
+              <span className="faq-icon" aria-hidden="true">{isOpen ? "–" : "+"}</span>
+            </button>
+            <div className="faq-a" hidden={!isOpen}>
+              <p>{f.a}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
