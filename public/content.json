@@ -1,0 +1,198 @@
+{
+  "brand": {
+    "name": "No Empty",
+    "nameAccent": "Chair",
+    "studioLine": "Brand & Content Studio · Atlanta"
+  },
+  "hero": {
+    "eyebrow": "Brand & Content Studio · Atlanta",
+    "title": "Become the salon",
+    "titleEm": "everyone's trying to book.",
+    "sub": "We turn incredible beauty work into a brand people screenshot, a website that books clients, and a feed that keeps your chair full.",
+    "primaryCtaLabel": "Book your $100 glow-up teardown",
+    "primaryCtaHref": "#contact",
+    "secondaryCtaLabel": "See the packages",
+    "secondaryCtaHref": "#services"
+  },
+  "strip": {
+    "text": "Your talent already fills the room. Let's make sure your ",
+    "bold": "calendar",
+    "tail": " matches."
+  },
+  "gap": {
+    "kicker": "The gap we close",
+    "title": "Talented, but invisible online?",
+    "intro": "You're booked by referrals and reputation, but new clients can't find you, can't tell you're premium, and can't book without sliding into your DMs. That's a brand problem, and it's fixable.",
+    "nowTitle": "Right now",
+    "now": [
+      "A blurry Linktree doing the job of a website",
+      "New clients can only book by DMing you",
+      "A feed that looks nothing like how good you are",
+      "Charging less than your work is worth",
+      "Getting lost when someone Googles \"near me\""
+    ],
+    "afterTitle": "With No Empty Chair",
+    "after": [
+      "A polished site that books clients while you sleep",
+      "A brand that instantly reads \"premium\"",
+      "Short-form content that actually pulls appointments",
+      "The confidence, and the look, to raise your rates",
+      "Showing up first when your city searches for you"
+    ]
+  },
+  "packages": {
+    "kicker": "The packages",
+    "title": "Choose your glow-up",
+    "intro": "Three ways to work together, from a quick polish to a full brand takeover. Every package is built to do one thing: fill your calendar.",
+    "items": [
+      {
+        "name": "The Refresh",
+        "from": "from $1,500",
+        "featured": false,
+        "tag": "",
+        "bullets": [
+          "Brand polish: logo, colors & fonts",
+          "One-page booking-ready website",
+          "Google \"near me\" setup",
+          "Instagram bio + highlight covers"
+        ]
+      },
+      {
+        "name": "The Signature",
+        "from": "from $3,000",
+        "featured": true,
+        "tag": "Most popular",
+        "bullets": [
+          "Full booking-ready website + online booking",
+          "Complete brand identity & brand board",
+          "Google Business + search setup",
+          "Instagram kit: bio, covers, 6 templates",
+          "One signature promo reel"
+        ]
+      },
+      {
+        "name": "The Statement",
+        "from": "from $5,500",
+        "featured": false,
+        "tag": "",
+        "bullets": [
+          "Everything in The Signature",
+          "Full rebrand + content shoot direction",
+          "A batch of short-form videos",
+          "30 days of ready-to-post content",
+          "Email / newsletter setup"
+        ]
+      }
+    ],
+    "retainerNote": "Want us to keep the chair full every month? Ask about The Chair-Filler, monthly content, newsletters & updates from $750/mo."
+  },
+  "consults": {
+    "kicker": "The DIY lane",
+    "title": "Rather do it yourself?",
+    "intro": "Book my brain, not my whole studio. Deep strategy sessions for salons who want to build it themselves but need a clear, expert plan first. Your fee credits toward a full package if you upgrade within 30 days.",
+    "items": [
+      {
+        "name": "Social Session",
+        "from": "$250 · 60 min",
+        "bullets": ["Live deep-dive on your content & growth", "What to post to actually book clients", "Written action plan you keep", "Recording to rewatch anytime"]
+      },
+      {
+        "name": "Website Session",
+        "from": "$250 · 60 min",
+        "bullets": ["Your site & booking flow, reviewed live", "Exactly what's costing you bookings", "Written fix-it roadmap", "Recording to rewatch anytime"]
+      },
+      {
+        "name": "Brand Session",
+        "from": "$250 · 60 min",
+        "bullets": ["Your look, voice & positioning", "How to read premium & raise rates", "Written brand direction", "Recording to rewatch anytime"]
+      }
+    ],
+    "intensiveNote": "Want the whole picture in one sitting? The Full Intensive, 90 minutes across social, site & brand + a complete DIY roadmap and a 2-week follow-up, $500."
+  },
+  "proof": {
+    "kicker": "Real results, real receipts",
+    "title": "The same skills that make videos explode",
+    "intro": "This isn't theory. It's a career spent making short-form content perform at the highest level of media, now pointed straight at your chair.",
+    "stats": [
+      { "n": "39M", "l": "cross-platform views · 90 days" },
+      { "n": "8.1M", "l": "Instagram reel plays" },
+      { "n": "65.4%", "l": "avg video retention" },
+      { "n": "Top 2%", "l": "producer across TEGNA" }
+    ],
+    "awardsLine": "Regional Murrow Award · 2× Emmy nominated · #1 post volume across TEGNA — the same engine now points at your salon."
+  },
+  "work": {
+    "kicker": "The attention engine",
+    "title": "I engineer short-form to travel",
+    "intro": "Each of these is a real vertical video I hooked, packaged, and pushed until it exploded. Different subjects, but the mechanics that make people stop, watch, and share are exactly what I'll aim at your salon's feed.",
+    "items": [
+      {
+        "n": "1.2M",
+        "meta": "views · 286K engagements",
+        "title": "One clip to 1.2M views",
+        "desc": "A single vertical video, engineered hook-to-caption and pushed hard in the first hour.",
+        "href": "https://www.facebook.com/reel/2190984538106225/",
+        "image": ""
+      },
+      {
+        "n": "542K",
+        "meta": "plays · 438K reach",
+        "title": "542K plays from one moment",
+        "desc": "Cut and packaged for instant clarity and emotional pull, the exact reason a viewer stops scrolling.",
+        "href": "https://www.instagram.com/reel/DW1dMcnlv1t/",
+        "image": ""
+      },
+      {
+        "n": "374K",
+        "meta": "plays · 2.3K shares",
+        "title": "374K plays, same day",
+        "desc": "Tight hook, fast turnaround, proof I can move at the speed of a trend and still land the reach.",
+        "href": "https://www.instagram.com/reel/DV9FyXdiMNp/",
+        "image": ""
+      }
+    ],
+    "note": "For your salon, that's the gap between a post 200 people scroll past and one that fills your books. Your clients' transformations go right here next."
+  },
+  "founder": {
+    "kicker": "Who's behind it",
+    "name": "Hi, I'm Makayla.",
+    "photo": "",
+    "monogram": "M",
+    "badges": ["Emmy-nominated ×2", "Murrow Award winner", "Short-form video strategist", "Top 2% producer"],
+    "paragraphs": [
+      "I've spent my career building brands and short-form content at the highest level of media, the same skills that make videos go viral and brands unforgettable. Now I bring them to the salon chair.",
+      "I take my beauty appointments seriously, and I kept noticing the same thing: the most talented person in the room had the weakest presence online. The braider whose work belongs in a magazine had an overgrown Linktree and a blurry cutout of herself. AI made it easy to throw something together, but not something clients actually want to engage with. That still takes a real eye.",
+      "No Empty Chair exists to close that gap, to give the people who are genuinely the best the brand, the site, and the content that finally match their talent, so the right clients find you, trust you, and book you."
+    ],
+    "ctaLabel": "Let's talk about your salon",
+    "ctaHref": "#contact"
+  },
+  "process": {
+    "kicker": "How it works",
+    "title": "Simple, and built around you",
+    "steps": [
+      { "num": "1", "title": "$100 teardown", "desc": "I send you a short video breaking down the highest-impact changes to book more clients, and the $100 credits toward another service." },
+      { "num": "2", "title": "We build it", "desc": "Pick your package and I handle the brand, site, and content, designed to match your vibe and your goals." },
+      { "num": "3", "title": "You get booked", "desc": "Launch a brand that looks as good as your work, and watch the right clients start finding their way to your chair." }
+    ]
+  },
+  "contact": {
+    "kicker": "Ready?",
+    "title": "Let's make your salon the one everyone wants.",
+    "sub": "Start with a $100 Glow-Up Teardown, a clear, expert look at exactly what's holding your bookings back. It credits toward another service.",
+    "email": "hello@noemptychair.co",
+    "bookingEmail": "info@noemptychair.co",
+    "teardownCtaLabel": "Book my $100 teardown",
+    "ig": "https://instagram.com/noemptychair",
+    "igLabel": "@noemptychair",
+    "location": "Atlanta, GA",
+    "formHeading": "Or send a note",
+    "formButton": "Send"
+  },
+  "footer": {
+    "tagline": "Brand & Content Studio · Atlanta, GA",
+    "email": "hello@noemptychair.co",
+    "site": "noemptychair.co",
+    "ig": "https://instagram.com/noemptychair"
+  }
+}
