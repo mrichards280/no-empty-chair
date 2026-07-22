@@ -9,7 +9,7 @@
     "title": "Become the salon",
     "titleEm": "everyone screenshots — then books.",
     "sub": "The talent was never the question — the brand around it is. We build the identity, the booking-ready website, and the short-form content that turn your best work into a chair that stays full.",
-    "primaryCtaLabel": "Book your $100 glow-up teardown",
+    "primaryCtaLabel": "Book your $100 teardown",
     "primaryCtaHref": "#contact",
     "secondaryCtaLabel": "See the packages",
     "secondaryCtaHref": "#services"
@@ -43,7 +43,7 @@
   "packages": {
     "kicker": "The packages",
     "title": "Choose your glow-up",
-    "intro": "Three ways to work together — a quick polish, a full identity, or a total takeover. Every one is built to do a single thing: keep the chair full.",
+    "intro": "Three ways to work together — a quick polish, a full identity, or a total takeover. Every one is built to do a single thing: Keep the chair full.",
     "items": [
       {
         "name": "The Refresh",
@@ -94,17 +94,32 @@
       {
         "name": "Social Session",
         "from": "$250 · 60 min",
-        "bullets": ["Live deep-dive on your content & growth", "What to post to actually book clients", "Written action plan you keep", "Recording to rewatch anytime"]
+        "bullets": [
+          "Live deep-dive on your content & growth",
+          "What to post to actually book clients",
+          "Written action plan you keep",
+          "Recording to rewatch anytime"
+        ]
       },
       {
         "name": "Website Session",
         "from": "$250 · 60 min",
-        "bullets": ["Your site & booking flow, reviewed live", "Exactly what's costing you bookings", "Written fix-it roadmap", "Recording to rewatch anytime"]
+        "bullets": [
+          "Your site & booking flow, reviewed live",
+          "Exactly what's costing you bookings",
+          "Written fix-it roadmap",
+          "Recording to rewatch anytime"
+        ]
       },
       {
         "name": "Brand Session",
         "from": "$250 · 60 min",
-        "bullets": ["Your look, voice & positioning", "How to read premium & raise rates", "Written brand direction", "Recording to rewatch anytime"]
+        "bullets": [
+          "Your look, voice & positioning",
+          "How to read premium & raise rates",
+          "Written brand direction",
+          "Recording to rewatch anytime"
+        ]
       }
     ],
     "intensiveNote": "Want the whole picture in one sitting? The Full Intensive, 90 minutes across social, site & brand + a complete DIY roadmap and a 2-week follow-up, $500."
@@ -114,10 +129,22 @@
     "title": "The same skills that make videos explode",
     "intro": "This isn't theory. It's a career spent making short-form content perform at the highest level of media — now aimed straight at your chair.",
     "stats": [
-      { "n": "39M", "l": "cross-platform views · 90 days" },
-      { "n": "8.1M", "l": "Instagram reel plays" },
-      { "n": "65.4%", "l": "avg video retention" },
-      { "n": "Top 2%", "l": "producer across TEGNA" }
+      {
+        "n": "39M",
+        "l": "cross-platform views · 90 days"
+      },
+      {
+        "n": "8.1M",
+        "l": "Instagram reel plays"
+      },
+      {
+        "n": "65.4%",
+        "l": "avg video retention"
+      },
+      {
+        "n": "Top 2%",
+        "l": "producer across TEGNA"
+      }
     ],
     "awardsLine": "Regional Murrow Award · 2× Emmy nominated · #1 post volume across TEGNA — the same engine now points at your salon."
   },
@@ -156,9 +183,14 @@
   "founder": {
     "kicker": "Who's behind it",
     "name": "Hi, I'm Makayla.",
-    "photo": "",
+    "photo": "https://res.cloudinary.com/djrmz717j/image/upload/v1784690911/tiodzg4cpfanrxsg0gwu.jpg",
     "monogram": "M",
-    "badges": ["Emmy-nominated ×2", "Murrow Award winner", "Short-form video strategist", "Top 2% producer"],
+    "badges": [
+      "Emmy-nominated ×2",
+      "Murrow Award winner",
+      "Short-form video strategist",
+      "Top 2% producer"
+    ],
     "paragraphs": [
       "I'm Makayla Richards. I've spent my career building brands and short-form content at the highest level of media — the same instincts that make videos travel and brands stick. Now I point them at the salon chair.",
       "I take my beauty appointments seriously, and I kept noticing the same thing: the most talented person in the room had the weakest presence online. The braider whose work belongs in a magazine had an overgrown Linktree and a blurry cutout of herself. AI made it easy to throw something together, but not something clients actually want to engage with. That still takes a real eye.",
@@ -171,9 +203,21 @@
     "kicker": "How it works",
     "title": "Simple, and built around you",
     "steps": [
-      { "num": "1", "title": "$100 teardown", "desc": "I send you a short video breaking down the highest-impact changes to book more clients, and the $100 credits toward another service." },
-      { "num": "2", "title": "We build it", "desc": "Pick your package and I handle the brand, site, and content, designed to match your vibe and your goals." },
-      { "num": "3", "title": "You get booked", "desc": "Launch a brand that looks as good as your work, and watch the right clients start finding their way to your chair." }
+      {
+        "num": "1",
+        "title": "$100 teardown",
+        "desc": "I send you a short video breaking down the highest-impact changes to book more clients, and the $100 credits toward another service."
+      },
+      {
+        "num": "2",
+        "title": "We build it",
+        "desc": "Pick your package and I handle the brand, site, and content, designed to match your vibe and your goals."
+      },
+      {
+        "num": "3",
+        "title": "You get booked",
+        "desc": "Launch a brand that looks as good as your work, and watch the right clients start finding their way to your chair."
+      }
     ]
   },
   "faq": {
