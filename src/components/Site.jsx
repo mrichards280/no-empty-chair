@@ -45,7 +45,7 @@ export default function Site() {
             <li><a href="#services">Services</a></li>
             <li><a href="#consults">Consults</a></li>
             <li><a href="#proof">Results</a></li>
-            <li><a href="#work">Work</a></li>
+            <li><a href="#demos">Demos</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#faq">FAQ</a></li>
             <li className="cta"><a href="#contact" className="navbtn">Book a call</a></li>
@@ -143,7 +143,7 @@ export default function Site() {
         </div>
       </section>
 
-      {/* PROOF */}
+      {/* RESULTS + WORK (merged) */}
       <section id="proof">
         <div className="wrap">
           <div className="sec-head">
@@ -160,13 +160,8 @@ export default function Site() {
             ))}
           </div>
           <p className="proof-note">{c.proof.awardsLine}</p>
-        </div>
-      </section>
 
-      {/* WORK */}
-      <section id="work">
-        <div className="wrap">
-          <div className="sec-head">
+          <div className="sec-head" style={{ marginTop: 64 }}>
             <div className="kicker">{c.work.kicker}</div>
             <h2>{c.work.title}</h2>
             <p>{c.work.intro}</p>
@@ -186,6 +181,34 @@ export default function Site() {
           <p className="proof-note">{c.work.note}</p>
         </div>
       </section>
+
+      {/* DEMOS */}
+      {c.demos ? (
+        <section id="demos">
+          <div className="wrap">
+            <div className="sec-head">
+              <div className="kicker">{c.demos.kicker}</div>
+              <h2>{c.demos.title}</h2>
+              <p>{c.demos.intro}</p>
+            </div>
+            <div className="demogrid">
+              {c.demos.items.map((d, i) => (
+                <a className="democard glass" key={i} href={d.href} target="_blank" rel="noopener noreferrer">
+                  <div className="demothumb" style={{ backgroundImage: `url(${d.image})` }}>
+                    <span className="demopill">Live demo</span>
+                  </div>
+                  <div className="demobody">
+                    <h3>{d.name}</h3>
+                    <div className="demotag">{d.tagline}</div>
+                    <p>{d.desc}</p>
+                    <span className="go">View the demo →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* FOUNDER */}
       <section id="about" className="founder">

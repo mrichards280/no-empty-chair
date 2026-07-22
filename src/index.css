@@ -357,3 +357,45 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
   .faq-item { padding: 18px 18px; }
   .faq-item h3 { font-size: 17px; }
 }
+
+/* ============================================================
+   Demos — clickable salon website concepts
+   ============================================================ */
+#demos .demogrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.democard {
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.democard:hover { transform: translateY(-5px); box-shadow: 0 18px 44px rgba(65, 54, 69, 0.2); }
+.demothumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position: center;
+}
+.demopill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 253, 251, 0.92);
+  color: var(--rose-deep);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 100px;
+}
+.demobody { padding: 18px 20px 22px; }
+.demobody h3 { font-family: "Marcellus", serif; font-size: 22px; color: var(--plum); margin-bottom: 3px; }
+.demotag { font-size: 12.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--rose); margin-bottom: 10px; }
+.demobody p { font-size: 14px; color: var(--plum-soft); line-height: 1.55; margin-bottom: 12px; }
+.demobody .go { font-size: 13.5px; font-weight: 600; color: var(--rose-deep); }
+@media (max-width: 820px) { #demos .demogrid { grid-template-columns: 1fr; } }

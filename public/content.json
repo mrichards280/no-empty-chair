@@ -211,6 +211,34 @@
       }
     ]
   },
+  "demos": {
+    "kicker": "See it in action",
+    "title": "Three salons, three whole worlds",
+    "intro": "Real, clickable demo sites I built to show the range — a colorful nail studio, a regal hair atelier, a modern braid bar. Yours gets built around you, not dropped into a template.",
+    "items": [
+      {
+        "name": "POPPI",
+        "tagline": "Colorful nail & color studio",
+        "desc": "Playful and high-energy, built to turn a scroll into a walk-in.",
+        "href": "/demos/poppi.html",
+        "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/poppi/nail-3"
+      },
+      {
+        "name": "Maison Noir",
+        "tagline": "Luxury hair atelier",
+        "desc": "Regal and editorial — quiet luxury, by appointment.",
+        "href": "/demos/maison-noir.html",
+        "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/maison/m-2"
+      },
+      {
+        "name": "KNOT",
+        "tagline": "Modern braid studio",
+        "desc": "Clean and trendy — protective styles with honest timing.",
+        "href": "/demos/knot.html",
+        "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/knot/hero-1"
+      }
+    ]
+  },
   "contact": {
     "kicker": "Ready?",
     "title": "Let's make your salon the one everyone wants.",
