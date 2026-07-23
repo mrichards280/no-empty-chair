@@ -170,6 +170,41 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 @media (prefers-reduced-motion: reduce) {
   .chairmark svg .nec-orb { animation: none; }
 }
+
+/* Homepage orbs slowly rotate through the brand palette. The hero waits for the
+   swish to land (2.1s) so it arrives in brand rose, then starts cycling. */
+.chairmark .nec-orb path,
+.navmark .nec-orb path {
+  animation: orb-hues 30s linear 2.1s infinite;
+}
+@keyframes orb-hues {
+  0%   { fill: #a85a76; } /* rose */
+  14%  { fill: #b98a52; } /* gold */
+  28%  { fill: #cfc6ee; } /* lilac */
+  42%  { fill: #c2ddcf; } /* mint */
+  56%  { fill: #c4d8f0; } /* sky */
+  70%  { fill: #f3c9d3; } /* blush */
+  84%  { fill: #8a4560; } /* deep rose */
+  100% { fill: #a85a76; } /* back to rose */
+}
+/* the companion-doc mark sits on the rose header band, so it cycles through
+   the light end of the palette to keep contrast */
+.companion-doc .nec-orb-doc {
+  animation: orb-hues-light 30s linear infinite;
+}
+@keyframes orb-hues-light {
+  0%   { fill: #e6b8c6; } /* light rose */
+  20%  { fill: #f3c9d3; } /* blush */
+  40%  { fill: #cfc6ee; } /* lilac */
+  60%  { fill: #c2ddcf; } /* mint */
+  80%  { fill: #c4d8f0; } /* sky */
+  100% { fill: #e6b8c6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chairmark .nec-orb path,
+  .navmark .nec-orb path,
+  .companion-doc .nec-orb-doc { animation: none; }
+}
 .eyebrow { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--rose); margin-bottom: 22px; font-weight: 600; }
 .hero h1 { font-size: 60px; color: var(--plum); margin-bottom: 20px; }
 .hero h1 em { font-style: normal; color: var(--rose); }
