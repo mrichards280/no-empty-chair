@@ -1,7 +1,8 @@
 ---
-// Themed clip-art of a "take-home companion document" — a little booklet with a
-// chair glyph on the cover. Used to separate the two note boxes in Consults.
+// Themed clip-art of a "take-home companion document" — a little booklet with
+// the brand mark on the cover. Used to separate the two note boxes in Consults.
 // Decorative (aria-hidden); matches the pastel + line-art theme.
+import { LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
 ---
 <div class="companion-doc" aria-hidden="true">
   <svg viewBox="0 0 150 150" role="presentation">
@@ -19,13 +20,13 @@
       {/* header band */}
       <rect x="34" y="20" width="72" height="26" rx="8" fill="#a85a76" />
       <rect x="34" y="38" width="72" height="8" fill="#a85a76" />
-      {/* little chair glyph on the cover */}
-      <g fill="none" stroke="#fffdfb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M64 40 L54 40 L54 30 Q54 27 57 27" />
-        <path d="M63 40 L64 46" />
-        <path d="M55 40 L54 46" />
+      {/* brand mark on the cover (scaled from the 1273x1609 logo art) */}
+      <g transform="translate(48 24) scale(0.01181)">
+        <g transform={LOGO_INNER_TRANSFORM}>
+          <path d={CHAIR_PATH} fill="#fffdfb" />
+          <path d={ORB_PATH} fill="#e6b8c6" />
+        </g>
       </g>
-      <circle cx="59" cy="34" r="4" fill="#e6b8c6" />
 
       {/* text lines */}
       <rect x="44" y="58" width="52" height="4.5" rx="2.25" fill="#6e6172" opacity="0.55" />
