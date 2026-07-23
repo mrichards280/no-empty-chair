@@ -148,10 +148,10 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
   box-shadow: 0 20px 60px rgba(65, 54, 69, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 .chairmark { margin-bottom: 22px; }
-/* On load, the orb rolls in from the right along a line and bounces into the
-   seat over 4s. Plays once per page load (replays only on reload). */
+/* On load the orb swishes into the seat. Plays once per page load (replays
+   only on reload). Values are in the mark's viewBox units (1273x1609). */
 .chairmark svg { overflow: visible; }
-.chairmark svg circle {
+.chairmark svg .nec-orb {
   transform-box: fill-box;
   transform-origin: center;
   animation: chair-ball-swish 2.1s cubic-bezier(0.4, 0.02, 0.4, 1) 1 both;
@@ -159,16 +159,16 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 /* Basketball swish: the ball is launched from the right, arcs up high, and
    drops down into the seat (the net). */
 @keyframes chair-ball-swish {
-  0%   { transform: translate(340px, 22px) rotate(0deg); }     /* launched from lower-right */
-  22%  { transform: translate(205px, -54px) rotate(-90deg); }  /* rising */
-  46%  { transform: translate(92px, -78px) rotate(-190deg); }  /* top of the arc, above the chair */
-  70%  { transform: translate(22px, -46px) rotate(-290deg); }  /* falling toward the seat */
-  86%  { transform: translate(0, 4px) rotate(-350deg); }       /* swishes down through into the seat */
-  93%  { transform: translate(0, -2px) rotate(-362deg); }      /* tiny net settle */
+  0%   { transform: translate(8548px, 553px) rotate(0deg); }    /* launched from lower-right */
+  22%  { transform: translate(5154px, -1358px) rotate(-90deg); }/* rising */
+  46%  { transform: translate(2313px, -1961px) rotate(-190deg); }/* top of the arc, above the chair */
+  70%  { transform: translate(553px, -1156px) rotate(-290deg); }/* falling toward the seat */
+  86%  { transform: translate(0, 101px) rotate(-350deg); }     /* swishes down through into the seat */
+  93%  { transform: translate(0, -50px) rotate(-362deg); }     /* tiny net settle */
   100% { transform: translate(0, 0) rotate(-368deg); }         /* rests in the seat */
 }
 @media (prefers-reduced-motion: reduce) {
-  .chairmark svg circle { animation: none; }
+  .chairmark svg .nec-orb { animation: none; }
 }
 .eyebrow { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--rose); margin-bottom: 22px; font-weight: 600; }
 .hero h1 { font-size: 60px; color: var(--plum); margin-bottom: 20px; }

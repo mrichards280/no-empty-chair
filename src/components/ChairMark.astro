@@ -1,12 +1,27 @@
 ---
-// Build-time (static) version of the chair brand mark for Astro sections.
+// The No Empty Chair brand mark (build-time / static version).
+// `size` is the HEIGHT — the mark is portrait (1273x1609), so width follows.
+// `stroke` colors the chair line, `orb` colors the seat orb, so the footer can
+// render a light version on the dark background.
+import { LOGO_VIEWBOX, LOGO_RATIO, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
+
 const { size = 58, orb = "#a85a76", stroke = "#413645" } = Astro.props;
+const width = Math.round(size * LOGO_RATIO * 100) / 100;
 ---
-<svg width={size} height={size} viewBox="0 0 64 64" aria-label="No Empty Chair mark">
-  <g fill="none" stroke={stroke} stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M45 40 L21 40 L21 20 Q21 15 26 15" />
-    <path d="M44 40 L46 55" />
-    <path d="M22 40 L20 55" />
+<svg
+  width={width}
+  height={size}
+  viewBox={LOGO_VIEWBOX}
+  preserveAspectRatio="xMidYMid meet"
+  role="img"
+  aria-label="No Empty Chair mark"
+>
+  <g fill={stroke} stroke="none">
+    <g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g>
   </g>
-  <circle cx="31" cy="29" r="8.5" fill={orb} />
+  {/* wrapper g carries no transform, so CSS animations on .nec-orb run in
+      plain viewBox coordinates (y-down) rather than the flipped potrace space */}
+  <g class="nec-orb">
+    <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill={orb} /></g>
+  </g>
 </svg>

@@ -1,16 +1,30 @@
 import React from "react";
+import { LOGO_VIEWBOX, LOGO_RATIO, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
 
-// The filled-chair brand mark. stroke uses the passed color; orb is the rose dot.
-// Shared by the hero (via ChairMark.astro), the radar popup, and the teardown page.
+// The No Empty Chair brand mark, for the React islands (radar popup, teardown).
+// `size` is the HEIGHT — the mark is portrait, so width follows the ratio.
+// `stroke` colors the chair line, `orb` colors the seat orb.
 export function ChairMark({ size = 58, orb = "#a85a76", stroke = "#413645" }) {
+  const width = Math.round(size * LOGO_RATIO * 100) / 100;
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-label="No Empty Chair mark">
-      <g fill="none" stroke={stroke} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M45 40 L21 40 L21 20 Q21 15 26 15" />
-        <path d="M44 40 L46 55" />
-        <path d="M22 40 L20 55" />
+    <svg
+      width={width}
+      height={size}
+      viewBox={LOGO_VIEWBOX}
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="No Empty Chair mark"
+    >
+      <g fill={stroke} stroke="none">
+        <g transform={LOGO_INNER_TRANSFORM}>
+          <path d={CHAIR_PATH} />
+        </g>
       </g>
-      <circle cx="31" cy="29" r="8.5" fill={orb} />
+      <g className="nec-orb">
+        <g transform={LOGO_INNER_TRANSFORM}>
+          <path d={ORB_PATH} fill={orb} />
+        </g>
+      </g>
     </svg>
   );
 }
