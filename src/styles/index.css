@@ -135,6 +135,26 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
   box-shadow: 0 20px 60px rgba(65, 54, 69, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 .chairmark { margin-bottom: 22px; }
+/* On load, the orb rolls in from the right along a line and bounces into the
+   seat over 4s. Plays once per page load (replays only on reload). */
+.chairmark svg { overflow: visible; }
+.chairmark svg circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chair-ball-roll 4s cubic-bezier(0.33, 0, 0.3, 1) 1 both;
+}
+@keyframes chair-ball-roll {
+  0%   { transform: translate(64px, 0) rotate(0deg); }      /* off to the right */
+  48%  { transform: translate(0, 0) rotate(-430deg); }      /* rolled to the seat, still spinning */
+  60%  { transform: translate(0, -13px) rotate(-455deg); }  /* bounces up */
+  73%  { transform: translate(0, 0) rotate(-470deg); }      /* drops into the seat */
+  83%  { transform: translate(0, -5px) rotate(-476deg); }   /* small settle bounce */
+  92%  { transform: translate(0, 0) rotate(-479deg); }
+  100% { transform: translate(0, 0) rotate(-480deg); }      /* at rest in the seat */
+}
+@media (prefers-reduced-motion: reduce) {
+  .chairmark svg circle { animation: none; }
+}
 .eyebrow { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--rose); margin-bottom: 22px; font-weight: 600; }
 .hero h1 { font-size: 60px; color: var(--plum); margin-bottom: 20px; }
 .hero h1 em { font-style: normal; color: var(--rose); }
