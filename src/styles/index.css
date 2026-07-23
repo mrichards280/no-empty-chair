@@ -154,10 +154,10 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 }
 @keyframes chair-ball-roll {
   0%   { transform: translate(435px, 18px) rotate(0deg); }     /* right edge of the card, floor level */
-  55%  { transform: translate(0, 18px) rotate(-1820deg); }     /* rolled along the floor to under the seat */
-  68%  { transform: translate(0, -7px) rotate(-1875deg); }     /* bounces up into the chair (overshoot) */
-  80%  { transform: translate(0, 0) rotate(-1900deg); }        /* lands in the seat */
-  89%  { transform: translate(0, -3px) rotate(-1908deg); }     /* small settle bounce */
+  45%  { transform: translate(110px, 18px) rotate(-1500deg); } /* rolls along the base, still right of the chair */
+  62%  { transform: translate(48px, 7px) rotate(-1740deg); }   /* begins curving up toward the seat */
+  77%  { transform: translate(6px, -6px) rotate(-1875deg); }   /* arcs up and over into the seat (overshoot) */
+  88%  { transform: translate(0, 2px) rotate(-1905deg); }      /* gentle settle */
   100% { transform: translate(0, 0) rotate(-1914deg); }        /* at rest in the seat */
 }
 @media (prefers-reduced-motion: reduce) {
