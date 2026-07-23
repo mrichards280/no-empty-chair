@@ -385,82 +385,86 @@ const year = new Date().getFullYear();
   })();
 </script>
 
-{/* Demos gallery: auto-advance one card at a time, seamless infinite loop,
-    soft pop-in on the entering card, pause on hover, respects reduced-motion. */}
+{/* Demos gallery: natively scrollable (swipe / trackpad / mouse-drag), with a
+    seamless infinite loop, and auto-advance that runs only while idle — it
+    pauses the moment you interact and resumes a few seconds later. */}
 <script is:inline>
   (function () {
     var car = document.querySelector("[data-demo-carousel]");
     if (!car) return;
     var track = car.querySelector(".demo-track");
     var originals = Array.prototype.slice.call(track.children);
-    var n = originals.length;
-    if (n < 2) return;
-
+    var N = originals.length;
+    if (N < 2) return;
     var GAP = 20;
-    var EASE = "transform .85s cubic-bezier(.22,.61,.36,1)";
-    var INTERVAL = 3000;
 
-    // Clone every card once and append, so scrolling past the end is seamless.
-    originals.forEach(function (c) {
-      var k = c.cloneNode(true);
-      k.setAttribute("aria-hidden", "true");
-      k.setAttribute("tabindex", "-1");
-      track.appendChild(k);
+    function mkClones() {
+      var f = document.createDocumentFragment();
+      originals.forEach(function (c) {
+        var k = c.cloneNode(true);
+        k.setAttribute("aria-hidden", "true");
+        k.setAttribute("tabindex", "-1");
+        f.appendChild(k);
+      });
+      return f;
+    }
+    // [ prepend clones ][ originals ][ append clones ] for seamless looping
+    track.appendChild(mkClones());
+    track.insertBefore(mkClones(), track.firstChild);
+
+    function step() { return track.children[0].getBoundingClientRect().width + GAP; }
+    function groupW() { return step() * N; }
+    function center() { car.scrollLeft = groupW(); }
+    requestAnimationFrame(center);
+    window.addEventListener("load", center);
+
+    // Keep the scroll position within the middle (originals) band; the jump is
+    // instant and invisible because the clones are identical.
+    function normalize() {
+      var g = groupW();
+      if (car.scrollLeft < g * 0.5) car.scrollLeft += g;
+      else if (car.scrollLeft >= g * 1.5) car.scrollLeft -= g;
+    }
+    var raf = null;
+    car.addEventListener("scroll", function () {
+      if (raf) return;
+      raf = requestAnimationFrame(function () { raf = null; normalize(); });
     });
 
-    var i = 0;
-    var timer = null;
-
-    function metrics() {
-      var first = track.children[0];
-      var w = first.getBoundingClientRect().width;
-      var per = Math.max(1, Math.round((car.getBoundingClientRect().width + GAP) / (w + GAP)));
-      return { w: w, per: per };
-    }
-
-    function pop(idx) {
-      var el = track.children[idx];
-      if (!el) return;
-      el.classList.remove("pop");
-      void el.offsetWidth; // force reflow so the animation can replay
-      el.classList.add("pop");
-    }
-
-    function step() {
-      var m = metrics();
-      i++;
-      track.style.transition = EASE;
-      track.style.transform = "translateX(" + (-i * (m.w + GAP)) + "px)";
-      pop(i + m.per - 1); // the card newly arriving at the right edge
-    }
-
-    track.addEventListener("transitionend", function () {
-      if (i >= n) {
-        i = 0;
-        track.style.transition = "none";
-        track.style.transform = "translateX(0px)";
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { track.style.transition = EASE; });
-        });
-      }
-    });
-
-    function start() { if (!timer) timer = setInterval(step, INTERVAL); }
+    // Auto-advance only while idle.
+    var timer = null, idle = null;
+    function advance() { car.scrollBy({ left: step(), behavior: "smooth" }); }
+    function start() { if (!timer && !reduce) timer = setInterval(advance, 3000); }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function nudgeIdle() { stop(); clearTimeout(idle); idle = setTimeout(start, 3500); }
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     car.addEventListener("mouseenter", stop);
-    car.addEventListener("mouseleave", start);
-
-    var rt;
-    window.addEventListener("resize", function () {
-      clearTimeout(rt);
-      rt = setTimeout(function () {
-        i = 0;
-        track.style.transition = "none";
-        track.style.transform = "translateX(0px)";
-      }, 150);
+    car.addEventListener("mouseleave", function () { clearTimeout(idle); start(); });
+    ["pointerdown", "touchstart", "wheel", "keydown"].forEach(function (ev) {
+      car.addEventListener(ev, nudgeIdle, { passive: true });
     });
+    window.addEventListener("resize", function () { requestAnimationFrame(center); });
 
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) start();
+    // Mouse drag-to-scroll (touch/trackpad already scroll natively).
+    var down = false, startX = 0, startLeft = 0, moved = 0;
+    car.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      down = true; moved = 0; startX = e.clientX; startLeft = car.scrollLeft;
+    });
+    car.addEventListener("pointermove", function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) { moved = Math.abs(dx); car.classList.add("dragging"); }
+      car.scrollLeft = startLeft - dx;
+    });
+    function endDrag() { down = false; setTimeout(function () { car.classList.remove("dragging"); }, 0); }
+    car.addEventListener("pointerup", endDrag);
+    car.addEventListener("pointercancel", endDrag);
+    car.addEventListener("pointerleave", function () { if (down) endDrag(); });
+    // suppress the click that ends a drag so cards don't navigate on a drag
+    car.addEventListener("click", function (e) { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
+
+    start();
   })();
 </script>
