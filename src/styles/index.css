@@ -205,6 +205,31 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
   .navmark .nec-orb path,
   .companion-doc .nec-orb-doc { animation: none; }
 }
+/* ============================================================
+   Hero intro sequence — ~6.3s, plays once per page load
+   1. the mark holds LARGE while the orb swishes into the seat (0–2.2s)
+   2. it shrinks down into its real position (2.2–3.6s)
+   3. the copy rises out of it, then the buttons (3.5–6.3s)
+   Copy stays in the HTML the whole time, so crawlers are unaffected.
+   ============================================================ */
+.hero .chairmark { animation: hero-mark-intro 3.6s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
+@keyframes hero-mark-intro {
+  0%   { transform: translateY(130px) scale(2.2); }
+  60%  { transform: translateY(130px) scale(2.2); } /* hold big for the swish */
+  100% { transform: translateY(0) scale(1); }       /* settle into place */
+}
+.hero .eyebrow { animation: hero-rise 0.8s ease 3.5s both; }
+.hero h1       { animation: hero-rise 0.9s ease 3.9s both; }
+.hero .sub     { animation: hero-rise 0.9s ease 4.5s both; }
+.hero .actions { animation: hero-rise 0.9s ease 5.4s both; }
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .chairmark, .hero .eyebrow, .hero h1, .hero .sub, .hero .actions { animation: none; }
+}
+
 .eyebrow { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--rose); margin-bottom: 22px; font-weight: 600; }
 .hero h1 { font-size: 60px; color: var(--plum); margin-bottom: 20px; }
 .hero h1 em { font-style: normal; color: var(--rose); }
