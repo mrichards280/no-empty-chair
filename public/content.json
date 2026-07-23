@@ -91,7 +91,7 @@
   "consults": {
     "kicker": "The DIY lane",
     "title": "Rather do it yourself?",
-    "intro": "Book a session, not the whole studio. Deep strategy sessions for salons who want to build it themselves but need the map first. Every one opens with the $200 teardown, so the call isn't spent getting up to speed — it's spent on you. Your fee credits toward a full package if you upgrade within 30 days.",
+    "intro": "Book a session with my brain, not the whole studio. These are deep strategy sessions for salons who want to build it themselves but need the map first. Every one opens with the $200 teardown, so the call isn't spent getting up to speed — it's spent on you. Your fee credits toward a full package if you upgrade within 30 days.",
     "items": [
       {
         "name": "Social Session",
@@ -129,7 +129,7 @@
   },
   "alacarte": {
     "kicker": "À la carte",
-    "title": "Not ready for the whole thing? Take a piece.",
+    "title": "Not ready for the whole makeover? Target what you need the most.",
     "intro": "Some salons want the full glow-up. Others just need one thing done right. Share your vision and No Empty Chair prices it to fit — no package required. It still opens with the $200 teardown, so even a single piece is built on what your salon actually needs.",
     "items": [
       {
@@ -259,7 +259,7 @@
   },
   "faq": {
     "kicker": "Questions",
-    "title": "The things salon owners ask me",
+    "title": "What salon owners ask me",
     "intro": "Straight answers, no runaround.",
     "items": [
       {
