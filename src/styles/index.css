@@ -47,7 +47,7 @@ img { max-width: 100%; display: block; }
 .serif { font-family: "Marcellus", serif; }
 .cinzel { font-family: "Cinzel", serif; }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--gutter); }
-h1, h2, h3 { font-family: "Marcellus", serif; font-weight: 400; letter-spacing: 0.3px; line-height: 1.14; }
+h1, h2, h3 { font-family: "Marcellus", serif; font-weight: 400; letter-spacing: 0.3px; line-height: 1.14; text-wrap: balance; }
 
 .glass {
   background: var(--glass);
@@ -183,7 +183,10 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 section { padding: 80px 0; }
 .sec-head { text-align: center; max-width: 640px; margin: 0 auto 46px; }
 .kicker { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose); font-weight: 600; margin-bottom: 14px; }
-h2 { font-size: 46px; color: var(--plum); margin-bottom: 12px; }
+h2 { font-size: clamp(30px, 4.6vw, 46px); color: var(--plum); margin-bottom: 12px; }
+/* the à la carte title is two sentences — give it room to sit on two clean lines */
+#alacarte .sec-head { max-width: 780px; }
+#alacarte h2 br { display: block; }
 .sec-head p { font-size: 17px; color: var(--plum-soft); }
 .em-accent { color: var(--rose); }
 
@@ -206,7 +209,30 @@ h2 { font-size: 46px; color: var(--plum); margin-bottom: 12px; }
 .card .btn { margin-top: auto; }
 .card ul { margin-bottom: 18px; }
 .card.feat { border: 2px solid var(--rose); }
-.card .tag { position: absolute; top: -12px; right: 22px; background: var(--gold); color: #fff; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; font-weight: 600; }
+.card .tag { position: absolute; top: -12px; right: 22px; background: var(--gold); color: #fff; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; font-weight: 600; overflow: visible; }
+/* sparkle stars on the "Most popular" badge, twinkling once it appears */
+.card .tag::before, .card .tag::after {
+  content: "\2726"; position: absolute; color: #fff; opacity: 0; pointer-events: none;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.95), 0 0 3px var(--gold);
+}
+.card .tag::before { top: -8px; left: -7px; font-size: 12px; }
+.card .tag::after { bottom: -8px; right: -3px; font-size: 9px; }
+.card .tag.sparkle { animation: tag-pop 0.6s cubic-bezier(0.2, 1.3, 0.4, 1) both; }
+.card .tag.sparkle::before { animation: tag-twinkle 2.2s ease 0.25s infinite; }
+.card .tag.sparkle::after { animation: tag-twinkle 2.2s ease 0.95s infinite; }
+@keyframes tag-pop {
+  0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  55%  { transform: scale(1.14) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes tag-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  25%      { opacity: 1; transform: scale(1) rotate(18deg); }
+  55%      { opacity: 0.45; transform: scale(0.8) rotate(-12deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card .tag.sparkle, .card .tag.sparkle::before, .card .tag.sparkle::after { animation: none; opacity: 1; }
+}
 .card .ico { display: inline-flex; margin-bottom: 16px; }
 .card h3 { font-size: 27px; color: var(--rose-deep); margin-bottom: 6px; }
 .card .from { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 16px; }

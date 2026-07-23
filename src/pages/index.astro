@@ -132,7 +132,7 @@ const year = new Date().getFullYear();
       <div class="wrap">
         <div class="sec-head">
           <div class="kicker">{c.alacarte.kicker}</div>
-          <h2>{c.alacarte.title}</h2>
+          <h2 set:html={c.alacarte.title.replace(/\?\s+/, "?<br>")}></h2>
           <p>{c.alacarte.intro}</p>
         </div>
         <div class="ala">
@@ -351,6 +351,21 @@ const year = new Date().getFullYear();
         }
       });
     });
+  })();
+</script>
+
+{/* Sparkle the "Most popular" badge when it first appears on screen. */}
+<script is:inline>
+  (function () {
+    var tag = document.querySelector(".card .tag");
+    if (!tag || !("IntersectionObserver" in window)) { if (tag) tag.classList.add("sparkle"); return; }
+    var io = new IntersectionObserver(
+      function (entries) {
+        if (entries[0].isIntersecting) { tag.classList.add("sparkle"); io.disconnect(); }
+      },
+      { threshold: 0.6 }
+    );
+    io.observe(tag);
   })();
 </script>
 
