@@ -1,0 +1,68 @@
+---
+// Decorative, on-brand animation: line-art chairs that fill, one by one, with
+// little pastel figures — a literal "no empty chair." Purely visual (aria-hidden),
+// CSS-only, respects prefers-reduced-motion.
+const seats = [
+  { color: "#f3c9d3", delay: "0s" },   // pink
+  { color: "#cfc6ee", delay: "0.4s" }, // lilac
+  { color: "#c2ddcf", delay: "0.8s" }, // mint
+  { color: "#c4d8f0", delay: "1.2s" }, // blue
+  { color: "#e6b8c6", delay: "1.6s" }, // rose
+];
+const stepX = 150;
+const startX = 15;
+---
+<div class="chairs-band" aria-hidden="true">
+  <svg viewBox="0 0 765 175" class="chairs-svg" role="presentation">
+    {seats.map((s, i) => (
+      <g transform={`translate(${startX + i * stepX}, 0)`}>
+        {/* chair — line art */}
+        <g class="chair-line" fill="none" stroke="#413645" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 42 L22 96" />
+          <path d="M98 42 L98 96" />
+          <path d="M22 42 Q60 30 98 42" />
+          <path d="M10 96 L110 96" />
+          <path d="M24 96 L18 150" />
+          <path d="M96 96 L102 150" />
+        </g>
+        {/* seated pastel figure — pops into the chair */}
+        <g class="chair-person" style={`--d:${s.delay}`}>
+          <path d="M40 94 Q40 66 60 66 Q80 66 80 94 Z" fill={s.color} />
+          <circle cx="60" cy="49" r="14" fill={s.color} />
+        </g>
+      </g>
+    ))}
+  </svg>
+</div>
+
+<style>
+  .chairs-band {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 6px 26px 0;
+  }
+  .chairs-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .chair-person {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: seat-fill 6s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes seat-fill {
+    0%   { opacity: 0; transform: translateY(14px) scale(0.4); }
+    10%  { opacity: 1; transform: translateY(0) scale(1.08); }
+    16%  { transform: translateY(0) scale(1); }
+    72%  { opacity: 1; transform: none; }
+    84%  { opacity: 0; transform: translateY(10px) scale(0.5); }
+    100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chair-person { animation: none; opacity: 1; }
+  }
+</style>

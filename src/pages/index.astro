@@ -1,6 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
 import ChairMark from "../components/ChairMark.astro";
+import ChairsFilling from "../components/ChairsFilling.astro";
+import CompanionDoc from "../components/CompanionDoc.astro";
 import ContactSection from "../components/ContactSection.jsx";
 import RadarModal from "../components/RadarModal.jsx";
 import { bookingHref } from "../lib/booking.js";
@@ -48,6 +50,9 @@ const year = new Date().getFullYear();
   </header>
 
   <div class="strip">{c.strip.text}<b>{c.strip.bold}</b>{c.strip.tail}</div>
+
+  {/* Decorative: line-art chairs filling with pastel figures — "no empty chair" */}
+  <ChairsFilling />
 
   {/* PROBLEM / PROMISE */}
   <section id="why">
@@ -112,7 +117,12 @@ const year = new Date().getFullYear();
         ))}
       </div>
       <div class="retainer-note"><b>{c.consults.intensiveNote}</b></div>
-      {c.consults.addonNote ? <div class="addon-note">{c.consults.addonNote}</div> : null}
+      {c.consults.addonNote ? (
+        <>
+          <CompanionDoc />
+          <div class="addon-note">{c.consults.addonNote}</div>
+        </>
+      ) : null}
     </div>
   </section>
 
@@ -188,20 +198,22 @@ const year = new Date().getFullYear();
           <h2>{c.demos.title}</h2>
           <p>{c.demos.intro}</p>
         </div>
-        <div class="demogrid">
-          {c.demos.items.map((d) => (
-            <a class="democard glass" href={d.href} target="_blank" rel="noopener noreferrer">
-              <div class="demothumb" style={`background-image:url(${d.image})`}>
-                <span class="demopill">Live demo</span>
-              </div>
-              <div class="demobody">
-                <h3>{d.name}</h3>
-                <div class="demotag">{d.tagline}</div>
-                <p>{d.desc}</p>
-                <span class="go">View the demo →</span>
-              </div>
-            </a>
-          ))}
+        <div class="demo-carousel" data-demo-carousel>
+          <div class="demo-track">
+            {c.demos.items.map((d) => (
+              <a class="democard glass" href={d.href} target="_blank" rel="noopener noreferrer">
+                <div class="demothumb" style={`background-image:url(${d.image})`}>
+                  <span class="demopill">Live demo</span>
+                </div>
+                <div class="demobody">
+                  <h3>{d.name}</h3>
+                  <div class="demotag">{d.tagline}</div>
+                  <p>{d.desc}</p>
+                  <span class="go">View the demo →</span>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -339,5 +351,85 @@ const year = new Date().getFullYear();
         }
       });
     });
+  })();
+</script>
+
+{/* Demos gallery: auto-advance one card at a time, seamless infinite loop,
+    soft pop-in on the entering card, pause on hover, respects reduced-motion. */}
+<script is:inline>
+  (function () {
+    var car = document.querySelector("[data-demo-carousel]");
+    if (!car) return;
+    var track = car.querySelector(".demo-track");
+    var originals = Array.prototype.slice.call(track.children);
+    var n = originals.length;
+    if (n < 2) return;
+
+    var GAP = 20;
+    var EASE = "transform .85s cubic-bezier(.22,.61,.36,1)";
+    var INTERVAL = 3000;
+
+    // Clone every card once and append, so scrolling past the end is seamless.
+    originals.forEach(function (c) {
+      var k = c.cloneNode(true);
+      k.setAttribute("aria-hidden", "true");
+      k.setAttribute("tabindex", "-1");
+      track.appendChild(k);
+    });
+
+    var i = 0;
+    var timer = null;
+
+    function metrics() {
+      var first = track.children[0];
+      var w = first.getBoundingClientRect().width;
+      var per = Math.max(1, Math.round((car.getBoundingClientRect().width + GAP) / (w + GAP)));
+      return { w: w, per: per };
+    }
+
+    function pop(idx) {
+      var el = track.children[idx];
+      if (!el) return;
+      el.classList.remove("pop");
+      void el.offsetWidth; // force reflow so the animation can replay
+      el.classList.add("pop");
+    }
+
+    function step() {
+      var m = metrics();
+      i++;
+      track.style.transition = EASE;
+      track.style.transform = "translateX(" + (-i * (m.w + GAP)) + "px)";
+      pop(i + m.per - 1); // the card newly arriving at the right edge
+    }
+
+    track.addEventListener("transitionend", function () {
+      if (i >= n) {
+        i = 0;
+        track.style.transition = "none";
+        track.style.transform = "translateX(0px)";
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { track.style.transition = EASE; });
+        });
+      }
+    });
+
+    function start() { if (!timer) timer = setInterval(step, INTERVAL); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    car.addEventListener("mouseenter", stop);
+    car.addEventListener("mouseleave", start);
+
+    var rt;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        i = 0;
+        track.style.transition = "none";
+        track.style.transform = "translateX(0px)";
+      }, 150);
+    });
+
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) start();
   })();
 </script>
