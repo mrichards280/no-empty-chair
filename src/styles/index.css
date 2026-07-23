@@ -82,8 +82,17 @@ nav {
   border-bottom: 1px solid var(--line);
 }
 nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
-.logo { font-family: "Cinzel", serif; font-size: 22px; font-weight: 600; color: var(--plum); letter-spacing: 1px; }
+.logo { font-family: "Cinzel", serif; font-size: 22px; font-weight: 600; color: var(--plum); letter-spacing: 1px; display: inline-flex; align-items: center; }
 .logo span { color: var(--rose); }
+/* nav chair mark: hidden until you scroll past the hero logo, then it eases in */
+.navmark {
+  display: inline-flex; align-items: center; overflow: hidden;
+  width: 0; opacity: 0; margin-right: 0; transform: translateX(-4px) scale(0.6);
+  transition: width 0.45s ease, opacity 0.45s ease, transform 0.45s ease, margin-right 0.45s ease;
+}
+nav .logo.show-mark .navmark { width: 24px; opacity: 1; margin-right: 8px; transform: none; }
+/* footer chair mark: always shown beside the name */
+.footmark { display: inline-flex; align-items: center; margin-right: 9px; }
 nav ul { display: flex; gap: 26px; align-items: center; list-style: none; }
 nav ul a { font-size: 13.5px; letter-spacing: 0.5px; color: var(--plum-soft); font-weight: 500; }
 nav ul a:hover { color: var(--rose); }
@@ -144,13 +153,12 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
   animation: chair-ball-roll 4s cubic-bezier(0.33, 0, 0.3, 1) 1 both;
 }
 @keyframes chair-ball-roll {
-  0%   { transform: translate(64px, 0) rotate(0deg); }      /* off to the right */
-  48%  { transform: translate(0, 0) rotate(-430deg); }      /* rolled to the seat, still spinning */
-  60%  { transform: translate(0, -13px) rotate(-455deg); }  /* bounces up */
-  73%  { transform: translate(0, 0) rotate(-470deg); }      /* drops into the seat */
-  83%  { transform: translate(0, -5px) rotate(-476deg); }   /* small settle bounce */
-  92%  { transform: translate(0, 0) rotate(-479deg); }
-  100% { transform: translate(0, 0) rotate(-480deg); }      /* at rest in the seat */
+  0%   { transform: translate(435px, 18px) rotate(0deg); }     /* right edge of the card, floor level */
+  55%  { transform: translate(0, 18px) rotate(-1820deg); }     /* rolled along the floor to under the seat */
+  68%  { transform: translate(0, -7px) rotate(-1875deg); }     /* bounces up into the chair (overshoot) */
+  80%  { transform: translate(0, 0) rotate(-1900deg); }        /* lands in the seat */
+  89%  { transform: translate(0, -3px) rotate(-1908deg); }     /* small settle bounce */
+  100% { transform: translate(0, 0) rotate(-1914deg); }        /* at rest in the seat */
 }
 @media (prefers-reduced-motion: reduce) {
   .chairmark svg circle { animation: none; }

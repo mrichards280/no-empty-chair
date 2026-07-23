@@ -14,7 +14,7 @@ const year = new Date().getFullYear();
 <Base>
   <nav>
     <div class="wrap">
-      <div class="logo">{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <div class="logo"><span class="navmark" aria-hidden="true"><ChairMark size={24} /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></div>
       <ul>
         <li class="hasmenu">
           <a href="#services" class="menutop">Services <span class="caret" aria-hidden="true">▾</span></a>
@@ -287,7 +287,7 @@ const year = new Date().getFullYear();
 
   <footer>
     <div class="wrap">
-      <div class="logo">{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <div class="logo"><span class="footmark" aria-hidden="true"><ChairMark size={26} stroke="#e9dfe6" orb="#e6b8c6" /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></div>
       <p>{c.footer.tagline}</p>
       <div class="socials">
         <a href={c.footer.ig} target="_blank" rel="noopener noreferrer">IG</a>
@@ -351,6 +351,22 @@ const year = new Date().getFullYear();
         }
       });
     });
+  })();
+</script>
+
+{/* Reveal the chair mark beside the nav name once the hero logo scrolls past. */}
+<script is:inline>
+  (function () {
+    var hero = document.querySelector(".chairmark");
+    var navLogo = document.querySelector("nav .logo");
+    if (!hero || !navLogo || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(
+      function (entries) {
+        navLogo.classList.toggle("show-mark", !entries[0].isIntersecting);
+      },
+      { rootMargin: "-70px 0px 0px 0px", threshold: 0 }
+    );
+    io.observe(hero);
   })();
 </script>
 
