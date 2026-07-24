@@ -89,10 +89,12 @@ export default function RadarModal({ radar }) {
     const prev = returnFocusRef.current;
     returnFocusRef.current = null;
     const t = setTimeout(() => {
-      // the floating tab unmounts while the dialog is open, so the saved node
-      // may be detached — fall back to the freshly-rendered trigger.
-      const target =
-        prev && document.contains(prev) ? prev : document.querySelector(".radar-fab");
+      // The floating tab unmounts as the dialog opens, so by the time we read
+      // activeElement it's usually <body> (still "attached", just useless).
+      // Only reuse the saved node if it's a real, still-mounted control.
+      const usable =
+        prev && prev !== document.body && prev.focus && document.contains(prev);
+      const target = usable ? prev : document.querySelector(".radar-fab");
       if (target && target.focus) target.focus();
     }, 0);
     return () => clearTimeout(t);
