@@ -109,6 +109,22 @@ const jsonLd = {
 
     <!-- Structured data for Google rich results + AI search engines -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Play the hero intro only once per session. Runs before first paint so
+         repeat views never flash the animation. -->
+    <script is:inline>
+      (function () {
+        try {
+          if (sessionStorage.getItem("nec-intro-seen")) {
+            document.documentElement.classList.add("intro-done");
+          } else {
+            sessionStorage.setItem("nec-intro-seen", "1");
+          }
+        } catch (e) {
+          /* storage blocked — the intro just plays every load */
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- Hidden static forms so Netlify detects "leads" and "teardown" at build

@@ -1,65 +1,61 @@
 ---
-// Decorative, on-brand animation: line-art chairs that fill, one by one, with
-// little pastel figures — a literal "no empty chair." Purely visual (aria-hidden),
-// CSS-only, respects prefers-reduced-motion.
+// Decorative, on-brand animation: a row of the actual brand mark, where the
+// orbs drop into their seats one by one — a literal "no empty chair."
+// Uses the real logo art so it matches the mark exactly.
+// Purely visual (aria-hidden), CSS-only, respects prefers-reduced-motion.
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
+
 const seats = [
-  { color: "#f3c9d3", delay: "0s" },   // pink
+  { color: "#f3c9d3", delay: "0s" },   // blush
   { color: "#cfc6ee", delay: "0.4s" }, // lilac
   { color: "#c2ddcf", delay: "0.8s" }, // mint
-  { color: "#c4d8f0", delay: "1.2s" }, // blue
-  { color: "#e6b8c6", delay: "1.6s" }, // rose
+  { color: "#c4d8f0", delay: "1.2s" }, // sky
+  { color: "#e6b8c6", delay: "1.6s" }, // light rose
 ];
-const stepX = 150;
-const startX = 15;
 ---
 <div class="chairs-band" aria-hidden="true">
-  <svg viewBox="0 0 765 175" class="chairs-svg" role="presentation">
-    {seats.map((s, i) => (
-      <g transform={`translate(${startX + i * stepX}, 0)`}>
-        {/* chair — line art */}
-        <g class="chair-line" fill="none" stroke="#413645" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 42 L22 96" />
-          <path d="M98 42 L98 96" />
-          <path d="M22 42 Q60 30 98 42" />
-          <path d="M10 96 L110 96" />
-          <path d="M24 96 L18 150" />
-          <path d="M96 96 L102 150" />
-        </g>
-        {/* seated pastel figure — pops into the chair */}
-        <g class="chair-person" style={`--d:${s.delay}`}>
-          <path d="M40 94 Q40 66 60 66 Q80 66 80 94 Z" fill={s.color} />
-          <circle cx="60" cy="49" r="14" fill={s.color} />
-        </g>
+  {seats.map((s) => (
+    <svg class="chair-unit" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="presentation">
+      <g fill="#413645" stroke="none">
+        <g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g>
       </g>
-    ))}
-  </svg>
+      <g class="chair-person" style={`--d:${s.delay}`}>
+        <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill={s.color} /></g>
+      </g>
+    </svg>
+  ))}
 </div>
 
 <style>
   .chairs-band {
     max-width: 1080px;
     margin: 0 auto;
-    padding: 6px var(--gutter) 0;
+    padding: 10px var(--gutter) 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(14px, 3.5vw, 46px);
   }
-  .chairs-svg {
+  .chair-unit {
+    height: clamp(58px, 8vw, 104px);
+    width: auto;
     display: block;
-    width: 100%;
-    height: auto;
     overflow: visible;
   }
   .chair-person {
     opacity: 0;
     transform-box: fill-box;
-    transform-origin: center bottom;
+    transform-origin: center;
     animation: seat-fill 6s ease-in-out infinite;
     animation-delay: var(--d);
   }
+  /* values are in the mark's viewBox units (1273x1609) */
   @keyframes seat-fill {
-    0%   { opacity: 0; transform: translateY(14px) scale(0.4); }
-    10%  { opacity: 1; transform: translateY(0) scale(1.08); }
+    0%   { opacity: 0; transform: translateY(150px) scale(0.35); }
+    10%  { opacity: 1; transform: translateY(0) scale(1.09); }
     16%  { transform: translateY(0) scale(1); }
     72%  { opacity: 1; transform: none; }
-    84%  { opacity: 0; transform: translateY(10px) scale(0.5); }
+    84%  { opacity: 0; transform: translateY(110px) scale(0.5); }
     100% { opacity: 0; }
   }
   @media (prefers-reduced-motion: reduce) {

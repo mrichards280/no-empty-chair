@@ -212,20 +212,28 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
    3. the copy rises out of it, then the buttons (3.5–6.3s)
    Copy stays in the HTML the whole time, so crawlers are unaffected.
    ============================================================ */
-.hero .chairmark { animation: hero-mark-intro 3.6s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
+.hero .chairmark { animation: hero-mark-intro 2.4s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
 @keyframes hero-mark-intro {
-  0%   { transform: translateY(130px) scale(2.2); }
-  60%  { transform: translateY(130px) scale(2.2); } /* hold big for the swish */
+  0%   { transform: translateY(190px) scale(4); }
+  65%  { transform: translateY(190px) scale(4); }   /* hold big for the swish */
   100% { transform: translateY(0) scale(1); }       /* settle into place */
 }
-.hero .eyebrow { animation: hero-rise 0.8s ease 3.5s both; }
-.hero h1       { animation: hero-rise 0.9s ease 3.9s both; }
-.hero .sub     { animation: hero-rise 0.9s ease 4.5s both; }
-.hero .actions { animation: hero-rise 0.9s ease 5.4s both; }
+/* copy rises out of the mark; the buttons deliberately overlap the headline */
+.hero .eyebrow { animation: hero-rise 0.6s ease 2.15s both; }
+.hero h1       { animation: hero-rise 0.7s ease 2.4s both; }
+.hero .sub     { animation: hero-rise 0.7s ease 2.7s both; }
+.hero .actions { animation: hero-rise 0.7s ease 2.95s both; }
 @keyframes hero-rise {
   from { opacity: 0; transform: translateY(18px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* Repeat visits in the same session skip the intro (the orb swish still plays).
+   .intro-done is set on <html> before first paint — see Base.astro. */
+html.intro-done .hero .chairmark,
+html.intro-done .hero .eyebrow,
+html.intro-done .hero h1,
+html.intro-done .hero .sub,
+html.intro-done .hero .actions { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .hero .chairmark, .hero .eyebrow, .hero h1, .hero .sub, .hero .actions { animation: none; }
 }
