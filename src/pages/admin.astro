@@ -3,7 +3,9 @@ import Base from "../layouts/Base.astro";
 import Admin from "../admin/Admin.jsx";
 ---
 <Base title="Admin · No Empty Chair">
+  <main id="main" class="admin-main">
   <div id="root">
     <Admin client:only="react" />
   </div>
+  </main>
 </Base>

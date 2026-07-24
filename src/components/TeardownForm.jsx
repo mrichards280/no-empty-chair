@@ -73,7 +73,7 @@ export default function TeardownForm() {
             </div>
 
             <form className="tform" name="teardown" onSubmit={submit}>
-              <input className="tp-hp" type="text" name="bot-field" tabIndex="-1" autoComplete="off" value={form["bot-field"]} onChange={set("bot-field")} />
+              <input className="tp-hp" aria-hidden="true" type="text" name="bot-field" tabIndex="-1" autoComplete="off" value={form["bot-field"]} onChange={set("bot-field")} />
 
               <div className="tp-row">
                 <label>Your name<input required type="text" value={form.name} onChange={set("name")} /></label>

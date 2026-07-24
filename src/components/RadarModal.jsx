@@ -139,6 +139,7 @@ export default function RadarModal({ radar }) {
                   {/* Honeypot field, visually hidden */}
                   <input
                     className="radar-hp"
+                    aria-hidden="true"
                     type="text"
                     name="bot-field"
                     tabIndex="-1"

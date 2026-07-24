@@ -138,14 +138,14 @@ const jsonLd = {
     <!-- Hidden static forms so Netlify detects "leads" and "teardown" at build
          time and captures submissions from the React islands. Field names must
          match the islands. -->
-    <form name="leads" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <form name="leads" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
       <input type="text" name="business" />
       <input type="text" name="instagram" />
       <input type="text" name="contact" />
       <input type="text" name="bot-field" />
     </form>
 
-    <form name="teardown" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <form name="teardown" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
       <input type="text" name="name" />
       <input type="text" name="salon" />
       <input type="text" name="email" />
