@@ -86,6 +86,32 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#413645" />
 
+    <!-- Google Analytics 4 (page views + CTA click events) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-P8QH69X00E"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-P8QH69X00E');
+      // Fire a GA4 "cta_click" event when a key button, CTA, or demo card is clicked.
+      document.addEventListener('click', function (e) {
+        var el = e.target.closest('a.btn, a.navbtn, button.btn, .navcta, .democard, [data-ev]');
+        if (!el) return;
+        var label;
+        if (el.classList.contains('democard')) {
+          var h = el.querySelector('h3');
+          label = 'demo: ' + (h ? h.textContent.trim() : 'demo');
+        } else {
+          label = el.getAttribute('data-ev') ||
+                  (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80) ||
+                  el.getAttribute('href') || 'click';
+        }
+        if (typeof gtag === 'function') {
+          gtag('event', 'cta_click', { cta_label: label, page_path: location.pathname });
+        }
+      }, true);
+    </script>
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href="https://noemptychair.co/" />
