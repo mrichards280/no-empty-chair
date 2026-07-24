@@ -154,18 +154,25 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 .chairmark svg .nec-orb {
   transform-box: fill-box;
   transform-origin: center;
-  animation: chair-ball-swish 2.1s cubic-bezier(0.4, 0.02, 0.4, 1) 1 both;
+  /* linear on purpose: a cubic-bezier re-eases between EVERY keyframe pair,
+     which makes the ball hesitate at each waypoint. The arc shape lives in the
+     values below (a real projectile curve), sampled every 10% so linear
+     interpolation reads as one continuous motion. */
+  animation: chair-ball-swish 2.1s linear 1 both;
 }
-/* Basketball swish: the ball is launched from the right, arcs up high, and
-   drops down into the seat (the net). */
+/* Basketball swish: launched from the right, arcs up high, drops into the seat. */
 @keyframes chair-ball-swish {
-  0%   { transform: translate(8548px, 553px) rotate(0deg); }    /* launched from lower-right */
-  22%  { transform: translate(5154px, -1358px) rotate(-90deg); }/* rising */
-  46%  { transform: translate(2313px, -1961px) rotate(-190deg); }/* top of the arc, above the chair */
-  70%  { transform: translate(553px, -1156px) rotate(-290deg); }/* falling toward the seat */
-  86%  { transform: translate(0, 101px) rotate(-350deg); }     /* swishes down through into the seat */
-  93%  { transform: translate(0, -50px) rotate(-362deg); }     /* tiny net settle */
-  100% { transform: translate(0, 0) rotate(-368deg); }         /* rests in the seat */
+  0%   { transform: translate(8548px, 553px)   rotate(0deg); }
+  10%  { transform: translate(7500px, -305px)  rotate(-37deg); }
+  20%  { transform: translate(6468px, -983px)  rotate(-74deg); }
+  30%  { transform: translate(5460px, -1484px) rotate(-110deg); }
+  40%  { transform: translate(4512px, -1806px) rotate(-147deg); }
+  50%  { transform: translate(3592px, -1950px) rotate(-184deg); } /* apex */
+  60%  { transform: translate(2720px, -1916px) rotate(-221deg); }
+  70%  { transform: translate(1896px, -1704px) rotate(-258deg); }
+  80%  { transform: translate(1144px, -1315px) rotate(-294deg); }
+  90%  { transform: translate(480px, -746px)   rotate(-331deg); }
+  100% { transform: translate(0, 0)            rotate(-368deg); } /* swish */
 }
 /* During the intro the mark is held at 4x, which would scale the arc above to
    ~4x its size (the ball would streak in from far off-screen). This variant
@@ -173,13 +180,17 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
    to the normal swish — just drawn bigger. */
 html:not(.intro-done) .hero .chairmark svg .nec-orb { animation-name: chair-ball-swish-intro; }
 @keyframes chair-ball-swish-intro {
-  0%   { transform: translate(2137px, 138px) rotate(0deg); }
-  22%  { transform: translate(1289px, -340px) rotate(-90deg); }
-  46%  { transform: translate(578px, -490px) rotate(-190deg); }
-  70%  { transform: translate(138px, -289px) rotate(-290deg); }
-  86%  { transform: translate(0, 25px) rotate(-350deg); }
-  93%  { transform: translate(0, -13px) rotate(-362deg); }
-  100% { transform: translate(0, 0) rotate(-368deg); }
+  0%   { transform: translate(2137px, 138px)  rotate(0deg); }
+  10%  { transform: translate(1875px, -76px)  rotate(-37deg); }
+  20%  { transform: translate(1617px, -246px) rotate(-74deg); }
+  30%  { transform: translate(1365px, -371px) rotate(-110deg); }
+  40%  { transform: translate(1128px, -451px) rotate(-147deg); }
+  50%  { transform: translate(898px, -488px)  rotate(-184deg); } /* apex */
+  60%  { transform: translate(680px, -479px)  rotate(-221deg); }
+  70%  { transform: translate(474px, -426px)  rotate(-258deg); }
+  80%  { transform: translate(286px, -329px)  rotate(-294deg); }
+  90%  { transform: translate(120px, -187px)  rotate(-331deg); }
+  100% { transform: translate(0, 0)           rotate(-368deg); } /* swish */
 }
 @media (prefers-reduced-motion: reduce) {
   .chairmark svg .nec-orb { animation: none; }
