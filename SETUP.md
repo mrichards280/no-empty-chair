@@ -29,6 +29,27 @@ whatever you edited in `/admin`. (If you do edit code while the admin also saved
 - Netlify Forms: `leads` (popup) and `teardown` (intake page).
 - Four standalone demo sites in `public/demos/*.html`.
 
+## The logo & animations
+- The brand mark's path data lives in **`src/lib/logoPaths.js`** and is shared by
+  `ChairMark.astro` (hero, nav, footer), `ChairMark.jsx` (popup, teardown) and
+  the companion-doc clip art. **One file to change if the logo changes.**
+  Source art: `../Brand/logo/primary/nec-mark-primary.svg`.
+- The chair line and orb are separate elements so they can be coloured
+  independently (light version in the footer) and animated on their own.
+- **Hero intro** (~4s, once per session via `sessionStorage`): the mark holds at
+  4× while the orb swishes into the seat, shrinks into place, then the copy and
+  buttons rise out of it. The copy is always in the HTML — only opacity animates,
+  so SEO/crawlers are unaffected.
+- **Orb swish** uses `linear` timing with a projectile trajectory sampled every
+  10%. Don't switch it to a cubic-bezier — easing re-applies between *every*
+  keyframe pair and makes the ball hesitate at each waypoint.
+- **Rotating orb colours**: hero and nav cycle the palette over 30s; the
+  companion doc cycles the light end only (contrast on its rose header).
+- **Chairs band** under the hero strip: five real brand marks whose orbs drop in
+  one by one. **Demos gallery**: natively scrollable (swipe/drag/trackpad) with
+  auto-advance that pauses on interaction and resumes when idle.
+- All of the above respect `prefers-reduced-motion`.
+
 ---
 
 ## 1. GitHub
