@@ -15,6 +15,12 @@
   --white: #fffdfb;
   --glass: rgba(255, 255, 255, 0.55);
   --glass-brd: rgba(255, 255, 255, 0.65);
+  /* Text-only accents. Rose and gold above are gorgeous but fail WCAG AA at
+     small sizes (4.19 and 2.7 on cream). These are the closest shades that
+     pass 4.5:1 — used ONLY for text, never for the logo, orbs or shapes. */
+  --rose-text: #9c4e69; /* 4.96 on cream */
+  --gold-text: #836030; /* 4.99 on cream */
+  --gold-deep: #7d5527; /* badge background, 6.56 with white text */
   /* one consistent horizontal gutter for the whole site — wide on desktop,
      steady on mobile so the content frame never shifts left/right */
   --gutter: clamp(22px, 5vw, 64px);
@@ -757,6 +763,9 @@ html.hc {
   --rose: #8a4560;
   --rose-deep: #6f3149;
   --gold: #7d5527;
+  --rose-text: #7a3a53;
+  --gold-text: #6b4620;
+  --gold-deep: #63421e;
   --plum-soft: #574a5b;
   --muted: #574a5b;
 }
@@ -772,6 +781,9 @@ html.hc .proof-note { color: #574a5b; }
     --rose: #8a4560;
     --rose-deep: #6f3149;
     --gold: #7d5527;
+    --rose-text: #7a3a53;
+    --gold-text: #6b4620;
+    --gold-deep: #63421e;
     --plum-soft: #574a5b;
     --muted: #574a5b;
   }
@@ -781,3 +793,26 @@ html.hc .proof-note { color: #574a5b; }
   footer .logo span { color: #f0c9d6; }
   .strip b { color: #f2cfda; }
 }
+
+/* ============================================================
+   WCAG AA contrast — deeper accents wherever the palette is TEXT.
+   The logo, orbs, gradients, bullets and pastel shapes are untouched.
+   ============================================================ */
+.kicker,
+.eyebrow,
+.demotag,
+.radar-eyebrow,
+.faq-icon,
+.work-card .go,
+.logo span,
+nav ul a:hover { color: var(--rose-text); }
+
+.card .from,
+.work-card .meta,
+.pstep .num { color: var(--gold-text); }
+
+.card .tag { background: var(--gold-deep); }
+
+/* on the plum footer, light text is what passes */
+footer .fine, footer .adminlink { color: #c9b3bb; }
+footer .logo span { color: #e6b8c6; }

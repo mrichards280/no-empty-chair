@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ChairMark } from "./ChairMark";
 
 // URL-encode a flat object for Netlify Forms submission.
@@ -48,15 +48,43 @@ export default function RadarModal({ radar }) {
     setSeen();
   }, []);
 
-  // Escape closes the modal.
+  const dialogRef = useRef(null);
+  const returnFocusRef = useRef(null);
+
+  // Escape closes the modal; Tab is trapped inside it.
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") { close(); return; }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const items = dialogRef.current.querySelectorAll(
+        'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      const list = Array.prototype.filter.call(items, (el) => !el.disabled && el.offsetParent !== null);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close]);
+
+  // Move focus into the dialog on open, and hand it back on close.
+  useEffect(() => {
+    if (open) {
+      returnFocusRef.current = document.activeElement;
+      const t = setTimeout(() => {
+        const el = dialogRef.current && dialogRef.current.querySelector("input, button");
+        if (el) el.focus();
+      }, 0);
+      return () => clearTimeout(t);
+    }
+    if (returnFocusRef.current && returnFocusRef.current.focus) {
+      returnFocusRef.current.focus();
+      returnFocusRef.current = null;
+    }
+  }, [open]);
 
   if (!enabled) return null;
 
@@ -90,7 +118,7 @@ export default function RadarModal({ radar }) {
 
       {open ? (
         <div className="radar-overlay" onClick={close} role="dialog" aria-modal="true" aria-label={radar.headline}>
-          <div className="radar-modal glass" onClick={(e) => e.stopPropagation()}>
+          <div className="radar-modal glass" ref={dialogRef} onClick={(e) => e.stopPropagation()}>
             <button className="radar-close" type="button" onClick={close} aria-label="Close">×</button>
 
             {status === "done" ? (
