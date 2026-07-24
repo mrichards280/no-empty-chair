@@ -14,7 +14,7 @@ const year = new Date().getFullYear();
 <Base>
   <nav>
     <div class="wrap">
-      <div class="logo"><span class="navmark" aria-hidden="true"><ChairMark size={24} /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <a href="/" class="logo" aria-label={`${c.brand.name} ${c.brand.nameAccent} — home`}><span class="navmark" aria-hidden="true"><ChairMark size={24} /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></a>
       <ul>
         <li class="hasmenu">
           <a href="#services" class="menutop">Services <span class="caret" aria-hidden="true">▾</span></a>
