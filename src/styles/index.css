@@ -103,17 +103,44 @@ nav .wrap { display: flex; align-items: center; justify-content: space-between; 
 nav .logo.show-mark .navmark { width: 24px; opacity: 1; margin-right: 8px; transform: none; }
 /* footer chair mark: always shown beside the name */
 .footmark { display: inline-flex; align-items: center; margin-right: 9px; }
+.navright { display: flex; align-items: center; gap: 26px; }
 nav ul { display: flex; gap: 26px; align-items: center; list-style: none; }
 nav ul a { font-size: 13.5px; letter-spacing: 0.5px; color: var(--plum-soft); font-weight: 500; }
-nav ul a:hover { color: var(--rose); }
-nav .navbtn { background: var(--rose); color: #fff; padding: 10px 22px; border-radius: 100px; text-transform: uppercase; letter-spacing: 1.2px; font-size: 12.5px; font-weight: 600; }
+nav ul a:hover { color: var(--rose-text); }
+nav .navbtn { background: var(--rose); color: #fff; padding: 10px 22px; border-radius: 100px; text-transform: uppercase; letter-spacing: 1.2px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
 nav .navbtn:hover { background: var(--rose-deep); }
+
+/* menu button — only shown on narrow screens */
+.navtoggle {
+  display: none;
+  background: none; border: 1px solid var(--line); border-radius: 10px;
+  width: 42px; height: 38px; cursor: pointer; padding: 0;
+  align-items: center; justify-content: center;
+}
+.navtoggle-bars, .navtoggle-bars::before, .navtoggle-bars::after {
+  display: block; width: 18px; height: 2px; background: var(--plum);
+  border-radius: 2px; transition: transform 0.22s ease, opacity 0.15s ease;
+}
+.navtoggle-bars { position: relative; }
+.navtoggle-bars::before, .navtoggle-bars::after { content: ""; position: absolute; left: 0; }
+.navtoggle-bars::before { top: -6px; }
+.navtoggle-bars::after { top: 6px; }
+nav.open .navtoggle-bars { background: transparent; }
+nav.open .navtoggle-bars::before { transform: translateY(6px) rotate(45deg); }
+nav.open .navtoggle-bars::after { transform: translateY(-6px) rotate(-45deg); }
 
 /* services dropdown */
 nav .hasmenu { position: relative; }
-nav .hasmenu .menutop { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+nav .hasmenu .menutop {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 13.5px; letter-spacing: 0.5px;
+  color: var(--plum-soft); font-weight: 500;
+}
+nav .hasmenu .menutop:hover { color: var(--rose-text); }
 nav .hasmenu .caret { font-size: 10px; transition: transform 0.2s; }
-nav .hasmenu:hover .caret, nav .hasmenu:focus-within .caret { transform: rotate(180deg); }
+nav .hasmenu:hover .caret,
+nav .hasmenu .menutop[aria-expanded="true"] .caret { transform: rotate(180deg); }
 nav .submenu {
   position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(6px);
   display: block; flex-direction: column; gap: 0; min-width: 208px; padding: 8px;
@@ -122,7 +149,9 @@ nav .submenu {
   box-shadow: 0 18px 40px rgba(65, 54, 69, 0.14);
   opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
 }
-nav .hasmenu:hover .submenu, nav .hasmenu:focus-within .submenu {
+nav .hasmenu:hover .submenu,
+nav .hasmenu:focus-within .submenu,
+nav .hasmenu .menutop[aria-expanded="true"] + .submenu {
   opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
 }
 nav .submenu::before { content: ""; position: absolute; top: -12px; left: 0; right: 0; height: 12px; }
@@ -132,7 +161,36 @@ nav .submenu a {
   font-size: 13.5px; color: var(--plum); font-weight: 500; letter-spacing: 0.3px;
 }
 nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
-@media (max-width: 820px) { nav ul li:not(.cta) { display: none; } }
+/* ---- narrow screens: real menu button + drop-down panel ---- */
+@media (max-width: 820px) {
+  .navtoggle { display: inline-flex; }
+  .navright { gap: 12px; }
+  nav .navlinks {
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 8px var(--gutter) 16px;
+    background: rgba(244, 239, 234, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 18px 34px rgba(65, 54, 69, 0.12);
+    display: none;
+  }
+  nav.open .navlinks { display: flex; }
+  nav .navlinks > li { width: 100%; border-bottom: 1px solid var(--line); }
+  nav .navlinks > li:last-child { border-bottom: none; }
+  nav .navlinks > li > a,
+  nav .navlinks .menutop { display: flex; width: 100%; padding: 14px 2px; font-size: 15px; }
+  /* the submenu sits inline on mobile instead of floating */
+  nav .submenu {
+    position: static; transform: none; opacity: 1; visibility: visible;
+    pointer-events: auto; background: none; border: none; box-shadow: none;
+    padding: 0 0 10px 14px; min-width: 0; display: none;
+  }
+  nav .hasmenu .menutop[aria-expanded="true"] + .submenu { display: block; transform: none; }
+  nav .hasmenu:hover .submenu { display: none; }
+  nav .hasmenu .menutop[aria-expanded="true"] + .submenu { display: block; }
+  nav .submenu::before { content: none; }
+}
 
 /* consult add-on note */
 .addon-note {

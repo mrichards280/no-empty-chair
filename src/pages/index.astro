@@ -15,21 +15,29 @@ const year = new Date().getFullYear();
   <nav>
     <div class="wrap">
       <a href="/" class="logo" aria-label={`${c.brand.name} ${c.brand.nameAccent} — home`}><span class="navmark" aria-hidden="true"><ChairMark size={24} /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></a>
-      <ul>
-        <li class="hasmenu">
-          <a href="#services" class="menutop">Services <span class="caret" aria-hidden="true">▾</span></a>
-          <ul class="submenu">
-            <li><a href="#services">Full Packages</a></li>
-            <li><a href="#consults">Consulting Only</a></li>
-            <li><a href="#alacarte">Individual Offerings</a></li>
-          </ul>
-        </li>
-        <li><a href="#proof">Results</a></li>
-        <li><a href="#demos">Demos</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li class="cta"><a href="#contact" class="navbtn">Book now</a></li>
-      </ul>
+      <div class="navright">
+        <ul class="navlinks" id="primary-nav">
+          <li class="hasmenu">
+            <button type="button" class="menutop" aria-expanded="false" aria-haspopup="true" aria-controls="services-menu">
+              Services <span class="caret" aria-hidden="true">▾</span>
+            </button>
+            <ul class="submenu" id="services-menu">
+              <li><a href="#services">Full Packages</a></li>
+              <li><a href="#consults">Consulting Only</a></li>
+              <li><a href="#alacarte">Individual Offerings</a></li>
+            </ul>
+          </li>
+          <li><a href="#proof">Results</a></li>
+          <li><a href="#demos">Demos</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <a href="#contact" class="navbtn">Book now</a>
+        <button type="button" class="navtoggle" aria-expanded="false" aria-controls="primary-nav">
+          <span class="navtoggle-bars" aria-hidden="true"></span>
+          <span class="visually-hidden">Menu</span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -359,6 +367,68 @@ const year = new Date().getFullYear();
           /* storage unavailable — accordion still works, just won't persist */
         }
       });
+    });
+  })();
+</script>
+
+{/* Navigation: menu button on narrow screens + a real Services disclosure.
+    Both use aria-expanded, close on Escape / outside click, and return focus. */}
+<script is:inline>
+  (function () {
+    var nav = document.querySelector("nav");
+    if (!nav) return;
+    var toggle = nav.querySelector(".navtoggle");
+    var menutop = nav.querySelector(".menutop");
+    var submenu = nav.querySelector(".submenu");
+
+    function setMenu(open) {
+      nav.classList.toggle("open", open);
+      if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) setServices(false);
+    }
+    function setServices(open) {
+      if (menutop) menutop.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    function menuOpen() { return nav.classList.contains("open"); }
+    function servicesOpen() { return menutop && menutop.getAttribute("aria-expanded") === "true"; }
+
+    if (toggle) {
+      toggle.addEventListener("click", function () { setMenu(!menuOpen()); });
+    }
+    if (menutop) {
+      menutop.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setServices(!servicesOpen());
+      });
+    }
+
+    // close the submenu when focus leaves the group entirely
+    nav.addEventListener("focusout", function () {
+      setTimeout(function () {
+        var el = nav.querySelector(".hasmenu");
+        if (el && !el.contains(document.activeElement)) setServices(false);
+      }, 0);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!nav.contains(e.target)) { setMenu(false); setServices(false); }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      if (servicesOpen()) { setServices(false); if (menutop) menutop.focus(); return; }
+      if (menuOpen()) { setMenu(false); if (toggle) toggle.focus(); }
+    });
+
+    // choosing a destination closes the menu
+    nav.querySelectorAll("a[href^='#']").forEach(function (a) {
+      a.addEventListener("click", function () { setMenu(false); setServices(false); });
+    });
+
+    // reset state when crossing the desktop breakpoint
+    var mq = window.matchMedia("(min-width: 821px)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
+      setMenu(false); setServices(false);
     });
   })();
 </script>
