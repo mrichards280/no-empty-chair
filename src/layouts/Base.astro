@@ -123,10 +123,18 @@ const jsonLd = {
         } catch (e) {
           /* storage blocked — the intro just plays every load */
         }
+        // higher-contrast preference, applied before paint so there's no flash
+        try {
+          if (localStorage.getItem("nec-contrast") === "more") {
+            document.documentElement.classList.add("hc");
+          }
+        } catch (e) {}
       })();
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
     <!-- Hidden static forms so Netlify detects "leads" and "teardown" at build
          time and captures submissions from the React islands. Field names must
          match the islands. -->

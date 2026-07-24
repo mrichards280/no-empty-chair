@@ -694,3 +694,90 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
 .tp-done h1 { font-family: "Marcellus", serif; font-size: 36px; color: var(--plum); margin-bottom: 16px; }
 .tp-done p { font-size: 16px; color: var(--plum-soft); line-height: 1.7; max-width: 520px; margin: 0 auto 26px; }
 .tp-done .btn { border: none; cursor: pointer; }
+
+/* ============================================================
+   Accessibility
+   ============================================================ */
+
+/* Skip link — hidden until keyboard-focused */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1000;
+  background: var(--plum);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 0 0 12px 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+.skip-link:focus { left: 0; }
+
+/* Visible keyboard focus everywhere (mouse clicks are unaffected) */
+:where(a, button, [role="button"], input, textarea, select, summary):focus-visible {
+  outline: 3px solid var(--rose-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* on the dark footer/strip a cream ring reads better */
+footer :focus-visible, .strip :focus-visible { outline-color: var(--cream); }
+
+/* Screen-reader-only text (real labels for placeholder-only fields) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Pause control for the auto-advancing demos gallery (WCAG 2.2.2) */
+.demo-controls { display: flex; justify-content: center; margin-top: 16px; }
+.demo-pause {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255, 253, 251, 0.85);
+  border: 1px solid var(--line);
+  color: var(--plum);
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 18px; border-radius: 100px; cursor: pointer;
+  transition: background 0.2s;
+}
+.demo-pause:hover { background: var(--white); }
+
+/* ============================================================
+   Higher-contrast mode
+   Enabled by the footer toggle (html.hc) or automatically when the
+   visitor's OS asks for more contrast. Deepens text accents only —
+   the logo, orbs and pastel shapes keep the brand palette.
+   ============================================================ */
+html.hc {
+  --rose: #8a4560;
+  --rose-deep: #6f3149;
+  --gold: #7d5527;
+  --plum-soft: #574a5b;
+  --muted: #574a5b;
+}
+html.hc .card .tag { background: #7d5527; }
+html.hc footer { color: #e2d2d8; }
+html.hc footer .fine, html.hc footer .adminlink { color: #d9c6cd; }
+html.hc footer .logo span { color: #f0c9d6; }
+html.hc .strip b { color: #f2cfda; }
+html.hc .proof-note { color: #574a5b; }
+
+@media (prefers-contrast: more) {
+  :root {
+    --rose: #8a4560;
+    --rose-deep: #6f3149;
+    --gold: #7d5527;
+    --plum-soft: #574a5b;
+    --muted: #574a5b;
+  }
+  .card .tag { background: #7d5527; }
+  footer { color: #e2d2d8; }
+  footer .fine, footer .adminlink { color: #d9c6cd; }
+  footer .logo span { color: #f0c9d6; }
+  .strip b { color: #f2cfda; }
+}

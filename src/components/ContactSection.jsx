@@ -38,9 +38,12 @@ export default function ContactSection({ contact }) {
 
         <form className="cform" onSubmit={submit}>
           <div style={{ fontFamily: "Marcellus, serif", fontSize: 20, color: "var(--plum)", textAlign: "center" }}>{contact.formHeading}</div>
-          <input required placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input required type="email" placeholder="Your email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <textarea required placeholder="Tell me about your salon" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
+          <label className="visually-hidden" htmlFor="nec-contact-name">Your name</label>
+          <input id="nec-contact-name" name="name" autoComplete="name" required placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <label className="visually-hidden" htmlFor="nec-contact-email">Your email</label>
+          <input id="nec-contact-email" name="email" autoComplete="email" required type="email" placeholder="Your email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <label className="visually-hidden" htmlFor="nec-contact-message">Tell me about your salon</label>
+          <textarea id="nec-contact-message" name="message" required placeholder="Tell me about your salon" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
           <button className="btn" type="submit" style={{ justifySelf: "center" }}>{contact.formButton}</button>
           {status ? <div className="status">{status}</div> : null}
         </form>

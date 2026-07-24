@@ -33,6 +33,7 @@ const year = new Date().getFullYear();
     </div>
   </nav>
 
+  <main id="main">
   {/* HERO */}
   <header class="hero">
     <div class="wrap">
@@ -215,6 +216,11 @@ const year = new Date().getFullYear();
             ))}
           </div>
         </div>
+        <div class="demo-controls">
+          <button type="button" class="demo-pause" data-demo-pause aria-pressed="false">
+            <span aria-hidden="true">❚❚</span><span data-demo-pause-label>Pause gallery</span>
+          </button>
+        </div>
       </div>
     </section>
   ) : null}
@@ -284,6 +290,7 @@ const year = new Date().getFullYear();
 
   {/* CONTACT — React island */}
   <ContactSection contact={c.contact} client:visible />
+  </main>
 
   <footer>
     <div class="wrap">
@@ -298,6 +305,8 @@ const year = new Date().getFullYear();
       </div>
       <div class="fine">
         © {year} No Empty Chair. Founded by Makayla Richards. · <a class="adminlink" href="/admin">Admin</a>
+        · <button type="button" class="adminlink" data-contrast-toggle aria-pressed="false"
+            style="background:none;border:none;font:inherit;cursor:pointer;text-decoration:underline">Higher contrast</button>
       </div>
     </div>
   </footer>
@@ -350,6 +359,26 @@ const year = new Date().getFullYear();
           /* storage unavailable — accordion still works, just won't persist */
         }
       });
+    });
+  })();
+</script>
+
+{/* Higher-contrast toggle — persists across pages via localStorage. */}
+<script is:inline>
+  (function () {
+    var btn = document.querySelector("[data-contrast-toggle]");
+    if (!btn) return;
+    var root = document.documentElement;
+    function sync() {
+      var on = root.classList.contains("hc");
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "Standard contrast" : "Higher contrast";
+    }
+    sync();
+    btn.addEventListener("click", function () {
+      var on = root.classList.toggle("hc");
+      try { localStorage.setItem("nec-contrast", on ? "more" : "standard"); } catch (e) {}
+      sync();
     });
   })();
 </script>
@@ -464,6 +493,22 @@ const year = new Date().getFullYear();
     car.addEventListener("pointerleave", function () { if (down) endDrag(); });
     // suppress the click that ends a drag so cards don't navigate on a drag
     car.addEventListener("click", function (e) { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
+
+    // Explicit pause control (WCAG 2.2.2) — keyboard and touch reachable.
+    var pauseBtn = document.querySelector("[data-demo-pause]");
+    var paused = false;
+    if (pauseBtn) {
+      var label = pauseBtn.querySelector("[data-demo-pause-label]");
+      pauseBtn.addEventListener("click", function () {
+        paused = !paused;
+        pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+        if (label) label.textContent = paused ? "Play gallery" : "Pause gallery";
+        if (paused) { stop(); clearTimeout(idle); } else { start(); }
+      });
+    }
+    // keep the pause button authoritative over the idle auto-resume
+    var _start = start;
+    start = function () { if (!paused) _start(); };
 
     start();
   })();
