@@ -116,9 +116,35 @@ Build locally with `npm run build` (outputs to `dist/`); preview with
 Netlify → Deploys → pick a previous deploy → **Publish deploy**. Instant revert;
 old code stays in git history.
 
+## Navigation
+The nav bar is `logo` + `.navright` (which holds `.navlinks`, the "Book now"
+button, and `.navtoggle`). It behaves differently either side of **820px**:
+
+- **Desktop:** `.navlinks` is a horizontal row. The Services submenu opens on
+  hover, on `:focus-within`, **or** when `.menutop[aria-expanded="true"]`.
+- **≤820px:** `.navtoggle` (the menu button) appears and `.navlinks` becomes a
+  drop-down panel, shown only when `nav.open`. The submenu renders inline
+  instead of floating. "Book now" stays visible in the bar.
+
+**Services is a `<button>`, not a link — keep it that way.** It carries
+`aria-expanded` / `aria-haspopup` / `aria-controls`. As a link it navigated to
+`#services` on tap, which meant the submenu was unreachable on touch devices.
+The first submenu item ("Full Packages") points at `#services`, so nothing was
+lost. The script also handles **layered Escape** (first closes the submenu and
+refocuses Services, second closes the menu and refocuses the toggle), outside
+clicks, link clicks, and resets state when crossing the breakpoint.
+
+⚠️ **The mobile bar is tight.** Logo + CTA + menu button have to fit inside
+`100vw − 2×--gutter` (≈346px on a 390px phone). The media query shrinks the logo
+(`clamp(15px, 4.3vw, 22px)`, `white-space: nowrap`) and the CTA to make room — if
+you enlarge any of them, the logo wraps and collides with the button.
+
 ## Accessibility
 The site targets **WCAG 2.1 AA**. What's built in:
 - `<main>` landmark on every page + a keyboard skip link (`Base.astro`).
+- A real menu button below 820px (see **Navigation** above) — the nav links used
+  to be `display: none` with no replacement, so mobile visitors couldn't reach
+  Services/Results/Demos/About/FAQ at all.
 - Real labels on every form control; honeypots are `aria-hidden`.
 - Visible `:focus-visible` rings (cream on dark surfaces).
 - The demos gallery has an explicit **pause/play** control (WCAG 2.2.2) — hover
