@@ -163,8 +163,12 @@ nav .submenu a {
 nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
 /* ---- narrow screens: real menu button + drop-down panel ---- */
 @media (max-width: 820px) {
-  .navtoggle { display: inline-flex; }
-  .navright { gap: 12px; }
+  .navtoggle { display: inline-flex; flex: none; }
+  .navright { gap: 10px; }
+  /* the bar has to fit logo + CTA + menu button, so tighten all three */
+  nav .logo { font-size: clamp(15px, 4.3vw, 22px); white-space: nowrap; }
+  nav .navbtn { padding: 9px 14px; font-size: 11px; letter-spacing: 0.8px; }
+  nav .wrap { gap: 10px; }
   nav .navlinks {
     position: absolute; top: 100%; left: 0; right: 0;
     flex-direction: column; align-items: stretch; gap: 0;
