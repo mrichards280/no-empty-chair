@@ -115,3 +115,28 @@ Build locally with `npm run build` (outputs to `dist/`); preview with
 ## Rollback
 Netlify → Deploys → pick a previous deploy → **Publish deploy**. Instant revert;
 old code stays in git history.
+
+## Accessibility
+The site targets **WCAG 2.1 AA**. What's built in:
+- `<main>` landmark on every page + a keyboard skip link (`Base.astro`).
+- Real labels on every form control; honeypots are `aria-hidden`.
+- Visible `:focus-visible` rings (cream on dark surfaces).
+- The demos gallery has an explicit **pause/play** control (WCAG 2.2.2) — hover
+  pause alone doesn't satisfy this, since it's unreachable by keyboard/touch.
+- The radar popup traps Tab, moves focus in on open, and restores it on close.
+  Note the floating tab *unmounts* while the dialog is open, so the restore
+  falls back to re-querying `.radar-fab` rather than the saved node.
+- Every animation respects `prefers-reduced-motion`.
+
+**Colour contrast.** Brand rose (`#a85a76`) and gold (`#b98a52`) fail AA at small
+sizes (4.19:1 and 2.7:1 on cream). The tokens `--rose-text`, `--gold-text` and
+`--gold-deep` hold the passing shades and are applied **only to text** — see the
+"WCAG AA contrast" block in `index.css`. Logos, orbs, gradients and bullets keep
+the original colours. **If you add new text in rose or gold, use the `-text`
+tokens.**
+
+There's also a **higher-contrast mode**: `html.hc`, toggled from the footer and
+persisted in `localStorage`, plus an automatic `@media (prefers-contrast: more)`.
+
+Re-audit after changes by running the contrast/landmark checks in a browser
+console, and do a manual VoiceOver + keyboard-only pass before any big launch.

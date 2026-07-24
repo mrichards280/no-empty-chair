@@ -70,9 +70,12 @@ export default function RadarModal({ radar }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close]);
 
+  const wasOpenRef = useRef(false);
+
   // Move focus into the dialog on open, and hand it back on close.
   useEffect(() => {
     if (open) {
+      wasOpenRef.current = true;
       returnFocusRef.current = document.activeElement;
       const t = setTimeout(() => {
         const el = dialogRef.current && dialogRef.current.querySelector("input, button");
@@ -80,10 +83,19 @@ export default function RadarModal({ radar }) {
       }, 0);
       return () => clearTimeout(t);
     }
-    if (returnFocusRef.current && returnFocusRef.current.focus) {
-      returnFocusRef.current.focus();
-      returnFocusRef.current = null;
-    }
+    // don't touch focus on first mount — only after the dialog has been open
+    if (!wasOpenRef.current) return;
+    wasOpenRef.current = false;
+    const prev = returnFocusRef.current;
+    returnFocusRef.current = null;
+    const t = setTimeout(() => {
+      // the floating tab unmounts while the dialog is open, so the saved node
+      // may be detached — fall back to the freshly-rendered trigger.
+      const target =
+        prev && document.contains(prev) ? prev : document.querySelector(".radar-fab");
+      if (target && target.focus) target.focus();
+    }, 0);
+    return () => clearTimeout(t);
   }, [open]);
 
   if (!enabled) return null;
