@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day Spa Website — Before & After</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Marcellus&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+ *{margin:0;padding:0;box-sizing:border-box;}
+ body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#efe9e2,#e7dfe6);color:#413645;
+   min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:26px 20px 34px;}
+ .kick{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#b98a52;font-weight:600;}
+ h1{font-family:'Cinzel',serif;font-weight:700;font-size:30px;letter-spacing:.5px;margin:5px 0 3px;text-align:center;}
+ .sub{font-family:'Marcellus',serif;color:#8a4560;font-size:15px;margin-bottom:22px;}
+ .row{display:flex;gap:46px;align-items:flex-start;justify-content:center;}
+ .col{display:flex;flex-direction:column;align-items:center;}
+ .lab{font-family:'Inter';font-weight:700;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;
+   padding:7px 16px;border-radius:100px;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+ .bad{background:#e2c9c0;color:#8f2f2f;} .good{background:#413645;color:#e9d9c4;}
+ .good b{color:#b98a52;}
+ .frame{width:384px;height:684px;border-radius:30px;overflow:hidden;background:#fff;
+   box-shadow:0 22px 50px rgba(65,54,69,.28);border:6px solid #2a222f;position:relative;}
+ .frame iframe{width:396px;height:1400px;border:0;transform:scale(.939);transform-origin:top left;position:absolute;top:0;left:0;}
+ .arrow{align-self:center;font-family:'Cinzel',serif;font-size:34px;color:#b98a52;padding:0 6px;margin-top:300px;}
+ @media(max-width:900px){.row{gap:20px}.frame{width:300px;height:560px}.frame iframe{transform:scale(.72)}}
+</style></head><body>
+ <div class="kick">No Empty Chair</div>
+ <h1>Day Spa Website</h1>
+ <div class="sub">The same salon, before and after.</div>
+ <div class="row">
+   <div class="col"><div class="lab bad">✗ BEFORE · their old site</div>
+     <div class="frame"><iframe src="before-spa.html" scrolling="no"></iframe></div></div>
+   <div class="arrow">→</div>
+   <div class="col"><div class="lab good">✓ AFTER · <b>No Empty Chair</b></div>
+     <div class="frame"><iframe src="/demos/lull.html" scrolling="no"></iframe></div></div>
+ </div>
+</body></html>
