@@ -82,11 +82,31 @@ exports.handler = async (event) => {
       return json(502, { error: `GitHub write failed (${putRes.status}): ${t.slice(0, 200)}` });
     }
 
+    // Best-effort: tell IndexNow (Bing, Yandex, etc.) the content changed so it
+    // recrawls fast. Never let this break the save.
+    try { await pingIndexNow(); } catch (e) { /* non-fatal */ }
+
     return json(200, { ok: true });
   } catch (e) {
     return json(500, { error: e.message });
   }
 };
+
+// IndexNow instant-indexing ping. Key file lives at public/<KEY>.txt.
+async function pingIndexNow() {
+  const HOST = "noemptychair.co";
+  const KEY = "dbb0cb8d9e5961d5c20a71c06cfc2eac";
+  await fetch("https://api.indexnow.org/indexnow", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify({
+      host: HOST,
+      key: KEY,
+      keyLocation: `https://${HOST}/${KEY}.txt`,
+      urlList: ["https://noemptychair.co/", "https://noemptychair.co/teardown"],
+    }),
+  });
+}
 
 function json(statusCode, obj) {
   return {
