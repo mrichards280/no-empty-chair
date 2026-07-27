@@ -33,7 +33,9 @@ whatever you edited in `/admin`. (If you do edit code while the admin also saved
 - The brand mark's path data lives in **`src/lib/logoPaths.js`** and is shared by
   `ChairMark.astro` (hero, nav, footer), `ChairMark.jsx` (popup, teardown) and
   the companion-doc clip art. **One file to change if the logo changes.**
-  Source art: `../Brand/logo/primary/nec-mark-primary.svg`.
+  Source art: `../Brand/logo/nec-mark-plum-rose-vector-transparent.svg`
+  (all logo files live flat in `Brand/logo/`, self-named
+  `nec-mark-{chair}-{orb}-{size}-transparent`).
 - The chair line and orb are separate elements so they can be coloured
   independently (light version in the footer) and animated on their own.
 - **Hero intro** (~4s, once per session via `sessionStorage`): the mark holds at
