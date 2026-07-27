@@ -23,13 +23,6 @@ function alaIcon(name = "") {
   if (n.includes("voice") || n.includes("caption")) return "comment";
   return "chair-mark";
 }
-function procIcon(title = "") {
-  const t = title.toLowerCase();
-  if (t.includes("teardown")) return "teardown";
-  if (t.includes("build")) return "package";
-  if (t.includes("book")) return "booked";
-  return "chair-mark";
-}
 ---
 <Base>
   <nav>
@@ -282,7 +275,6 @@ function procIcon(title = "") {
       <div class="proc">
         {c.process.steps.map((s) => (
           <div class="pstep">
-            <img class="pstep-icon" src={`/icons/nec-${procIcon(s.title)}-line.svg`} alt="" width="52" height="52"/>
             <div class="num">{s.num}</div>
             <h3>{s.title}</h3>
             <p>{s.desc}</p>

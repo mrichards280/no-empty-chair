@@ -436,7 +436,6 @@ h2 { font-size: clamp(30px, 4.6vw, 46px); color: var(--plum); margin-bottom: 12p
 /* process */
 .proc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 20px; }
 .pstep { text-align: center; padding: 10px; }
-.pstep-icon { width: 52px; height: 52px; display: block; margin: 0 auto 10px; }
 .pstep .num { font-family: "Cinzel", serif; font-size: 52px; color: var(--gold); font-weight: 600; line-height: 1; margin-bottom: 10px; }
 .pstep h3 { font-size: 22px; color: var(--plum); margin-bottom: 8px; }
 .pstep p { font-size: 14.5px; color: var(--plum-soft); }
