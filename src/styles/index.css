@@ -436,6 +436,7 @@ h2 { font-size: clamp(30px, 4.6vw, 46px); color: var(--plum); margin-bottom: 12p
 /* process */
 .proc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 20px; }
 .pstep { text-align: center; padding: 10px; }
+.pstep-icon { width: 52px; height: 52px; display: block; margin: 0 auto 10px; }
 .pstep .num { font-family: "Cinzel", serif; font-size: 52px; color: var(--gold); font-weight: 600; line-height: 1; margin-bottom: 10px; }
 .pstep h3 { font-size: 22px; color: var(--plum); margin-bottom: 8px; }
 .pstep p { font-size: 14.5px; color: var(--plum-soft); }
@@ -719,6 +720,7 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
 #alacarte .ala { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .ala-item { border-radius: 18px; padding: 24px; transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease; }
 .ala-item:hover { transform: translateY(-6px); box-shadow: 0 20px 46px rgba(65,54,69,.16); }
+.ala-icon { width: 40px; height: 40px; margin-bottom: 12px; display: block; }
 .ala-item h3 { font-family: "Marcellus", serif; font-size: 20px; color: var(--plum); margin-bottom: 8px; }
 .ala-item p { font-size: 14px; color: var(--plum-soft); line-height: 1.6; margin: 0; }
 @media (max-width: 820px) { #alacarte .ala { grid-template-columns: 1fr; } }

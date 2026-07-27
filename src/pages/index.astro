@@ -10,6 +10,26 @@ import content from "../../public/content.json";
 
 const c = content;
 const year = new Date().getFullYear();
+
+// Map a card's text to one of the brand line-icons in /public/icons.
+// Name-based so it survives reordering/editing in the admin.
+function alaIcon(name = "") {
+  const n = name.toLowerCase();
+  if (n.includes("template")) return "feed";
+  if (n.includes("reel")) return "reel";
+  if (n.includes("pinterest")) return "save";
+  if (n.includes("website") || n.includes("site")) return "website";
+  if (n.includes("team") || n.includes("sourced") || n.includes("photo") || n.includes("video")) return "shoot";
+  if (n.includes("voice") || n.includes("caption")) return "comment";
+  return "chair-mark";
+}
+function procIcon(title = "") {
+  const t = title.toLowerCase();
+  if (t.includes("teardown")) return "teardown";
+  if (t.includes("build")) return "package";
+  if (t.includes("book")) return "booked";
+  return "chair-mark";
+}
 ---
 <Base>
   <nav>
@@ -147,6 +167,7 @@ const year = new Date().getFullYear();
         <div class="ala">
           {c.alacarte.items.map((a) => (
             <div class="ala-item glass">
+              <img class="ala-icon" src={`/icons/nec-${alaIcon(a.name)}-line.svg`} alt="" width="40" height="40"/>
               <h3>{a.name}</h3>
               <p>{a.desc}</p>
             </div>
@@ -261,6 +282,7 @@ const year = new Date().getFullYear();
       <div class="proc">
         {c.process.steps.map((s) => (
           <div class="pstep">
+            <img class="pstep-icon" src={`/icons/nec-${procIcon(s.title)}-line.svg`} alt="" width="52" height="52"/>
             <div class="num">{s.num}</div>
             <h3>{s.title}</h3>
             <p>{s.desc}</p>
