@@ -891,6 +891,11 @@ footer .logo span { color: #e6b8c6; }
 
 .disc-sec { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 22px; }
 .disc-sec:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+/* social-media checkbox group */
+.disc-social-q { font-size: 13px; font-weight: 600; color: var(--plum); letter-spacing: 0.3px; margin-bottom: 12px; }
+.disc-checks { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.disc-form .disc-check { display: inline-flex; align-items: center; gap: 8px; font-weight: 400; font-size: 14.5px; color: var(--plum); cursor: pointer; }
+.disc-form .disc-check input { width: auto; margin: 0; padding: 0; accent-color: var(--rose); }
 .disc-sec-h { font-family: "Cinzel", serif; font-weight: 600; font-size: 13.5px; letter-spacing: 1.6px; text-transform: uppercase;
               color: var(--gold-text); display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
 .disc-num { width: 23px; height: 23px; border-radius: 50%; background: var(--plum); color: var(--cream);

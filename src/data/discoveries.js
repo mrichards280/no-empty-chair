@@ -24,7 +24,6 @@ export const DISCOVERIES = [
       { name: "business_name", label: "Business name", placeholder: "" },
       { name: "product_line", label: "What do you sell? (product line, quick overview)", placeholder: "" },
       { name: "sell_where", label: "Where do you sell now?", placeholder: "Etsy, Instagram, markets, nowhere yet" },
-      { name: "social_media", label: "Are you on social media? Which platforms, and roughly how many followers?", placeholder: "@yourhandle on IG / TikTok, or 'not yet'" },
       { name: "domain", label: "Do you already own a domain name?", placeholder: "" },
     ],
     assets: [
