@@ -13,7 +13,7 @@
 
 export const DISCOVERIES = [
   {
-    slug: "beauty-body-butter",
+    slug: "lola",
     active: true,
     // Shown in the page title/head only — keep it generic, not the client's name,
     // since this link may be forwarded.

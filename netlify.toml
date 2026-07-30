@@ -8,3 +8,15 @@
 
 # No SPA redirect: Astro emits real routes (/, /teardown/, /admin/, /demos/*).
 # A catch-all /* -> /index.html would shadow those, so it is intentionally absent.
+
+# Discovery page renamed: beauty-body-butter -> lola (keep any shared old link working)
+[[redirects]]
+  from = "/discovery/beauty-body-butter"
+  to = "/discovery/lola/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/discovery/beauty-body-butter/*"
+  to = "/discovery/lola/"
+  status = 301
+  force = true
