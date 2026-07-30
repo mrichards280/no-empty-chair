@@ -246,7 +246,7 @@ nav .submenu a:hover { background: var(--cream-2); color: var(--rose-deep); }
    ~4x its size (the ball would streak in from far off-screen). This variant
    uses the same path at 1/4 the distance, so on screen the arc looks identical
    to the normal swish — just drawn bigger. */
-html:not(.intro-done) .hero .chairmark svg .nec-orb { animation-name: chair-ball-swish-intro; }
+html:not(.intro-done) .hero .chairmark svg .nec-orb { animation-name: chair-ball-swish-intro; animation-duration: 1.3s; }
 @keyframes chair-ball-swish-intro {
   0%   { transform: translate(2137px, 138px)  rotate(0deg); }
   10%  { transform: translate(1875px, -76px)  rotate(-37deg); }
@@ -305,19 +305,20 @@ html:not(.intro-done) .hero .chairmark svg .nec-orb { animation-name: chair-ball
    3. the copy rises out of it, then the buttons (3.5–6.3s)
    Copy stays in the HTML the whole time, so crawlers are unaffected.
    ============================================================ */
-/* Holds big until the 2.1s swish has fully landed, THEN shrinks — so the two
-   motions never overlap and the orb reads clean. */
-.hero .chairmark { animation: hero-mark-intro 2.9s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
+/* Holds big until the 1.3s swish lands, THEN shrinks. The copy starts rising as
+   the mark shrinks so the headline (the LCP element) paints by ~1.8s instead of
+   ~3s — a real Largest Contentful Paint win. */
+.hero .chairmark { animation: hero-mark-intro 1.9s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
 @keyframes hero-mark-intro {
   0%   { transform: translateY(105px) scale(2.5); }
-  72%  { transform: translateY(105px) scale(2.5); } /* 2.09s — swish has landed */
+  68%  { transform: translateY(105px) scale(2.5); } /* 1.29s — swish has landed */
   100% { transform: translateY(0) scale(1); }       /* settle into place */
 }
 /* copy rises out of the mark; the buttons deliberately overlap the headline */
-.hero .eyebrow { animation: hero-rise 0.6s ease 2.75s both; }
-.hero h1       { animation: hero-rise 0.65s ease 2.95s both; }
-.hero .sub     { animation: hero-rise 0.65s ease 3.2s both; }
-.hero .actions { animation: hero-rise 0.65s ease 3.4s both; }
+.hero .eyebrow { animation: hero-rise 0.55s ease 1.25s both; }
+.hero h1       { animation: hero-rise 0.6s ease 1.4s both; }
+.hero .sub     { animation: hero-rise 0.6s ease 1.65s both; }
+.hero .actions { animation: hero-rise 0.6s ease 1.85s both; }
 @keyframes hero-rise {
   from { opacity: 0; transform: translateY(18px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
