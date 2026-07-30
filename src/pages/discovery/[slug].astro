@@ -38,7 +38,7 @@ const tiers = d.tiers.map((t) => ({
       <div class="tp-intro">
         <div class="disc-kick">No Empty Chair</div>
         <h1>Website Discovery</h1>
-        <p>A few quick questions so I can put together your <b>exact quote</b> — no guessing, no generic pricing. Fill in what you can (skip anything you're not sure about yet) and hit send.</p>
+        <p>A few quick questions so we can put together your <b>exact quote</b>. Fill in what you can (skip anything you're not sure about yet) and hit send.</p>
       </div>
 
       <form
@@ -69,6 +69,10 @@ const tiers = d.tiers.map((t) => ({
               <label>{f.label}<input type="text" name={f.name} placeholder={f.placeholder || ""} /></label>
             ))}
           </div>
+        </div>
+
+        <div class="disc-sec">
+          <label>Anything else we should know about your business?<textarea name="anything_else" rows="3" placeholder="Vibe, goals, timeline, brands you love, anything at all"></textarea></label>
         </div>
 
         <div class="disc-sec">

@@ -54,7 +54,7 @@ export const DISCOVERIES = [
     ],
     costs: [
       { what: "Domain name", cost: "~$15–20 / year", note: "Registered once a year, separate from the build." },
-      { what: "Hosting / platform", cost: "Free–ish (Showcase) · ~$29–79/mo (Storefront)", note: "Storefront runs on a commerce platform like Shopify or Squarespace." },
+      { what: "Hosting / platform", cost: "~$16–40 / mo, never free", note: "A custom-designed site needs a paid plan on every platform. Squarespace has no free tier: its custom-CSS plan is about $23/mo billed yearly, or $39/mo month to month. WordPress.com blocks custom CSS on its free plan, so you're on Premium (~$8/mo) for CSS or Business (~$25/mo) for full control. Self-hosted WordPress runs about $10 to $30/mo plus the domain. A full storefront on a commerce platform (Shopify, Squarespace Commerce) runs about $29 to $79/mo." },
       { what: "Payment processing", cost: "~2.9% + $0.30 / sale", note: "Storefront only. Goes to Stripe/Shopify Payments, not to No Empty Chair." },
       { what: "Email / newsletter tool", cost: "Free–$20 / mo", note: "Optional. Depends on list size." },
     ],
