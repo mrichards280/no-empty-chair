@@ -309,8 +309,8 @@ html:not(.intro-done) .hero .chairmark svg .nec-orb { animation-name: chair-ball
    motions never overlap and the orb reads clean. */
 .hero .chairmark { animation: hero-mark-intro 2.9s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
 @keyframes hero-mark-intro {
-  0%   { transform: translateY(190px) scale(4); }
-  72%  { transform: translateY(190px) scale(4); }   /* 2.09s — swish has landed */
+  0%   { transform: translateY(105px) scale(2.5); }
+  72%  { transform: translateY(105px) scale(2.5); } /* 2.09s — swish has landed */
   100% { transform: translateY(0) scale(1); }       /* settle into place */
 }
 /* copy rises out of the mark; the buttons deliberately overlap the headline */
