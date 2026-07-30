@@ -1,4 +1,5 @@
 ---
+import "../styles/fonts.css";
 import "../styles/index.css";
 import content from "../../public/content.json";
 
@@ -142,12 +143,10 @@ const jsonLd = {
     <meta name="twitter:description" content="An Atlanta brand and content studio that keeps talented salons fully booked." />
     <meta name="twitter:image" content={image} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Marcellus&family=Inter:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Self-hosted fonts (no third-party round trip). Preload the two that
+         paint above the fold: Marcellus (the LCP headline) and Inter (body). -->
+    <link rel="preload" href="/fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Structured data for Google rich results + AI search engines -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
