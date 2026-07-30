@@ -8,6 +8,7 @@ const {
   ogDescription = "An Atlanta brand and content studio that keeps talented salons fully booked — premium branding, booking-ready websites, and short-form content.",
   canonical = "https://noemptychair.co/",
   image = "https://noemptychair.co/og-image.png",
+  noindex = false,
 } = Astro.props;
 
 // Static structured-data nodes (ProfessionalService + Person). The FAQ node is
@@ -124,6 +125,7 @@ const jsonLd = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Open Graph / social preview -->
     <meta property="og:type" content="website" />

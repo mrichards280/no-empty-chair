@@ -879,3 +879,51 @@ nav ul a:hover { color: var(--rose-text); }
 /* on the plum footer, light text is what passes */
 footer .fine, footer .adminlink { color: #c9b3bb; }
 footer .logo span { color: #e6b8c6; }
+
+/* ============================================================
+   Private "Website Discovery" forms (/discovery/[slug])
+   Reuses the .tp-* / .tform system from the teardown page for
+   layout + inputs; these .disc-* rules add the sectioned
+   Q&A / tier-picker / cost-table look on top of it.
+   ============================================================ */
+.disc-kick { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-text); text-align: center; margin-bottom: 6px; }
+.disc-wrap .tform { margin-top: 8px; }
+
+.disc-sec { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 22px; }
+.disc-sec:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.disc-sec-h { font-family: "Cinzel", serif; font-weight: 600; font-size: 13.5px; letter-spacing: 1.6px; text-transform: uppercase;
+              color: var(--gold-text); display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.disc-num { width: 23px; height: 23px; border-radius: 50%; background: var(--plum); color: var(--cream);
+            font-family: "Inter"; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 23px; }
+.disc-ribbon { display: inline-flex; align-items: center; gap: 7px; background: var(--rose); color: #fff; font-family: "Inter";
+               font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; margin-left: auto; }
+
+.disc-tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .disc-tiers { grid-template-columns: 1fr; } }
+.disc-tier { position: relative; display: block; cursor: pointer; border-radius: 16px; padding: 18px 20px;
+             background: var(--white); border: 1.5px solid var(--line); transition: .15s; }
+.disc-tier.b { background: var(--plum); color: var(--cream); border-color: var(--plum); }
+.disc-tier-radio { position: absolute; opacity: 0; pointer-events: none; }
+.disc-tier:has(.disc-tier-radio:checked) { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(168,90,118,.16); }
+.disc-tier-lbl { font-family: "Inter"; font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--rose-text); }
+.disc-tier.b .disc-tier-lbl { color: var(--gold); }
+.disc-tier h3 { font-family: "Marcellus", serif; font-size: 20px; margin: 6px 0 8px; color: var(--plum); }
+.disc-tier.b h3 { color: #fff; }
+.disc-tier-d { font-size: 13px; line-height: 1.55; color: var(--plum-soft); margin-bottom: 12px; }
+.disc-tier.b .disc-tier-d { color: #d9cdd0; }
+.disc-tier-price { font-family: "Cinzel", serif; font-weight: 700; font-size: 18px; color: var(--rose-text); display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.disc-tier.b .disc-tier-price { color: var(--gold); }
+.disc-orig { font-family: "Inter"; font-weight: 600; font-size: 13px; text-decoration: line-through; opacity: .6; }
+.disc-pick { margin-top: 13px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.disc-box { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--rose-text); flex: 0 0 15px; display: inline-block; }
+.disc-tier.b .disc-box { border-color: var(--gold); }
+.disc-tier:has(.disc-tier-radio:checked) .disc-box { background: var(--rose); border-color: var(--rose); }
+.disc-fine { font-size: 12px; color: var(--plum-soft); font-style: italic; margin-top: 10px; }
+
+.disc-costs { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 13px; }
+.disc-costs th { background: var(--plum); color: var(--cream); font-family: "Inter"; font-size: 10.5px; font-weight: 700;
+                  letter-spacing: .8px; text-transform: uppercase; text-align: left; padding: 10px 14px; }
+.disc-costs td { padding: 10px 14px; border-top: 1px solid var(--line); color: #3d3540; }
+.disc-costs td.note { color: var(--plum-soft); font-size: 12px; }
+.disc-costs tr:nth-child(odd) td { background: #faf7f4; }
+@media (max-width: 640px) { .disc-costs, .disc-costs tbody, .disc-costs tr, .disc-costs td, .disc-costs th { display: block; } .disc-costs tr { padding: 10px 0; } .disc-costs th:not(:first-child) { display: none; } }

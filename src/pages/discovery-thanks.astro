@@ -1,0 +1,28 @@
+---
+import Base from "../layouts/Base.astro";
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
+---
+<Base
+  title="Got it | No Empty Chair"
+  description="Thanks for filling out your website discovery form."
+  canonical="https://noemptychair.co/discovery-thanks"
+  noindex={true}>
+  <main id="main" class="disc-page">
+    <header class="tp-head">
+      <a href="/" class="tp-logo">No Empty <span>Chair</span></a>
+    </header>
+    <div class="tp-wrap">
+      <div class="tp-done">
+        <div class="tp-mark">
+          <svg width="44" height="55.6" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="img" aria-label="No Empty Chair mark">
+            <g fill="#413645" stroke="none"><g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g></g>
+            <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill="#a85a76" /></g>
+          </svg>
+        </div>
+        <h1>Got it — thank you.</h1>
+        <p>Your answers just landed with Makayla. She'll turn this into your exact quote within a couple days — no obligation, no pressure.</p>
+        <a href="/" class="btn">Back to the site</a>
+      </div>
+    </div>
+  </main>
+</Base>

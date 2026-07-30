@@ -1,0 +1,122 @@
+---
+import Base from "../../layouts/Base.astro";
+import { DISCOVERIES, getDiscovery } from "../../data/discoveries.js";
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../lib/logoPaths.js";
+
+export function getStaticPaths() {
+  return DISCOVERIES.filter((d) => d.active !== false).map((d) => ({ params: { slug: d.slug } }));
+}
+
+const { slug } = Astro.params;
+const d = getDiscovery(slug);
+
+const pct = (d.discountPercent || 0) / 100;
+const tiers = d.tiers.map((t) => ({
+  ...t,
+  discLow: Math.round(t.priceLow * (1 - pct)),
+  discHigh: Math.round(t.priceHigh * (1 - pct)),
+}));
+---
+<Base
+  title="Website Discovery | No Empty Chair"
+  description="A private discovery form for a No Empty Chair website quote."
+  canonical={`https://noemptychair.co/discovery/${d.slug}`}
+  noindex={true}>
+  <main id="main" class="disc-page">
+    <header class="tp-head">
+      <a href="/" class="tp-logo">No Empty <span>Chair</span></a>
+    </header>
+
+    <div class="tp-wrap disc-wrap">
+      <div class="tp-mark">
+        <svg width="40" height="50.5" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="img" aria-label="No Empty Chair mark">
+          <g fill="#413645" stroke="none"><g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g></g>
+          <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill="#a85a76" /></g>
+        </svg>
+      </div>
+
+      <div class="tp-intro">
+        <div class="disc-kick">No Empty Chair</div>
+        <h1>Website Discovery</h1>
+        <p>A few quick questions so I can put together your <b>exact quote</b> — no guessing, no generic pricing. Fill in what you can (skip anything you're not sure about yet) and hit send.</p>
+      </div>
+
+      <form
+        class="tform disc-form"
+        name="discovery"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/discovery-thanks"
+      >
+        <input type="hidden" name="form-name" value="discovery" />
+        <input type="hidden" name="client_slug" value={d.slug} />
+        <input class="tp-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">1</span>The Basics</div>
+          <div class="tp-row">
+            {d.basics.map((f) => (
+              <label>{f.label}<input type="text" name={f.name} placeholder={f.placeholder || ""} /></label>
+            ))}
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">2</span>What You Already Have</div>
+          <div class="tp-row">
+            {d.assets.map((f) => (
+              <label>{f.label}<input type="text" name={f.name} placeholder={f.placeholder || ""} /></label>
+            ))}
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h">
+            <span class="disc-num">3</span>Which Sounds Like You?
+            {d.discountPercent ? <span class="disc-ribbon">{d.discountPercent}% off · {d.discountLabel || "limited-time rate"}</span> : null}
+          </div>
+          <div class="disc-tiers">
+            {tiers.map((t, i) => (
+              <label class={`disc-tier ${i === 0 ? "a" : "b"}`}>
+                <input type="radio" name="tier_pick" value={t.key} class="disc-tier-radio" />
+                <div class="disc-tier-lbl">{t.label}</div>
+                <h3>{t.name}</h3>
+                <p class="disc-tier-d">{t.desc}</p>
+                <div class="disc-tier-price">
+                  {d.discountPercent ? <span class="disc-orig">${t.priceLow.toLocaleString()}–{t.priceHigh.toLocaleString()}{t.plus ? "+" : ""}</span> : null}
+                  <span>${(d.discountPercent ? t.discLow : t.priceLow).toLocaleString()}–{(d.discountPercent ? t.discHigh : t.priceHigh).toLocaleString()}{t.plus ? "+" : ""}</span>
+                </div>
+                <div class="disc-pick"><span class="disc-box" aria-hidden="true"></span> This is closer to what I want</div>
+              </label>
+            ))}
+          </div>
+          {d.discountPercent ? <p class="disc-fine">{d.discountPercent}% {d.discountLabel || "discount"} applies to the website build only — ongoing costs below are unaffected.</p> : null}
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">4</span>Ongoing Costs (so there's no surprise later)</div>
+          <table class="disc-costs">
+            <tr><th>What</th><th>Typical cost</th><th>Notes</th></tr>
+            {d.costs.map((c) => (
+              <tr><td>{c.what}</td><td>{c.cost}</td><td class="note">{c.note}</td></tr>
+            ))}
+          </table>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">5</span>Timeline &amp; Budget</div>
+          <div class="tp-row">
+            <label>When would you like this live by?<input type="text" name="timeline" /></label>
+            <label>Do you have a budget range in mind?<input type="text" name="budget" /></label>
+          </div>
+        </div>
+
+        <label>Best email to send your quote to<input required type="email" name="email" /></label>
+
+        <button class="btn" type="submit">Send my answers →</button>
+        <p class="tp-fine">Goes straight to Makayla — no account needed.</p>
+      </form>
+    </div>
+  </main>
+</Base>
