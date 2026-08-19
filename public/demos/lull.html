@@ -17,7 +17,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:'Jost',sans-serif;color:var(--ink);background:var(--bg);line-height:1.75;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  body{font-family:'Jost',sans-serif;color:var(--ink);background:var(--bg);line-height:1.75;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:clip;}
   .serif{font-family:'Cormorant Garamond',serif;}
   .wrap{max-width:1140px;margin:0 auto;padding:0 34px;}
   a{color:inherit;text-decoration:none;}
@@ -303,7 +303,6 @@
 
 
 <style>
-  html{overflow-x:clip;}
   .appbar{display:none;}
   .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
   .reveal.in{opacity:1;transform:none;}
@@ -339,7 +338,7 @@
   var els=[].slice.call(document.querySelectorAll('.sec-head,.mcard,.vcard,.trow,.tcard,.svc-row'));
   els.forEach(function(e){e.classList.add('reveal');});
   if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
-  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});} setTimeout(function(){els.forEach(function(e){e.classList.add('in');});},1600);
   var links=[].slice.call(document.querySelectorAll('nav ul a[href^="#"]'));var lm={};links.forEach(function(l){var id=l.getAttribute('href').slice(1);if(id)lm[id]=l;});var lids=Object.keys(lm);
   function spy(){var mid=window.scrollY+window.innerHeight*0.3,cur=null,ct=-1;lids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var t=el.offsetTop;if(t<=mid&&t>ct){ct=t;cur=lm[id];}});links.forEach(function(l){l.classList.toggle('active',l===cur);});}
   window.addEventListener('scroll',spy,{passive:true});spy();

@@ -127,6 +127,7 @@
       if (itemPrice(state.answers) > 0) html += '<div class="nec-bk-sum"><div><span>This service</span><span>' + money(itemPrice(state.answers)) + "</span></div></div>";
       var need = s.type !== "multi" && !s.optional && !state.answers[s.key];
       var last = state.si === qs.length - 1;
+      if (last) html += '<div class="nec-bk-hint">＋ Add this to your order — you can add more services after.</div>';
       html += '<button class="nec-bk-cta" data-next ' + (need ? "disabled" : "") + ">" + (last ? "Add to order →" : "Continue →") + "</button>";
       if (state.si > 0) html += '<button class="nec-bk-back" data-back>← Back</button>';
       else if (state.cart.length) html += '<button class="nec-bk-back" data-tocart>← Back to order</button>';
@@ -134,7 +135,7 @@
       html += bars(svcSteps().length + 3, svcSteps().length);
       html += '<div class="nec-bk-h">Your order</div><div class="nec-bk-sub">Add as many services as you like.</div>';
       state.cart.forEach(function (it, i) {
-        html += '<div class="nec-bk-line"><div><b>' + esc(it.label) + "</b>" + (it.detail ? "<small>" + esc(it.detail) + "</small>" : "") + '</div><div class="nec-bk-liner"><span>' + money(it.price) + '</span><button class="nec-bk-rm" data-rm="' + i + '" aria-label="Remove">&times;</button></div></div>';
+        html += '<div class="nec-bk-line"><div><b>' + esc(it.label) + "</b>" + (it.detail ? "<small>" + esc(it.detail) + "</small>" : "") + '</div><div class="nec-bk-liner"><span>' + money(it.price) + '</span><button class="nec-bk-edit" data-edit="' + i + '">Edit</button><button class="nec-bk-rm" data-rm="' + i + '" aria-label="Remove">&times;</button></div></div>';
       });
       html += '<div class="nec-bk-sum"><div><span>Order total</span><span>' + money(cartPrice()) + "</span></div></div>";
       html += '<button class="nec-bk-add" data-addmore>+ Add another service</button>';
@@ -188,7 +189,7 @@
   }
 
   overlay.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-close],[data-next],[data-back],[data-tocart],[data-opt],[data-addmore],[data-tovisit],[data-rm],[data-vnext],[data-vback],[data-day],[data-slot],[data-towhen],[data-backvisit],[data-confirm],[data-backwhen]");
+    var t = e.target.closest("[data-close],[data-next],[data-back],[data-tocart],[data-opt],[data-addmore],[data-tovisit],[data-rm],[data-edit],[data-vnext],[data-vback],[data-day],[data-slot],[data-towhen],[data-backvisit],[data-confirm],[data-backwhen]");
     if (!t) return;
     if (t.hasAttribute("data-close")) return close();
     // option select (service or visit)
@@ -205,6 +206,7 @@
     if (t.hasAttribute("data-back")) { if (state.si > 0) state.si--; return render(); }
     if (t.hasAttribute("data-tocart")) { state.answers = {}; state.si = 0; state.phase = "cart"; return render(); }
     if (t.hasAttribute("data-rm")) { state.cart.splice(+t.getAttribute("data-rm"), 1); return render(); }
+    if (t.hasAttribute("data-edit")) { var it = state.cart.splice(+t.getAttribute("data-edit"), 1)[0]; state.answers = it.answers; state.phase = "service"; state.si = 0; return render(); }
     if (t.hasAttribute("data-addmore")) { state.answers = {}; state.si = 0; state.phase = "service"; return render(); }
     if (t.hasAttribute("data-tovisit")) { if (t.disabled) return; state.vi = 0; state.phase = visitSteps().length ? "visit" : "when"; return render(); }
     if (t.hasAttribute("data-vnext")) { var vs = visitSteps(); if (state.vi < vs.length - 1) state.vi++; else state.phase = "when"; return render(); }

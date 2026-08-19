@@ -16,8 +16,8 @@
     --muted:#6f6a60; --line:#d9d2c6;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  html{scroll-behavior:smooth;overflow-x:clip;}
-  body{font-family:'Space Grotesk',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Space Grotesk',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:clip;}
   .ser{font-family:'Instrument Serif',serif;font-weight:400;}
   .wrap{max-width:1200px;margin:0 auto;padding:0 28px;}
   a{color:inherit;text-decoration:none;}
@@ -320,7 +320,7 @@
   var els=[].slice.call(document.querySelectorAll('.sec-head,.scard,.pstep,.rl,.cell,.eyebrow'));
   els.forEach(function(e){e.classList.add('reveal');});
   if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
-  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});} setTimeout(function(){els.forEach(function(e){e.classList.add('in');});},1600);
   var links=[].slice.call(document.querySelectorAll('nav ul a[href^="#"]'));var lm={};links.forEach(function(l){var id=l.getAttribute('href').slice(1);if(id)lm[id]=l;});var lids=Object.keys(lm);
   function spy(){var mid=window.scrollY+window.innerHeight*0.3,cur=null,ct=-1;lids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var t=el.offsetTop;if(t<=mid&&t>ct){ct=t;cur=lm[id];}});links.forEach(function(l){l.classList.toggle('active',l===cur);});}
   window.addEventListener('scroll',spy,{passive:true});spy();
