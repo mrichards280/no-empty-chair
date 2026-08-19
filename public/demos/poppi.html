@@ -16,7 +16,7 @@
     --rose:#a85a76; --plum:#413645; /* No Empty Chair signature thread */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth;overflow-x:clip;}
   body{font-family:'Poppins',sans-serif;color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
   .display{font-family:'Rubik',sans-serif;}
   .wrap{max-width:1140px;margin:0 auto;padding:0 26px;}
@@ -39,7 +39,25 @@
   .book-btn{background:var(--ink);color:#fff !important;padding:12px 26px;border-radius:100px;font-weight:600;font-size:14px;
     transition:.2s;box-shadow:0 6px 0 rgba(139,77,255,.35);}
   .book-btn:hover{transform:translateY(-2px);box-shadow:0 9px 0 rgba(139,77,255,.35);}
-  @media(max-width:900px){nav ul li:not(.cta){display:none;}}
+  /* left collapsible nav drawer */
+  .navburger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:8px;margin-left:-8px;}
+  .navburger span{width:22px;height:2.5px;background:var(--plum);border-radius:2px;transition:.2s;}
+  .navburger:hover span{background:var(--pink);}
+  .drawer-scrim{position:fixed;inset:0;background:rgba(32,18,46,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:.28s;z-index:190;}
+  .drawer{position:fixed;top:0;left:0;bottom:0;width:min(300px,82vw);background:var(--cream);z-index:200;padding:26px 26px 30px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.7,.2,1);box-shadow:22px 0 64px rgba(32,18,46,.22);display:flex;flex-direction:column;}
+  body.drawer-open{overflow:hidden;}
+  body.drawer-open .drawer{transform:translateX(0);}
+  body.drawer-open .drawer-scrim{opacity:1;visibility:visible;}
+  .drawer-x{align-self:flex-end;background:none;border:none;font-size:30px;line-height:1;cursor:pointer;color:var(--plum);opacity:.55;}
+  .drawer-x:hover{opacity:1;}
+  .drawer-logo{font-family:'Fredoka';font-weight:700;font-size:26px;letter-spacing:1px;background:linear-gradient(90deg,var(--pink),var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:2px 0 22px;}
+  .drawer-links{display:flex;flex-direction:column;gap:2px;}
+  .drawer-links a{font-family:'Rubik';font-weight:700;font-size:21px;color:var(--plum);padding:12px 2px;border-bottom:1px solid rgba(65,54,69,.08);transition:.15s;}
+  .drawer-links a:hover{color:var(--pink);padding-left:8px;}
+  .drawer-links a.drawer-book{color:#fff;background:var(--pink);text-align:center;border:none;border-radius:100px;padding:14px;margin-top:18px;box-shadow:0 6px 0 #c41f6a;}
+  .drawer-links a.drawer-book:hover{padding-left:0;transform:translateY(-2px);}
+  .drawer-foot{margin-top:auto;font-size:12.5px;color:var(--muted);line-height:1.6;}
+  .appbar{display:none !important;} /* nav moved to the left drawer */
 
   /* HERO — editorial, photo-forward */
   .hero{position:relative;padding:52px 0 56px;overflow:hidden;}
@@ -182,16 +200,26 @@
 
 <nav>
   <div class="wrap">
+    <button class="navburger" data-drawer-open aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <div class="logo">POPPI</div>
-    <ul>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#reviews">Reviews</a></li>
-      <li class="cta"><a href="#book" class="book-btn">Book now</a></li>
-    </ul>
+    <a href="#book" data-booking class="book-btn">Book now</a>
   </div>
 </nav>
+
+<div class="drawer-scrim" data-drawer-close></div>
+<aside class="drawer" aria-label="Menu">
+  <button class="drawer-x" data-drawer-close aria-label="Close menu">&times;</button>
+  <div class="drawer-logo">POPPI</div>
+  <nav class="drawer-links">
+    <a href="#" data-drawer-top data-drawer-close>Home</a>
+    <a href="#services" data-drawer-close>Services</a>
+    <a href="#gallery" data-drawer-close>Gallery</a>
+    <a href="#about" data-drawer-close>Meet Sofia</a>
+    <a href="#reviews" data-drawer-close>Reviews</a>
+    <a href="#book" data-booking data-drawer-close class="drawer-book">Book now</a>
+  </nav>
+  <div class="drawer-foot">641 Edgewood Ave NE · Old Fourth Ward, ATL<br>Tue–Sat 10a–7p</div>
+</aside>
 
 <header class="hero">
   <div class="wrap">
@@ -359,7 +387,7 @@
 <style>
   .appbar{display:none;}
   @media(max-width:900px){
-    body{padding-bottom:80px;}
+    body{padding-bottom:0;}
     .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
       padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,249,244,.98);
       backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(32,18,46,.12);box-shadow:0 -12px 34px rgba(32,18,46,.16);}
@@ -452,22 +480,31 @@
         {name:"Soak-off removal",price:"+$10",p:10}
       ]},
       {key:"massage",label:"Massage & spa add-ons",type:"multi",optional:true,perVisit:true,options:[
-        {name:"Foot & leg massage (10 min)",price:"+$10",p:10,icon:"\U0001F9B6"},
+        {name:"Foot & leg massage (10 min)",price:"+$10",p:10,icon:"🦶"},
         {name:"Hand & arm massage (10 min)",price:"+$10",p:10,icon:"✋"},
-        {name:"Shoulder & neck massage",price:"+$15",p:15,icon:"\U0001F486"},
-        {name:"Paraffin dip",price:"+$12",p:12,icon:"\U0001F56F️"}
+        {name:"Shoulder & neck massage",price:"+$15",p:15,icon:"💆"},
+        {name:"Paraffin dip",price:"+$12",p:12,icon:"🕯️"}
       ]},
       {key:"drink",label:"Pick your drink",sub:"On the house — or add something bubbly.",type:"single",optional:true,perVisit:true,options:[
-        {name:"Still water",price:"free",p:0,icon:"\U0001F4A7"},
-        {name:"Sparkling water",price:"free",p:0,icon:"\U0001FAE7"},
-        {name:"Hot tea",price:"free",p:0,icon:"\U0001F375"},
-        {name:"Soda",price:"free",p:0,icon:"\U0001F964"},
-        {name:"Mimosa",price:"+$8",p:8,icon:"\U0001F942"},
-        {name:"Glass of wine",price:"+$10",p:10,icon:"\U0001F377"},
-        {name:"Prosecco",price:"+$9",p:9,icon:"\U0001F942"}
+        {name:"Still water",price:"free",p:0,icon:"💧"},
+        {name:"Sparkling water",price:"free",p:0,icon:"🫧"},
+        {name:"Hot tea",price:"free",p:0,icon:"🍵"},
+        {name:"Soda",price:"free",p:0,icon:"🥤"},
+        {name:"Mimosa",price:"+$8",p:8,icon:"🥂"},
+        {name:"Glass of wine",price:"+$10",p:10,icon:"🍷"},
+        {name:"Prosecco",price:"+$9",p:9,icon:"🥂"}
       ]}
     ]
   };
+</script>
+<script>
+  (function(){
+    function set(o){document.body.classList.toggle('drawer-open',o);var b=document.querySelector('[data-drawer-open]');if(b)b.setAttribute('aria-expanded',o?'true':'false');}
+    var ob=document.querySelector('[data-drawer-open]');if(ob)ob.addEventListener('click',function(){set(true);});
+    document.querySelectorAll('[data-drawer-close]').forEach(function(el){el.addEventListener('click',function(){set(false);});});
+    var top=document.querySelector('[data-drawer-top]');if(top)top.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
+  })();
 </script>
 <script src="/demos/_booking.js" defer></script>
 <script>

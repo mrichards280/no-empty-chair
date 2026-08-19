@@ -64,3 +64,13 @@
 .nec-bk-calbtn{flex:1;text-align:center;border:1.5px solid rgba(128,128,128,.28);border-radius:12px;padding:11px 8px;font-weight:600;font-size:13.5px;color:inherit;transition:.15s;}
 .nec-bk-calbtn:hover{border-color:var(--bk-accent);color:var(--bk-accent);}
 .nec-bk-pending{background:var(--bk-accent-soft,rgba(0,0,0,.06));font-size:30px;}
+/* inspiration upload / links */
+.nec-bk-inspo{margin:2px 0 8px;}
+.nec-bk-inspolbl{font-size:13px;font-weight:700;margin-bottom:8px;}
+.nec-bk-inspolbl span{font-weight:400;opacity:.55;}
+.nec-bk-uplbl{display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:1.5px dashed rgba(128,128,128,.4);border-radius:12px;padding:11px 16px;font-weight:600;font-size:13.5px;margin-bottom:10px;transition:.15s;}
+.nec-bk-uplbl:hover{border-color:var(--bk-accent);color:var(--bk-accent);}
+.nec-bk-thumbs{display:flex;flex-wrap:wrap;gap:8px;}
+.nec-bk-thumbs:not(:empty){margin-bottom:10px;}
+.nec-bk-thumb{width:52px;height:52px;border-radius:10px;background-size:cover;background-position:center;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.14);}
+textarea.nec-bk-field{resize:vertical;min-height:54px;font-family:inherit;}

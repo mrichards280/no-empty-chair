@@ -28,7 +28,8 @@
   function markImg(px) { return '<img src="' + markSrc + '" alt="" width="' + Math.round(px * 0.79) + '" height="' + px + '" style="display:inline-block;vertical-align:middle">'; }
 
   var state = blank();
-  function blank() { return { phase: "service", si: 0, answers: {}, cart: [], visit: {}, vi: 0, dayIdx: 0, slot: null, name: "", phone: "" }; }
+  function blank() { return { phase: "service", si: 0, answers: {}, cart: [], visit: {}, vi: 0, dayIdx: 0, slot: null, name: "", phone: "", inspo: { links: "", thumbs: [] } }; }
+  function inspoSummary() { var t = state.inspo.thumbs.length, l = state.inspo.links.trim(); if (!t && !l) return ""; var parts = []; if (t) parts.push(t + " photo" + (t > 1 ? "s" : "")); if (l) parts.push("links"); return parts.join(" + "); }
 
   var overlay = document.createElement("div");
   overlay.className = "nec-bk-overlay";
@@ -164,13 +165,17 @@
       if (vadd.length) html += "<div><span>Add-ons</span><span>" + esc(vadd.join(", ")) + "</span></div>";
       html += "<div><span>When</span><span>" + dayLabel(days[state.dayIdx], state.dayIdx) + " · " + state.slot + "</span></div><div><span>Est. total</span><span>" + money(grandTotal()) + "</span></div></div>";
       html += '<input class="nec-bk-field" data-name placeholder="Your name" value="' + esc(state.name) + '" autocomplete="name"><input class="nec-bk-field" data-phone placeholder="Mobile number" value="' + esc(state.phone) + '" inputmode="tel" autocomplete="tel">';
+      html += '<div class="nec-bk-inspo"><div class="nec-bk-inspolbl">Bring your inspiration <span>(optional)</span></div>';
+      html += '<label class="nec-bk-uplbl">📎 Add inspo photos<input type="file" accept="image/*" multiple hidden data-inspo-files></label>';
+      html += '<div class="nec-bk-thumbs" data-thumbs>' + state.inspo.thumbs.map(function (t) { return '<span class="nec-bk-thumb" style="background-image:url(' + t + ')"></span>'; }).join("") + "</div>";
+      html += '<textarea class="nec-bk-field" data-inspo-links rows="2" placeholder="Or paste inspo links — Instagram, TikTok, Pinterest">' + esc(state.inspo.links) + "</textarea></div>";
       html += '<button class="nec-bk-cta" data-confirm ' + (state.name && state.phone ? "" : "disabled") + ">Request appointment" + (CFG.deposit ? " · " + esc(CFG.deposit) + " deposit" : "") + "</button><button class=\"nec-bk-back\" data-backwhen>← Back</button>";
     } else { // done — PENDING
       var links = calLinks();
       html += '<div class="nec-bk-center"><div class="nec-bk-check nec-bk-pending">🕓</div><div class="nec-bk-h">Request sent, ' + esc(state.name.split(" ")[0] || "") + "!</div><div class=\"nec-bk-sub\">Your spot is <b>pending</b> — " + esc(CFG.brand) + " will text you shortly to confirm. Nothing is charged yet.</div></div>";
       html += '<div class="nec-bk-sum">';
       state.cart.forEach(function (it) { html += "<div><span>" + esc(it.label) + "</span><span>" + money(it.price) + "</span></div>"; });
-      html += "<div><span>Requested</span><span>" + dayLabel(days[state.dayIdx], state.dayIdx) + " · " + state.slot + "</span></div><div><span>Est. total</span><span>" + money(grandTotal()) + "</span></div></div>";
+      html += "<div><span>Requested</span><span>" + dayLabel(days[state.dayIdx], state.dayIdx) + " · " + state.slot + "</span></div>" + (inspoSummary() ? "<div><span>Inspo</span><span>" + esc(inspoSummary()) + "</span></div>" : "") + "<div><span>Est. total</span><span>" + money(grandTotal()) + "</span></div></div>";
       html += '<div class="nec-bk-callabel">Add a tentative hold to your calendar</div><div class="nec-bk-cal">';
       html += '<a class="nec-bk-calbtn" href="' + links.g + '" target="_blank" rel="noopener">Google</a>';
       html += '<a class="nec-bk-calbtn" href="' + links.a + '" download="' + esc((CFG.brand || "appointment")) + '.ics">Apple</a>';
@@ -213,7 +218,19 @@
   sheet.addEventListener("input", function (e) {
     if (e.target.hasAttribute("data-name")) state.name = e.target.value;
     if (e.target.hasAttribute("data-phone")) state.phone = e.target.value;
+    if (e.target.hasAttribute("data-inspo-links")) state.inspo.links = e.target.value;
     var c = sheet.querySelector("[data-confirm]"); if (c) c.disabled = !(state.name && state.phone);
+  });
+  overlay.addEventListener("change", function (e) {
+    if (!e.target.hasAttribute || !e.target.hasAttribute("data-inspo-files")) return;
+    var files = e.target.files; if (!files) return;
+    var thumbsEl = sheet.querySelector("[data-thumbs]");
+    Array.prototype.slice.call(files).slice(0, 8).forEach(function (f) {
+      if (!/^image\//.test(f.type)) return;
+      var r = new FileReader();
+      r.onload = function () { state.inspo.thumbs.push(r.result); if (thumbsEl) { var sp = document.createElement("span"); sp.className = "nec-bk-thumb"; sp.style.backgroundImage = "url(" + r.result + ")"; thumbsEl.appendChild(sp); } };
+      r.readAsDataURL(f);
+    });
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && overlay.classList.contains("open")) close(); });
   document.addEventListener("click", function (e) { var t = e.target.closest("[data-booking], a[href='#book'], a[href='#reserve'], a[href='#book-flow']"); if (!t) return; e.preventDefault(); open(); });
