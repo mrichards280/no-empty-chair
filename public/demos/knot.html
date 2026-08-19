@@ -48,12 +48,11 @@
 
   /* BENTO HERO GRID */
   .hgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:156px;gap:14px;}
-  .cell{border-radius:22px;padding:22px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:space-between;}
+  .cell{border-radius:22px;padding:22px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:flex-start;gap:14px;}
   .cell.big{grid-column:span 2;grid-row:span 2;}
   .cell.wide{grid-column:span 2;grid-row:span 2;}
   .cell.tall{grid-row:span 2;}
   .cell.photo{color:#fff;}
-  .cell.big > div{transform:translateY(-70px);}      /* Knotless Boho caption up */
   .cell.photo:before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.35),transparent 55%);z-index:0;}
   .cell.photo > *{position:relative;z-index:1;}
   .p-clay{background:linear-gradient(150deg,#c25b3a,#8a3a22);}
@@ -182,7 +181,7 @@
         <span class="lbl">Most booked</span>
         <div>
           <div class="tag">Knotless<br>Boho Braids</div>
-          <a href="#book" class="bookmini" style="margin-top:14px;">Book from $180 →</a>
+          <a href="#book" class="bookmini" style="margin-top:48px;">Book from $180 →</a>
         </div>
       </div>
       <div class="cell wide c-ink"><span class="lbl">Open late</span><div><div class="tag">Evening slots<br>Tue–Sat til 9pm</div><div class="cellrows"><div><b>Tue – Fri</b><span>10a – 9p</span></div><div><b>Saturday</b><span>9a – 8p</span></div><div><b>Sun / Mon</b><span>By request</span></div></div></div></div>
