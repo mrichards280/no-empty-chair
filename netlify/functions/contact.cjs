@@ -1,5 +1,5 @@
 // Handles the site contact form. If RESEND_API_KEY is set, it emails you at
-// CONTACT_TO_EMAIL (default hello@noemptychair.co). Without a key it still
+// CONTACT_TO_EMAIL (default info@noemptychair.co). Without a key it still
 // accepts the message so the form works, and you can wire email later.
 // Env: RESEND_API_KEY (optional), CONTACT_TO_EMAIL (optional)
 
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     return json(400, { error: "Please enter a valid email." });
   }
 
-  const to = process.env.CONTACT_TO_EMAIL || "hello@noemptychair.co";
+  const to = process.env.CONTACT_TO_EMAIL || "info@noemptychair.co";
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
   if (RESEND_API_KEY) {
