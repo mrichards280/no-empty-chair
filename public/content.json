@@ -327,9 +327,9 @@
       {
         "name": "Maison Noir",
         "tagline": "Luxury hair atelier",
-        "desc": "Regal and editorial. Quiet luxury, by appointment.",
+        "desc": "Clean editorial luxury: warm, modern, by appointment.",
         "href": "/demos/maison-noir.html",
-        "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/maison/m-2"
+        "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/maison/hero"
       },
       {
         "name": "KNOT",
