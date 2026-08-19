@@ -123,6 +123,7 @@
       var nbars = qs.length + 3; // steps + cart + when + details
       html += bars(nbars, state.si);
       html += '<div class="nec-bk-h">' + esc(s.label) + '</div>' + (s.sub ? '<div class="nec-bk-sub">' + esc(s.sub) + "</div>" : '<div class="nec-bk-sub">' + (s.type === "multi" ? "Tap any that apply — optional." : "Tap to choose.") + "</div>");
+      if (s.guide) html += '<div class="nec-bk-guide">' + s.guide + "</div>";
       s.options.forEach(function (o, i) { html += optionRow(s, o, i); });
       if (itemPrice(state.answers) > 0) html += '<div class="nec-bk-sum"><div><span>This service</span><span>' + money(itemPrice(state.answers)) + "</span></div></div>";
       var need = s.type !== "multi" && !s.optional && !state.answers[s.key];
@@ -144,6 +145,7 @@
       var vs = visitSteps(), v = vs[state.vi];
       html += bars(svcSteps().length + 3, svcSteps().length + 1);
       html += '<div class="nec-bk-h">' + esc(v.label) + '</div>' + (v.sub ? '<div class="nec-bk-sub">' + esc(v.sub) + "</div>" : '<div class="nec-bk-sub">Optional — tap to add.</div>');
+      if (v.guide) html += '<div class="nec-bk-guide">' + v.guide + "</div>";
       v.options.forEach(function (o, i) { html += optionRow(v, o, i); });
       html += '<button class="nec-bk-cta" data-vnext>' + (state.vi === vs.length - 1 ? "Choose a time →" : "Continue →") + "</button>";
       html += '<button class="nec-bk-back" data-vback>← Back</button>';

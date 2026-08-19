@@ -19,6 +19,9 @@
 .nec-bk-steps i.on{background:var(--bk-accent,#ff3d92);}
 .nec-bk-h{font-size:21px;font-weight:700;margin-bottom:3px;line-height:1.15;}
 .nec-bk-sub{font-size:13.5px;opacity:.62;margin-bottom:16px;}
+.nec-bk-guide{background:var(--bk-accent-soft,rgba(0,0,0,.05));border:1px solid var(--bk-accent-soft,rgba(0,0,0,.08));border-radius:16px;padding:14px 12px 12px;margin:-4px 0 16px;}
+.nec-bk-guide svg{display:block;width:100%;height:auto;}
+.nec-bk-guide .gcap{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.55;text-align:center;margin-bottom:8px;}
 .nec-bk-opt{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid rgba(128,128,128,.22);
   background:var(--bk-bg,#faf7fb);border-radius:16px;padding:13px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;font:inherit;color:inherit;}
 .nec-bk-opt:hover{border-color:var(--bk-accent,#ff3d92);}
