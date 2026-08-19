@@ -86,10 +86,11 @@
     if (o.heading) return '<div class="nec-bk-group">' + esc(o.heading) + "</div>";
     var scope = s.perVisit ? state.visit : state.answers;
     var sel = s.type === "multi" ? ((scope[s.key] || []).indexOf(o) > -1) : (scope[s.key] === o);
+    var photo = o.img ? '<span class="nec-bk-photo" style="background-image:url(' + o.img + ')"></span>' : "";
     var ico = o.icon ? '<span class="nec-bk-ico">' + o.icon + "</span>" : "";
-    var left = '<span class="nec-bk-optl">' + ico + "<span><b>" + esc(o.name) + "</b>" + (o.desc ? "<small>" + esc(o.desc) + "</small>" : "") + "</span></span>";
+    var left = '<span class="nec-bk-optl">' + photo + ico + "<span><b>" + esc(o.name) + "</b>" + (o.desc ? "<small>" + esc(o.desc) + "</small>" : "") + "</span></span>";
     var right = o.price ? '<span class="pr">' + (sel && s.type === "multi" ? "✓ " : "") + esc(o.price) + "</span>" : (sel && s.type === "multi" ? '<span class="pr">✓</span>' : "");
-    return '<button class="nec-bk-opt' + (o.icon ? " has-ico" : "") + " " + (sel ? "sel" : "") + '" data-opt="' + i + '">' + left + right + "</button>";
+    return '<button class="nec-bk-opt' + (o.icon || o.img ? " has-ico" : "") + " " + (sel ? "sel" : "") + '" data-opt="' + i + '">' + left + right + "</button>";
   }
 
   // ---- calendar helpers (client-side; Date is fine in the browser) ----
