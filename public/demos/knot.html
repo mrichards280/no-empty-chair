@@ -46,7 +46,7 @@
   @media(max-width:920px){.hero h1{font-size:74px;letter-spacing:-3px;}.hero .right{text-align:left;}}
 
   /* BENTO HERO GRID */
-  .hgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:118px;gap:14px;}
+  .hgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(118px,auto);gap:14px;}
   .cell{border-radius:22px;padding:22px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:space-between;}
   .cell.big{grid-column:span 2;grid-row:span 3;}
   .cell.wide{grid-column:span 2;grid-row:span 2;}
@@ -180,7 +180,7 @@
         </div>
       </div>
       <div class="cell wide c-ink"><span class="lbl">Open late</span><div><div class="tag">Evening slots<br>Tue–Sat til 9pm</div><div class="cellrows"><div><b>Tue – Fri</b><span>10a – 9p</span></div><div><b>Saturday</b><span>9a – 8p</span></div><div><b>Sun / Mon</b><span>By request</span></div></div></div></div>
-      <div class="cell tall c-butter"><div><div class="big-n">3–4h</div><span class="lbl">Avg. finish time</span></div><div class="cellfoot" style="color:var(--ink)">Most knotless done in one sitting — no all-day marathons. You get the real time before you book.</div></div>
+      <div class="cell tall c-butter"><div><div class="big-n" style="font-size:52px">3–4h</div><span class="lbl">Avg. finish time</span></div><div class="cellfoot" style="color:var(--ink)">Most styles in one sitting — no all-day marathons.</div></div>
       <div class="cell tall photo p-sky" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_780,q_auto,f_auto/noemptychair/demos/knot/hero-2');background-size:cover;background-position:center;"><span class="lbl">New</span><span class="tag">Stitch<br>Cornrows</span></div>
       <div class="cell wide c-card"><span class="lbl" style="color:var(--muted)">Book online</span><div><div class="tag">In under 30 sec.<br>No deposit to browse</div><div class="slotline"><span>Today 4:30p</span><span>Thu 11:00a</span><span>Fri 2:15p</span><span>Sat 9:30a</span></div><a href="#book" data-booking class="bookmini" style="margin-top:12px;background:var(--ink);color:#fff">Check live slots →</a></div></div>
     </div>
