@@ -11,9 +11,9 @@
 <link rel="stylesheet" href="/demos/_booking.css">
 <style>
   :root{
-    --bg:#f6f3ee; --bg2:#efeae1; --white:#fffdfa;
-    --ink:#37372f; --muted:#8a8779; --sage:#7d8b76; --sage-d:#5f6c59;
-    --sand:#c7b299; --gold:#a98d63; --line:#e4ddd2;
+    --bg:#f8faf7; --bg2:#eef3ec; --white:#ffffff;
+    --ink:#3a3c34; --muted:#8b8d81; --sage:#8a9a81; --sage-d:#63715b;
+    --sand:#cbbaa2; --gold:#a98d63; --line:#e9ede6;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
@@ -26,7 +26,7 @@
   .announce{background:var(--sage-d);color:#eef1ea;text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:9px;font-weight:400;}
 
   /* NAV */
-  nav{position:sticky;top:0;z-index:50;background:rgba(246,243,238,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  nav{position:sticky;top:0;z-index:50;background:rgba(248,250,247,.8);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
   nav .wrap{display:flex;align-items:center;justify-content:space-between;height:80px;}
   .logo{font-family:'Cormorant Garamond';font-weight:600;font-size:32px;letter-spacing:4px;text-transform:uppercase;}
   .logo span{color:var(--sage);}
@@ -38,8 +38,8 @@
   @media(max-width:900px){nav ul li:not(.cta){display:none;}}
 
   /* HERO */
-  .hero{padding:70px 0 40px;}
-  .hero .grid{display:grid;grid-template-columns:1fr .82fr;gap:56px;align-items:center;}
+  .hero{padding:104px 0 64px;}
+  .hero .grid{display:grid;grid-template-columns:1fr .82fr;gap:72px;align-items:center;}
   .eyebrow{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:26px;}
   .hero h1{font-family:'Cormorant Garamond';font-weight:500;font-size:82px;line-height:1;letter-spacing:.5px;margin-bottom:24px;}
   .hero h1 em{font-style:italic;color:var(--sage-d);}
@@ -49,15 +49,15 @@
   .btn:hover{background:var(--ink);}
   .btn-text{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px;transition:.2s;}
   .btn-text:hover{color:var(--ink);border-color:var(--ink);}
-  .hero .art{aspect-ratio:3/4;border-radius:4px;background-size:cover;background-position:center;box-shadow:0 30px 60px -30px rgba(55,55,47,.4);}
+  .hero .art{aspect-ratio:3/4;border-radius:4px;background-size:cover;background-position:center;box-shadow:0 26px 54px -34px rgba(55,55,47,.26);}
   @media(max-width:820px){.hero .grid{grid-template-columns:1fr;gap:32px;} .hero h1{font-size:58px;} .hero .art{max-width:420px;}}
 
   /* PHILOSOPHY */
-  .phil{padding:80px 0;text-align:center;}
+  .phil{padding:108px 0;text-align:center;}
   .phil p{font-family:'Cormorant Garamond';font-style:italic;font-size:32px;line-height:1.4;max-width:760px;margin:0 auto;color:#4a4a41;}
   .phil p b{font-style:normal;font-weight:500;color:var(--sage-d);}
 
-  section{padding:88px 0;}
+  section{padding:112px 0;}
   .sec-head{max-width:600px;margin:0 auto 56px;text-align:center;}
   .kicker{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
   h2{font-family:'Cormorant Garamond';font-weight:500;font-size:52px;line-height:1.05;}
@@ -163,7 +163,7 @@
           <a href="#treatments" class="btn-text">View treatments</a>
         </div>
       </div>
-      <div class="art" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_760,q_auto,f_auto/noemptychair/demos/lull/detail');"></div>
+      <div class="art" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_760,e_brightness:16,e_saturation:-8,q_auto,f_auto/noemptychair/demos/lull/detail');"></div>
     </div>
   </div>
 </header>
