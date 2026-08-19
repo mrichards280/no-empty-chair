@@ -38,7 +38,15 @@
 
   /* HERO */
   .hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;
-    background:radial-gradient(ellipse at 70% 20%,var(--plum),var(--noir) 60%);}
+    background:
+      linear-gradient(90deg, var(--noir) 6%, rgba(14,13,16,.86) 40%, rgba(14,13,16,.42) 70%, rgba(14,13,16,.12) 100%),
+      radial-gradient(ellipse at 72% 18%, rgba(36,26,36,.55), transparent 60%),
+      url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:2,w_1600,q_auto,f_auto/noemptychair/demos/maison/m-5') right center/cover no-repeat,
+      var(--noir);}
+  @media(max-width:720px){.hero{background:
+      linear-gradient(180deg, rgba(14,13,16,.72) 0%, rgba(14,13,16,.88) 55%, var(--noir) 100%),
+      url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_900,q_auto,f_auto/noemptychair/demos/maison/m-5') center/cover no-repeat,
+      var(--noir);}}
   .hero:after{content:"";position:absolute;inset:0;background:
     radial-gradient(circle at 78% 45%,rgba(200,164,90,.16),transparent 38%);pointer-events:none;}
   .hero .frame{position:absolute;inset:26px;border:1px solid var(--line);pointer-events:none;}
@@ -128,7 +136,7 @@
 </head>
 <body>
 
-<div class="demo-band"><svg width="15" height="15" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#413645" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M45 40 L21 40 L21 20 Q21 15 26 15"/><path d="M44 40 L46 55"/><path d="M22 40 L20 55"/></g><circle cx="31" cy="29" r="8.5" fill="#a85a76"/></svg> Demo concept by No Empty Chair · Prestigious &amp; Regal direction · your imagery &amp; details drop right in</div>
+<div class="demo-band"><svg width="15" height="15" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#413645" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M45 40 L21 40 L21 20 Q21 15 26 15"/><path d="M44 40 L46 55"/><path d="M22 40 L20 55"/></g><circle cx="31" cy="29" r="8.5" fill="#a85a76"/></svg> Demo concept by No Empty Chair · Prestigious &amp; Regal direction · built fully custom, down to the icons &amp; link colors</div>
 
 <div class="announce">By appointment · Buckhead, Atlanta · Now reserving for the season</div>
 
@@ -196,11 +204,11 @@
       <div class="eimg m2 e-b" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-2');background-size:cover;background-position:center;"><span>The Silk Press</span></div>
       <div class="eimg m3 e-c" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-3');background-size:cover;background-position:center;"><span>Bridal Chignon</span></div>
       <div class="eimg m4 e-d" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-4');background-size:cover;background-position:center;"><span>Couture Color</span></div>
-      <div class="eimg m2 e-e" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-5');background-size:cover;background-position:center;"><span>Precision Bob</span></div>
-      <div class="eimg m1 e-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-6');background-size:cover;background-position:center;"><span>Restoration</span></div>
+      <div class="eimg m2 e-e" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-5');background-size:cover;background-position:center;"><span>Platinum Statement</span></div>
+      <div class="eimg m1 e-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-6');background-size:cover;background-position:center;"><span>In the Chair</span></div>
       <div class="eimg m3 e-g" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-7');background-size:cover;background-position:center;"><span>Editorial Feature</span></div>
     </div>
-    <p class="imgnote">Demo imagery — replaced with your signature work in the live atelier build.</p>
+    <p class="imgnote">A full custom build — never a template. Every photo, icon, font, and link color is designed around your brand.</p>
   </div>
 </section>
 

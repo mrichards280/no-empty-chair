@@ -103,7 +103,7 @@ function alaIcon(name = "") {
       <div class="sec-head">
         <div class="kicker">{c.packages.kicker}</div>
         <h2>{c.packages.title}</h2>
-        <p>{c.packages.intro}</p>
+        <p set:html={c.packages.intro}></p>
       </div>
       <div class="svc">
         {c.packages.items.map((p) => (
@@ -126,7 +126,7 @@ function alaIcon(name = "") {
       <div class="sec-head">
         <div class="kicker">{c.consults.kicker}</div>
         <h2>{c.consults.title}</h2>
-        <p>{c.consults.intro}</p>
+        <p set:html={c.consults.intro}></p>
       </div>
       <div class="svc">
         {c.consults.items.map((p) => (
@@ -155,7 +155,7 @@ function alaIcon(name = "") {
         <div class="sec-head">
           <div class="kicker">{c.alacarte.kicker}</div>
           <h2 set:html={c.alacarte.title.replace(/\?\s+/, "?<br>")}></h2>
-          <p>{c.alacarte.intro}</p>
+          <p set:html={c.alacarte.intro}></p>
         </div>
         <div class="ala">
           {c.alacarte.items.map((a) => (

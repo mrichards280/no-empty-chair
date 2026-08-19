@@ -621,10 +621,10 @@ function studioServices(){
 }
 function studioPhotos(){
   const ids=Object.keys(state.portfolio);
-  return `<div class="stsec"><h4>Portfolio</h4><div class="h-sub">Tap a photo to show/hide it on the style. Your real work replaces these.</div>`
+  return `<div class="stsec"><h4>Portfolio</h4><div class="h-sub">Tap a photo to show/hide it on the style. In your live build this is fully custom — your real work, your colors.</div>`
     +ids.map(id=>`<div style="margin-bottom:14px"><div class="fieldlbl" style="margin:6px 0 8px">${svc(id).name}</div>
       <div class="pgrid">${state.portfolio[id].map((p,i)=>`<div class="pc ${p.on?'':'hidden'}" style="background-image:url('${img(p.n)}')" onclick="togglePhoto('${id}',${i})"><span class="x">${p.on?'✓':'+'}</span></div>`).join('')}
-      <div class="pc" style="display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--muted);font-size:26px" onclick="toast('Upload — clients\\' before/afters drop in here')">＋</div></div></div>`).join('')
+      <div class="pc" style="display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--muted);font-size:26px" onclick="toast('Fully custom build — your real before/afters live here')">＋</div></div></div>`).join('')
     +`</div>`;
 }
 function studioRequests(){

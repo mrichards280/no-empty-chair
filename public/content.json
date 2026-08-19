@@ -43,7 +43,7 @@
   "packages": {
     "kicker": "The packages",
     "title": "Choose your glow-up",
-    "intro": "Three ways to work with No Empty Chair: a quick polish, a full identity, or a total takeover. Every one opens with the $200 teardown, so the real work starts with your goals already on the table. And every one is built to do a single thing: keep the chair full.",
+    "intro": "Three ways to work with No Empty Chair: a quick polish, a full identity, or a total takeover. Every one opens with the $200 teardown, so the real work starts with your goals already on the table. And every one is built to do a single thing: keep the chair full. Not sure this is your lane? Book a guided <a href=\"#consults\">DIY session</a> or build it piece by piece <a href=\"#alacarte\">à la carte</a>.",
     "items": [
       {
         "name": "The Refresh",
@@ -91,7 +91,7 @@
   "consults": {
     "kicker": "The DIY lane",
     "title": "Rather do it yourself?",
-    "intro": "Book a session with my brain, not the whole studio. These are deep strategy sessions for salons who want to build it themselves but need the map first. Every one opens with the $200 teardown, so the call isn't spent getting up to speed, it's spent on you. Your fee credits toward a full package if you upgrade within 30 days.",
+    "intro": "Book a session with my brain, not the whole studio. These are deep strategy sessions for salons who want to build it themselves but need the map first. Every one opens with the $200 teardown, so the call isn't spent getting up to speed, it's spent on you. Your fee credits toward a full package if you upgrade within 30 days. Rather have it fully done for you? See the <a href=\"#services\">full packages</a>, or grab just one piece <a href=\"#alacarte\">à la carte</a>.",
     "items": [
       {
         "name": "Social Session",
@@ -130,7 +130,7 @@
   "alacarte": {
     "kicker": "À la carte",
     "title": "Not ready for the whole makeover? Target what you need the most.",
-    "intro": "Some salons want the full glow-up. Others just need one thing done right. Share your vision and No Empty Chair prices it to fit, no package required. It still opens with the $200 teardown, so even a single piece is built on what your salon actually needs.",
+    "intro": "Some salons want the full glow-up. Others just need one thing done right. Share your vision and No Empty Chair prices it to fit, no package required. It still opens with the $200 teardown, so even a single piece is built on what your salon actually needs. Want more structure? Compare the <a href=\"#services\">full packages</a> or a guided <a href=\"#consults\">DIY session</a>.",
     "items": [
       {
         "name": "Social templates",
