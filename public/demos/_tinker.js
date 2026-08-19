@@ -13,7 +13,8 @@
   var SEL = ".cell,.scard,.rl,.reel,.tile,.shot,.hphoto,.htext,.review,.rc,.pstep,.sec-head," +
     ".slotline span,.bookmini,.book-btn,.btn-big,.btn-ghost,.reserve,.book,.finpill,.tag,.lbl,.big-n,.cellfoot," +
     ".dur,.price,.go,.stars,.v,.views,.eyebrow,.lead,.kicker,.tagpill,.who,.sig," +
-    "h2,h3,h4,.hero h1,blockquote,cite";
+    "h2,h3,h4,.hero h1,blockquote,cite," +
+    "p,img,.btn,.navbtn,.navcta,.democard,.card,.stat,.faq-item,.pkg,.pill";
 
   function path(el) {
     var p = [];
@@ -52,8 +53,10 @@
   function save() { try { if (Object.keys(store).length) localStorage.setItem(KEY, JSON.stringify(store)); else localStorage.removeItem(KEY); } catch (e) {} }
   function updHist() { var u = document.getElementById("_tu"), r = document.getElementById("_trd"); if (u) u.disabled = !undoStack.length; if (r) r.disabled = !redoStack.length; }
 
-  // toolbar only when ?edit is present
-  if (!/[?&]edit\b/.test(location.search)) return;
+  // toolbar shows for ?edit (demos) or when the admin has enabled it (main site)
+  var adminOn = false;
+  try { adminOn = localStorage.getItem("nec-admin-edit") === "1"; } catch (e) {}
+  if (!/[?&]edit\b/.test(location.search) && !adminOn) return;
 
   var css = document.createElement("style");
   css.textContent =

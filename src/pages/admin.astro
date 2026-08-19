@@ -4,6 +4,13 @@ import Admin from "../admin/Admin.jsx";
 ---
 <Base title="Admin · No Empty Chair">
   <main id="main" class="admin-main">
+  <script is:inline>try{localStorage.setItem("nec-admin-edit","1");}catch(e){}</script>
+  <div class="arrange-launch" style="max-width:900px;margin:0 auto 18px;padding:14px 18px;background:#f4efea;border:1px solid #e4ddd2;border-radius:14px;font-family:system-ui,-apple-system,sans-serif;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <b style="color:#413645">🎨 Arrange the live site</b>
+    <a href="/?edit" style="background:#413645;color:#fff;text-decoration:none;padding:8px 16px;border-radius:100px;font-weight:600;font-size:14px">Homepage</a>
+    <a href="/teardown?edit" style="background:#fff;color:#413645;border:1px solid #d8d1c4;text-decoration:none;padding:8px 14px;border-radius:100px;font-weight:600;font-size:14px">Teardown page</a>
+    <span style="color:#8a8779;font-size:13px">Drag pieces where you want, then hit <b>Copy layout</b> and send it to me to bake it in.</span>
+  </div>
   <div id="root">
     <Admin client:only="react" />
   </div>
