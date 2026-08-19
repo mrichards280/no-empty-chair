@@ -469,6 +469,8 @@ footer .adminlink { color: #8a6b75; text-decoration: underline; font-size: 11px;
 /* ============================================================
    "On our radar?" lead-capture popup
    ============================================================ */
+/* [hidden] must win over the explicit display on these two */
+.radar-overlay[hidden], .radar-fab[hidden] { display: none; }
 .radar-overlay {
   position: fixed;
   inset: 0;

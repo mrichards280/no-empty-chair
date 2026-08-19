@@ -3,8 +3,8 @@ import Base from "../layouts/Base.astro";
 import ChairMark from "../components/ChairMark.astro";
 import ChairsFilling from "../components/ChairsFilling.astro";
 import CompanionDoc from "../components/CompanionDoc.astro";
-import ContactSection from "../components/ContactSection.jsx";
-import RadarModal from "../components/RadarModal.jsx";
+import ContactSection from "../components/ContactSection.astro";
+import RadarModal from "../components/RadarModal.astro";
 import { bookingHref } from "../lib/booking.js";
 import content from "../../public/content.json";
 
@@ -310,8 +310,8 @@ function alaIcon(name = "") {
     </section>
   ) : null}
 
-  {/* CONTACT — React island */}
-  <ContactSection contact={c.contact} client:visible />
+  {/* CONTACT — vanilla Astro (no React) */}
+  <ContactSection contact={c.contact} />
   </main>
 
   <footer>
@@ -333,8 +333,8 @@ function alaIcon(name = "") {
     </div>
   </footer>
 
-  {/* Radar lead-capture popup — React island */}
-  <RadarModal radar={c.radar} client:idle />
+  {/* Radar lead-capture popup — vanilla Astro (no React) */}
+  <RadarModal radar={c.radar} />
 </Base>
 
 {/* FAQ accordion: all answers are already in the HTML (collapsed via `hidden`

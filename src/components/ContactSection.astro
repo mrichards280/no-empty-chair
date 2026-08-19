@@ -1,0 +1,52 @@
+---
+// Contact section, vanilla (no React). Posts to the `contact` Netlify function.
+const { contact } = Astro.props;
+---
+<section id="contact" class="cta">
+  <div class="wrap">
+    <div class="kicker">{contact.kicker}</div>
+    <h2>{contact.title}</h2>
+    <p>{contact.sub}</p>
+    <a href="/teardown" class="btn">{contact.teardownCtaLabel || "Book my $200 teardown"}</a>
+    <p style="margin-top:24px;font-size:14px">
+      Or DM <a href={contact.ig} target="_blank" rel="noopener noreferrer" style="color:var(--rose-deep);font-weight:600">{contact.igLabel}</a> on Instagram
+    </p>
+
+    <form class="cform" data-contact-form>
+      <div style="font-family:Marcellus,serif;font-size:20px;color:var(--plum);text-align:center">{contact.formHeading}</div>
+      <label class="visually-hidden" for="nec-contact-name">Your name</label>
+      <input id="nec-contact-name" name="name" autocomplete="name" required placeholder="Your name" />
+      <label class="visually-hidden" for="nec-contact-email">Your email</label>
+      <input id="nec-contact-email" name="email" autocomplete="email" required type="email" placeholder="Your email" />
+      <label class="visually-hidden" for="nec-contact-message">Tell me about your salon</label>
+      <textarea id="nec-contact-message" name="message" required placeholder="Tell me about your salon"></textarea>
+      <button class="btn" type="submit" style="justify-self:center">{contact.formButton}</button>
+      <div class="status" data-contact-status hidden></div>
+    </form>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var form = document.querySelector("[data-contact-form]");
+    if (!form) return;
+    var status = form.querySelector("[data-contact-status]");
+    function setStatus(msg) { status.textContent = msg; status.hidden = !msg; }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      setStatus("Sending…");
+      var data = {
+        name: form.name.value,
+        email: form.email.value,
+        message: form.message.value,
+      };
+      fetch("/.netlify/functions/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then(function (r) { if (!r.ok) throw new Error(); form.reset(); setStatus("Thank you. I'll be in touch soon."); })
+        .catch(function () { setStatus("Something went wrong. Please email me directly."); });
+    });
+  })();
+</script>

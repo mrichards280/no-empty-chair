@@ -1,0 +1,128 @@
+---
+// "Are you on our radar?" lead popup, vanilla (no React). Posts to Netlify
+// Forms bucket "leads". Auto-opens once per browser, floating tab reopens it.
+import ChairMark from "./ChairMark.astro";
+const { radar } = Astro.props;
+const enabled = radar && radar.enabled !== false;
+const delay = Number(radar.delaySeconds) > 0 ? Number(radar.delaySeconds) : 8;
+---
+{enabled && (
+  <div data-radar data-radar-delay={delay}>
+    <button class="radar-fab" type="button" data-radar-open aria-label={radar.reopenLabel || "On our radar?"}>
+      <span class="radar-fab-eyes" aria-hidden="true">👀</span>
+      <span class="radar-fab-text">{radar.reopenLabel || "On our radar?"}</span>
+    </button>
+
+    <div class="radar-overlay" data-radar-overlay role="dialog" aria-modal="true" aria-label={radar.headline} hidden>
+      <div class="radar-modal glass" data-radar-dialog>
+        <button class="radar-close" type="button" data-radar-close aria-label="Close">×</button>
+
+        <div data-radar-view-form>
+          <div class="radar-mark"><ChairMark size={44} /></div>
+          {radar.eyebrow && <div class="radar-eyebrow">{radar.eyebrow}</div>}
+          <h3 class="radar-headline">{radar.headline} <span aria-hidden="true">👀</span></h3>
+          <p class="radar-sub">{radar.sub}</p>
+          <form class="radar-form" name="leads" data-radar-form>
+            <input class="radar-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+            <input required type="text" name="business" placeholder={radar.businessLabel || "Salon / business name"} />
+            <input type="text" name="instagram" placeholder={radar.instagramLabel || "Instagram handle"} />
+            <input required type="text" name="contact" placeholder={radar.contactLabel || "Best email or phone"} />
+            <button class="btn" type="submit" data-radar-submit>{radar.button || "Check now"}</button>
+            <div class="radar-err" data-radar-err hidden>Hmm, that didn't go through. Try again in a moment.</div>
+          </form>
+        </div>
+
+        <div class="radar-done" data-radar-view-done hidden>
+          <div class="radar-eyes" aria-hidden="true">👀</div>
+          <h3>{radar.successHeadline || "Oh, we've noticed you."}</h3>
+          <p>{radar.successBody || "You're officially on our radar. We'll be in touch soon."}</p>
+          <button class="btn" type="button" data-radar-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector("[data-radar]");
+    if (!root) return;
+    var SEEN = "nec_radar_seen";
+    var fab = root.querySelector("[data-radar-open]");
+    var overlay = root.querySelector("[data-radar-overlay]");
+    var dialog = root.querySelector("[data-radar-dialog]");
+    var form = root.querySelector("[data-radar-form]");
+    var submitBtn = root.querySelector("[data-radar-submit]");
+    var err = root.querySelector("[data-radar-err]");
+    var viewForm = root.querySelector("[data-radar-view-form]");
+    var viewDone = root.querySelector("[data-radar-view-done]");
+    var submitLabel = submitBtn.textContent;
+    var returnEl = null;
+
+    function seen() { try { return localStorage.getItem(SEEN) === "1"; } catch (e) { return false; } }
+    function setSeen() { try { localStorage.setItem(SEEN, "1"); } catch (e) {} }
+    function isOpen() { return !overlay.hidden; }
+
+    function open() {
+      returnEl = document.activeElement;
+      overlay.hidden = false;
+      fab.hidden = true;
+      setTimeout(function () { var el = dialog.querySelector("input, button"); if (el) el.focus(); }, 0);
+    }
+    function close() {
+      overlay.hidden = true;
+      fab.hidden = false;
+      setSeen();
+      setTimeout(function () {
+        var t = returnEl && returnEl !== document.body && returnEl.focus && document.contains(returnEl) ? returnEl : fab;
+        if (t && t.focus) t.focus();
+      }, 0);
+    }
+
+    fab.addEventListener("click", open);
+    root.querySelectorAll("[data-radar-close]").forEach(function (b) { b.addEventListener("click", close); });
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
+
+    document.addEventListener("keydown", function (e) {
+      if (!isOpen()) return;
+      if (e.key === "Escape") { close(); return; }
+      if (e.key !== "Tab") return;
+      var items = Array.prototype.filter.call(
+        dialog.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'),
+        function (el) { return !el.disabled && el.offsetParent !== null; }
+      );
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (form["bot-field"] && form["bot-field"].value) return; // honeypot
+      err.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Checking…";
+      var pairs = { "form-name": "leads", "bot-field": "", business: form.business.value, instagram: form.instagram.value, contact: form.contact.value };
+      var body = Object.keys(pairs).map(function (k) { return encodeURIComponent(k) + "=" + encodeURIComponent(pairs[k]); }).join("&");
+      fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body })
+        .then(function (r) {
+          if (!r.ok) throw new Error();
+          viewForm.hidden = true;
+          viewDone.hidden = false;
+          setSeen();
+        })
+        .catch(function () {
+          err.hidden = false;
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitLabel;
+        });
+    });
+
+    // auto-open once, after the delay
+    if (!seen()) {
+      var secs = Number(root.getAttribute("data-radar-delay")) || 8;
+      setTimeout(function () { if (!seen() && !isOpen()) open(); }, secs * 1000);
+    }
+  })();
+</script>
