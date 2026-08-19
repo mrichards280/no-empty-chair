@@ -131,13 +131,13 @@
 
   /* MEET THE ARTIST */
   .artist{display:grid;grid-template-columns:.82fr 1fr;gap:52px;align-items:center;}
-  .artist-photo{aspect-ratio:4/5;border-radius:28px;background-size:cover;background-position:center;box-shadow:0 28px 60px rgba(65,54,69,.22);position:relative;}
+  .artist-photo{width:100%;aspect-ratio:4/5;border-radius:28px;background-size:cover;background-position:center;box-shadow:0 28px 60px rgba(65,54,69,.22);position:relative;}
   .artist-photo .sticker{position:absolute;bottom:-16px;right:-14px;background:var(--pink);color:#fff;font-family:'Fredoka';font-weight:600;font-size:14px;padding:12px 18px;border-radius:16px;box-shadow:0 12px 26px rgba(255,61,146,.4);transform:rotate(-4deg);}
   .artist-text h2{margin-bottom:14px;}
   .artist-text p{font-size:16.5px;color:#5a4a68;line-height:1.7;margin-bottom:22px;max-width:480px;}
   .artist-meta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:24px;font-size:14px;color:var(--muted);font-weight:500;}
   .artist-meta .ig{color:var(--pink);font-weight:700;}
-  @media(max-width:820px){.artist{grid-template-columns:1fr;gap:34px;text-align:center;} .artist-photo{max-width:300px;margin:0 auto;} .artist-text p{margin-left:auto;margin-right:auto;} .artist-meta{justify-content:center;}}
+  @media(max-width:820px){.artist{grid-template-columns:1fr;gap:34px;text-align:center;justify-items:center;} .artist-photo{max-width:300px;justify-self:center;margin:0;} .artist-text p{margin-left:auto;margin-right:auto;} .artist-meta{justify-content:center;}}
 
   /* BOOK CTA */
   .bookcta{background:var(--ink);color:#fff;border-radius:36px;padding:84px 44px;text-align:center;position:relative;overflow:hidden;}
@@ -360,7 +360,7 @@
   .appbar{display:none;}
   @media(max-width:900px){
     body{padding-bottom:80px;}
-    .appbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
+    .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
       padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.86);
       backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(32,18,46,.10);box-shadow:0 -10px 32px rgba(32,18,46,.12);}
     .appbar-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-height:54px;
