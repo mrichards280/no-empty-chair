@@ -87,8 +87,12 @@
       var s = qs[pos]; html += bars(nbars, pos);
       html += '<div class="nec-bk-h">' + esc(s.label) + '</div>' + (s.sub ? '<div class="nec-bk-sub">' + esc(s.sub) + "</div>" : '<div class="nec-bk-sub">' + (s.type === "multi" ? "Tap any that apply — optional." : "Tap to choose.") + "</div>");
       s.options.forEach(function (o, i) {
+        if (o.heading) { html += '<div class="nec-bk-group">' + esc(o.heading) + "</div>"; return; }
         var sel = s.type === "multi" ? ((state.answers[s.key] || []).indexOf(o) > -1) : (state.answers[s.key] === o);
-        html += '<button class="nec-bk-opt ' + (sel ? "sel" : "") + '" data-opt="' + i + '"><span><b>' + esc(o.name) + "</b></span>" + (o.price ? '<span class="pr">' + (sel && s.type === "multi" ? "✓ " : "") + esc(o.price) + "</span>" : (sel && s.type === "multi" ? '<span class="pr">✓</span>' : "")) + "</button>";
+        var ico = o.icon ? '<span class="nec-bk-ico">' + o.icon + "</span>" : "";
+        var left = '<span class="nec-bk-optl">' + ico + "<span><b>" + esc(o.name) + "</b>" + (o.desc ? "<small>" + esc(o.desc) + "</small>" : "") + "</span></span>";
+        var right = o.price ? '<span class="pr">' + (sel && s.type === "multi" ? "✓ " : "") + esc(o.price) + "</span>" : (sel && s.type === "multi" ? '<span class="pr">✓</span>' : "");
+        html += '<button class="nec-bk-opt' + (o.icon ? " has-ico" : "") + " " + (sel ? "sel" : "") + '" data-opt="' + i + '">' + left + right + "</button>";
       });
       if (total() > 0) html += '<div class="nec-bk-sum"><div><span>Running total</span><span>' + money(total()) + "</span></div></div>";
       var need = s.type !== "multi" && !s.optional && !state.answers[s.key];
