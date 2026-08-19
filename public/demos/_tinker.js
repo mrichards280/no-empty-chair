@@ -6,8 +6,12 @@
 */
 (function () {
   var KEY = "nec_layout_" + location.pathname;
+  var applyLocal = /[?&]edit\b/.test(location.search); // in-progress drags only apply while editing
   var store = {};
-  try { store = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+  // a baked-in layout applies for everyone (the clean/even, approved arrangement)
+  if (window.NEC_BAKED_LAYOUT) { try { store = JSON.parse(JSON.stringify(window.NEC_BAKED_LAYOUT)); } catch (e) {} }
+  // the editor's saved drags layer on top only in ?edit mode, so stray test-moves never leak into the live view
+  if (applyLocal) { try { var _ls = JSON.parse(localStorage.getItem(KEY) || "{}"); Object.keys(_ls).forEach(function (k) { store[k] = _ls[k]; }); } catch (e) {} }
 
   // every pill + text block + card is its own draggable object (no group containers like .slotline)
   var SEL = ".cell,.scard,.rl,.reel,.tile,.shot,.hphoto,.htext,.review,.rc,.pstep,.sec-head," +
@@ -53,10 +57,8 @@
   function save() { try { if (Object.keys(store).length) localStorage.setItem(KEY, JSON.stringify(store)); else localStorage.removeItem(KEY); } catch (e) {} }
   function updHist() { var u = document.getElementById("_tu"), r = document.getElementById("_trd"); if (u) u.disabled = !undoStack.length; if (r) r.disabled = !redoStack.length; }
 
-  // toolbar shows for ?edit (demos) or when the admin has enabled it (main site)
-  var adminOn = false;
-  try { adminOn = localStorage.getItem("nec-admin-edit") === "1"; } catch (e) {}
-  if (!/[?&]edit\b/.test(location.search) && !adminOn) return;
+  // toolbar shows only in ?edit mode (demos use ?edit directly; the /admin launcher opens pages with ?edit)
+  if (!applyLocal) return;
 
   var css = document.createElement("style");
   css.textContent =
