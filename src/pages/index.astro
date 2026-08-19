@@ -301,7 +301,7 @@ function alaIcon(name = "") {
                 <span class="faq-icon" aria-hidden="true">+</span>
               </button>
               <div class="faq-a" hidden>
-                <p>{f.a}</p>
+                <p set:html={f.a}></p>
               </div>
             </div>
           ))}

@@ -5,7 +5,7 @@ import content from "../../public/content.json";
 
 const {
   title = "Salon Branding, Websites & Reels | No Empty Chair · Atlanta",
-  description = "No Empty Chair is an Atlanta brand and content studio for salons, stylists, braiders, and barbers. It builds premium branding, booking-ready websites, and short-form content that keep your chair full. Every project starts with a $200 teardown.",
+  description = "No Empty Chair is an Atlanta brand and content studio for beauty & wellness pros — stylists, braiders, barbers, nail techs, estheticians, spa and massage. It builds premium branding, booking-ready websites, online shops, and short-form content that keep your chair full. Every project starts with a $200 teardown.",
   ogDescription = "An Atlanta brand and content studio that keeps talented salons fully booked — premium branding, booking-ready websites, and short-form content.",
   canonical = "https://noemptychair.co/",
   image = "https://noemptychair.co/og-image.png",
@@ -20,7 +20,7 @@ const businessNode = {
   name: "No Empty Chair",
   alternateName: "No Empty Chair Brand & Content Studio",
   description:
-    "Atlanta brand and content studio that keeps talented salons, stylists, braiders, and barbers fully booked through premium branding, booking-ready websites, and short-form video content.",
+    "Atlanta brand and content studio that keeps talented beauty and wellness pros — stylists, braiders, barbers, nail techs, estheticians, spa and massage — fully booked through premium branding, booking-ready websites, online shops, and short-form video content.",
   url: "https://noemptychair.co/",
   email: "hello@noemptychair.co",
   priceRange: "$100–$5,500+",
@@ -39,9 +39,11 @@ const businessNode = {
   knowsAbout: [
     "Salon branding",
     "Salon website design",
+    "Nail, spa, and wellness studio branding",
     "Short-form video content",
     "Instagram marketing for salons",
     "Local SEO for salons",
+    "E-commerce and online shop setup for salons",
   ],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
@@ -74,7 +76,7 @@ const faqNode = {
   mainEntity: (content.faq?.items || []).map((f) => ({
     "@type": "Question",
     name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
+    acceptedAnswer: { "@type": "Answer", text: f.a.replace(/<[^>]+>/g, "") },
   })),
 };
 

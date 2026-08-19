@@ -155,6 +155,10 @@
       {
         "name": "Brand voice + captions",
         "desc": "A short voice guide and a batch of captions so everything you post sounds like you."
+      },
+      {
+        "name": "Online shop setup",
+        "desc": "Sell your products, hair, oils, or merch right from your site: catalog, checkout, and payouts wired up and styled to match your brand, from a few items to a full storefront."
       }
     ],
     "ctaLabel": "Share your vision",
@@ -264,15 +268,15 @@
     "items": [
       {
         "q": "What does No Empty Chair actually do?",
-        "a": "No Empty Chair is a salon brand and content studio in Atlanta, built for one kind of person: the stylist, braider, or barber whose work is better than their internet. It builds the brand, the booking-ready website, and the short-form content that get the right clients to find you and book you."
+        "a": "No Empty Chair is a beauty &amp; wellness brand and content studio in Atlanta, built for one kind of person: the stylist, braider, barber, nail tech, esthetician, or spa &amp; massage pro whose work is better than their internet. It builds the brand, the <a href=\"#services\">booking-ready website</a>, and the <a href=\"#proof\">short-form content</a> that get the right clients to find you and book you. Every build opens with the <a href=\"/teardown\">$200 teardown</a>."
       },
       {
         "q": "How much does a salon website and brand cost?",
-        "a": "Packages run from $1,500 for a focused refresh to $5,500+ for a full rebrand with content. Most salons start with the $200 teardown, a short video breaking down your highest-impact fixes, and that $200 credits toward whatever you build next."
+        "a": "Packages run from $1,500 for a focused refresh to $5,500+ for a full rebrand with content. Most salons start with the <a href=\"/teardown\">$200 teardown</a>, a short video breaking down your highest-impact fixes, and that $200 credits toward whatever you build next. See the full <a href=\"#services\">packages</a>, a guided <a href=\"#consults\">DIY session</a>, or <a href=\"#alacarte\">à la carte</a> options."
       },
       {
         "q": "What's the $200 teardown?",
-        "a": "A short, honest video breaking down what's quietly costing you bookings (your feed, your site, your booking flow) and the three changes that would move the needle first. It's $200, and it credits toward any package."
+        "a": "A short, honest video breaking down what's quietly costing you bookings (your feed, your site, your booking flow) and the three changes that would move the needle first. It's $200, and it credits toward any <a href=\"#services\">package</a>. <a href=\"/teardown\">Book your teardown here</a>."
       },
       {
         "q": "Why does every project start with a teardown?",
@@ -285,6 +289,14 @@
       {
         "q": "I already have an Instagram. Why would I need more?",
         "a": "A feed of good photos isn't a brand, and it isn't a booking system. No Empty Chair turns scattered posts into a look that reads premium, a website that takes the appointment, and reels built to be shared, not just scrolled past."
+      },
+      {
+        "q": "Will my website actually show up on Google?",
+        "a": "Yes, and that's built in, not an upsell. Every site ships with real local SEO: your Google Business Profile set up, the \"near me\" and city-plus-service keywords your clients actually search, fast mobile-first pages, clean titles and descriptions, and behind-the-scenes schema so Google (and AI search) understand exactly what you do and where. Want to lift a site you already have? A <a href=\"#consults\">Website Session</a> or an <a href=\"#alacarte\">à la carte</a> website makeover audits it and tells you what's holding your ranking back."
+      },
+      {
+        "q": "I also sell products, hair, oils, or merch. Can you set that up?",
+        "a": "Absolutely. Whether you already sell or want to start, No Empty Chair can add a proper online shop to your site: your products, photos, checkout, and payouts wired up and styled to match your brand, from a few signature items to a full storefront. Add it <a href=\"#alacarte\">à la carte</a> or flag it in your <a href=\"/teardown\">teardown</a>."
       },
       {
         "q": "Is there any ongoing cost after the project's done?",
