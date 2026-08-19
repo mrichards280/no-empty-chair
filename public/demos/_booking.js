@@ -55,11 +55,12 @@
     return t;
   }
   function itemPrice(ans) { return priceOf(svcFlow, ans); }
-  function itemLabel(ans) { return ans.service ? ans.service.name : "Service"; }
+  var firstKey = svcFlow[0] && svcFlow[0].key;
+  function itemLabel(ans) { var a = firstKey && ans[firstKey]; return a ? a.name : "Service"; }
   function itemDetail(ans) {
     var bits = [];
     svcFlow.filter(function (s) { return !s.showIf || s.showIf(ans); }).forEach(function (s) {
-      if (s.key === "service") return;
+      if (s.key === firstKey) return;
       var a = ans[s.key]; if (!a || (s.type === "multi" && !a.length)) return;
       bits.push(s.type === "multi" ? a.map(function (o) { return o.name; }).join(", ") : a.name);
     });
@@ -69,7 +70,7 @@
   function cartPrice() { return state.cart.reduce(function (s, i) { return s + i.price; }, 0); }
   function grandTotal() { return cartPrice() + visitPrice(); }
   function commitItem() {
-    if (!state.answers.service) return;
+    if (!firstKey || !state.answers[firstKey]) return;
     state.cart.push({ answers: state.answers, label: itemLabel(state.answers), detail: itemDetail(state.answers), price: itemPrice(state.answers) });
     state.answers = {};
   }
