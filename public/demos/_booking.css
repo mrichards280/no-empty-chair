@@ -51,3 +51,16 @@
 .nec-bk-ico{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--bk-accent-soft,rgba(0,0,0,.06));font-size:21px;line-height:1;}
 .nec-bk-ico svg{display:block;}
 .nec-bk-opt small{display:block;opacity:.62;font-size:12px;margin-top:2px;font-weight:400;line-height:1.35;}
+/* cart + calendar (phased flow) */
+.nec-bk-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(128,128,128,.16);}
+.nec-bk-line b{font-size:14.5px;} .nec-bk-line small{display:block;opacity:.6;font-size:12px;margin-top:2px;}
+.nec-bk-liner{display:flex;align-items:center;gap:10px;font-weight:600;white-space:nowrap;}
+.nec-bk-rm{background:none;border:none;font-size:20px;line-height:1;color:inherit;opacity:.45;cursor:pointer;}
+.nec-bk-rm:hover{opacity:1;color:var(--bk-accent);}
+.nec-bk-add{width:100%;border:1.5px dashed rgba(128,128,128,.4);background:transparent;color:inherit;font:inherit;font-weight:600;font-size:14px;padding:12px;border-radius:14px;cursor:pointer;margin:8px 0 12px;transition:.15s;}
+.nec-bk-add:hover{border-color:var(--bk-accent);color:var(--bk-accent);}
+.nec-bk-callabel{font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;opacity:.55;margin:18px 0 10px;text-align:center;}
+.nec-bk-cal{display:flex;gap:8px;margin-bottom:8px;}
+.nec-bk-calbtn{flex:1;text-align:center;border:1.5px solid rgba(128,128,128,.28);border-radius:12px;padding:11px 8px;font-weight:600;font-size:13.5px;color:inherit;transition:.15s;}
+.nec-bk-calbtn:hover{border-color:var(--bk-accent);color:var(--bk-accent);}
+.nec-bk-pending{background:var(--bk-accent-soft,rgba(0,0,0,.06));font-size:30px;}

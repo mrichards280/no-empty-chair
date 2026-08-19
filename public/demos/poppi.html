@@ -7,7 +7,7 @@
 <meta name="description" content="POPPI is Atlanta's most colorful nail & color studio. Book your next set in under 30 seconds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Fredoka:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800;900&family=Fredoka:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/demos/_booking.css">
 <style>
   :root{
@@ -18,7 +18,7 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
   body{font-family:'Poppins',sans-serif;color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
-  .display{font-family:'Fraunces',sans-serif;}
+  .display{font-family:'Rubik',sans-serif;}
   .wrap{max-width:1140px;margin:0 auto;padding:0 26px;}
   a{color:inherit;text-decoration:none;}
   /* scroll reveal + active nav (company best practices) */
@@ -48,8 +48,7 @@
   .tagpill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--plum);border-radius:100px;
     padding:8px 16px;font-weight:600;font-size:12.5px;margin-bottom:24px;box-shadow:3px 3px 0 var(--pink);}
   .tagpill .dot{width:9px;height:9px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 3px rgba(255,61,146,.25);}
-  .hero h1{font-family:'Fraunces';font-weight:600;font-size:74px;line-height:.98;letter-spacing:-1.5px;margin-bottom:20px;color:var(--plum);}
-  .hero h1 em,.hero h1 .grad{font-style:italic;}
+  .hero h1{font-family:'Rubik';font-weight:800;font-size:72px;line-height:.96;letter-spacing:-2px;margin-bottom:20px;color:var(--plum);}
   .hero h1 .grad{color:var(--pink);-webkit-text-fill-color:var(--pink);}
   .hero p{max-width:440px;margin:0 0 30px;font-size:17.5px;color:#5a4a68;}
   .hero .actions{display:flex;gap:14px;flex-wrap:wrap;}
@@ -63,15 +62,16 @@
   .hphoto .chip{position:absolute;background:#fff;border-radius:16px;padding:12px 16px;box-shadow:0 16px 34px rgba(65,54,69,.2);font-weight:700;font-size:13px;color:var(--plum);z-index:2;}
   .hphoto .chip.rating{bottom:-16px;left:-14px;} .hphoto .chip.rating b{color:var(--pink);}
   .hphoto .chip.pic{top:-18px;right:-16px;width:112px;height:142px;padding:0;border-radius:18px;overflow:hidden;background-size:cover;background-position:center;border:5px solid #fff;transform:rotate(4deg);}
-  @media(max-width:860px){
+  @media(max-width:900px){
     .hero .wrap{grid-template-columns:1fr;gap:40px;text-align:center;}
     .htext{text-align:center;} .hero p{margin-left:auto;margin-right:auto;} .hero .actions{justify-content:center;}
-    .hphoto{max-width:340px;margin:8px auto 0;} .hero h1{font-size:52px;}
+    .hphoto{max-width:320px;margin:8px auto 0;} .hero h1{font-size:50px;}
+    .hphoto .chip{display:none;}
   }
 
   /* MARQUEE */
   .marquee{background:var(--ink);color:#fff;padding:15px 0;overflow:hidden;white-space:nowrap;}
-  .marquee span{display:inline-block;animation:scroll 22s linear infinite;font-family:'Fraunces';font-size:19px;letter-spacing:1px;}
+  .marquee span{display:inline-block;animation:scroll 22s linear infinite;font-family:'Rubik';font-size:19px;letter-spacing:1px;}
   .marquee span b{color:var(--yellow);margin:0 6px;} .marquee span em{color:var(--cyan);font-style:normal;margin:0 26px;}
   @keyframes scroll{to{transform:translateX(-50%);}}
 
@@ -79,7 +79,7 @@
   .sec-head{text-align:center;max-width:600px;margin:0 auto 46px;}
   .kicker{display:inline-block;background:var(--violet);color:#fff;font-weight:600;font-size:12px;letter-spacing:2px;
     text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:16px;}
-  h2{font-family:'Fraunces';font-weight:600;font-size:44px;line-height:1.05;letter-spacing:-.6px;margin-bottom:12px;}
+  h2{font-family:'Rubik';font-weight:800;font-size:44px;line-height:1.04;letter-spacing:-1px;margin-bottom:12px;}
   .sec-head p{font-size:17px;color:#5a4a68;}
 
   /* BENTO SERVICES — photo-forward */
@@ -90,12 +90,12 @@
   .tile:hover{transform:translateY(-5px);}
   .tile:hover:before{background:linear-gradient(to top,rgba(65,54,69,.86),rgba(255,61,146,.32) 72%);}
   .tile>*{position:relative;z-index:1;}
-  .tile h3{font-family:'Fraunces';font-size:22px;font-weight:700;letter-spacing:-.4px;}
+  .tile h3{font-family:'Rubik';font-size:22px;font-weight:700;letter-spacing:-.4px;}
   .tile .price{font-weight:700;font-size:14px;background:var(--pink);color:#fff;padding:5px 13px;border-radius:100px;align-self:flex-start;}
   .tile .em{font-size:30px;opacity:.96;}
   .t-a{grid-column:span 2;grid-row:span 2;}
   .t-b{grid-column:span 2;} .t-e{grid-column:span 2;} .t-f{grid-column:span 2;}
-  @media(max-width:820px){.bento{grid-template-columns:repeat(2,1fr);} .t-a,.t-b,.t-e,.t-f{grid-column:span 2;} .t-a{grid-row:span 1;}}
+  @media(max-width:900px){.bento{grid-template-columns:repeat(2,1fr);} .t-a,.t-b,.t-e,.t-f{grid-column:span 2;} .t-a{grid-row:span 1;}}
 
   /* GALLERY */
   .gal-sec{background:#fff;}
@@ -157,7 +157,7 @@
 
   .gtk{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
   .gtk .card{background:#fff;border:2px solid var(--ink);border-radius:20px;padding:22px;box-shadow:5px 5px 0 var(--violet);}
-  .gtk .card h4{font-family:'Fraunces';font-size:18px;font-weight:600;margin-bottom:8px;}
+  .gtk .card h4{font-family:'Rubik';font-size:18px;font-weight:600;margin-bottom:8px;}
   .gtk .card p{font-size:13.5px;color:#5a4a68;}
   @media(max-width:820px){.gtk{grid-template-columns:1fr 1fr;}}
   @media(max-width:520px){.gtk{grid-template-columns:1fr;}}
@@ -220,16 +220,16 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="kicker">The Menu</span>
-      <h2>Pick your vibe</h2>
+      <h2>Pick your service</h2>
       <p>Transparent pricing, always. Tap any service to book it directly.</p>
     </div>
     <div class="bento" data-booking>
-      <div class="tile t-a" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-1')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="13" y="3" width="6" height="4" rx="1"/><path d="M13 7 L19 7"/><path d="M12 12 Q12 10 14 10 L18 10 Q20 10 20 12 L20 26 Q20 28 18 28 L14 28 Q12 28 12 26 Z"/></svg></span><div><h3>Signature Custom Set</h3><span class="price">from $85</span></div></div>
-      <div class="tile t-b" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-3')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 5 C8 5 4 11 4 16 C4 21 9 24 12 22 C14 21 13 18 16 18 C22 18 28 15 28 11 C28 7 22 5 16 5 Z"/><circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.3" fill="currentColor" stroke="none"/><circle cx="21" cy="11" r="1.3" fill="currentColor" stroke="none"/></svg></span><div><h3>Hand-Painted Nail Art</h3><span class="price">from $110</span></div></div>
-      <div class="tile t-c" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-6')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M16 4 L18 13 L27 16 L18 19 L16 28 L14 19 L5 16 L14 13 Z"/></svg></span><div><h3>Gel Mani</h3><span class="price">$55</span></div></div>
-      <div class="tile t-d" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-4')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5 C9 5 9 13 10 18 C10.6 21 10 25 14 25 C17 25 18 21 17 17 C16 12 17 5 13 5 Z"/><circle cx="20" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="21.5" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="21" cy="17" r="1.1" fill="currentColor" stroke="none"/></svg></span><div><h3>Lux Pedi</h3><span class="price">$70</span></div></div>
-      <div class="tile t-e" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-5')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 24 A12 12 0 0 1 28 24"/><path d="M8 24 A8 8 0 0 1 24 24"/><path d="M12 24 A4 4 0 0 1 20 24"/></svg></span><div><h3>Color Party (groups of 4+)</h3><span class="price">from $65/pp</span></div></div>
-      <div class="tile t-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-2')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 27 L26 27 L26 17 Q26 15 24 15 L8 15 Q6 15 6 17 Z"/><path d="M6 20 Q10 23 14 20 T22 20 T26 20"/><path d="M16 15 L16 9"/><circle cx="16" cy="7" r="1.4" fill="currentColor" stroke="none"/></svg></span><div><h3>Birthday Glam Set</h3><span class="price">from $95</span></div></div>
+      <div class="tile t-a" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-1')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="13" y="3" width="6" height="4" rx="1"/><path d="M13 7 L19 7"/><path d="M12 12 Q12 10 14 10 L18 10 Q20 10 20 12 L20 26 Q20 28 18 28 L14 28 Q12 28 12 26 Z"/></svg></span><div><h3>Full Sets & Fills</h3><span class="price">from $70</span></div></div>
+      <div class="tile t-b" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-3')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 5 C8 5 4 11 4 16 C4 21 9 24 12 22 C14 21 13 18 16 18 C22 18 28 15 28 11 C28 7 22 5 16 5 Z"/><circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.3" fill="currentColor" stroke="none"/><circle cx="21" cy="11" r="1.3" fill="currentColor" stroke="none"/></svg></span><div><h3>Manicures</h3><span class="price">from $30</span></div></div>
+      <div class="tile t-c" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-6')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M16 4 L18 13 L27 16 L18 19 L16 28 L14 19 L5 16 L14 13 Z"/></svg></span><div><h3>Pedicures</h3><span class="price">from $45</span></div></div>
+      <div class="tile t-d" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-4')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5 C9 5 9 13 10 18 C10.6 21 10 25 14 25 C17 25 18 21 17 17 C16 12 17 5 13 5 Z"/><circle cx="20" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="21.5" cy="13" r="1.3" fill="currentColor" stroke="none"/><circle cx="21" cy="17" r="1.1" fill="currentColor" stroke="none"/></svg></span><div><h3>Mani + Pedi</h3><span class="price">from $70</span></div></div>
+      <div class="tile t-e" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-5')"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 24 A12 12 0 0 1 28 24"/><path d="M8 24 A8 8 0 0 1 24 24"/><path d="M12 24 A4 4 0 0 1 20 24"/></svg></span><div><h3>Lashes</h3><span class="price">from $90</span></div></div>
+      <div class="tile t-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,w_560,q_auto,f_auto/noemptychair/demos/poppi/nail-2')"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 27 L26 27 L26 17 Q26 15 24 15 L8 15 Q6 15 6 17 Z"/><path d="M6 20 Q10 23 14 20 T22 20 T26 20"/><path d="M16 15 L16 9"/><circle cx="16" cy="7" r="1.4" fill="currentColor" stroke="none"/></svg></span><div><h3>Brows & Waxing</h3><span class="price">from $12</span></div></div>
     </div>
   </div>
 </section>
@@ -335,7 +335,7 @@
         <h2 class="display">Ready to be obsessed?</h2>
         <p>Real-time availability. No deposit to browse times. Reschedule anytime up to 24 hrs.</p>
         <a href="#" data-booking class="btn-big" style="background:var(--pink);box-shadow:0 7px 0 #c41f6a;">Book your appointment →</a>
-        <p style="margin-top:22px;font-size:14px;color:#c9b8d6;">641 Edgewood Ave NE, Atlanta · Tue–Sat 10a–7p · (404) 555-0199</p>
+        <p style="margin-top:32px;font-size:13px;color:#c9b8d6;">641 Edgewood Ave NE, Atlanta · Tue–Sat 10a–7p · (404) 555-0199</p>
       </div>
     </div>
   </div>
@@ -361,8 +361,8 @@
   @media(max-width:900px){
     body{padding-bottom:80px;}
     .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
-      padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.86);
-      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(32,18,46,.10);box-shadow:0 -10px 32px rgba(32,18,46,.12);}
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,249,244,.98);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(32,18,46,.12);box-shadow:0 -12px 34px rgba(32,18,46,.16);}
     .appbar-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-height:54px;
       border-radius:16px;color:#20122e;opacity:.6;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;transition:.2s;}
     .appbar-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
@@ -451,13 +451,13 @@
         {name:"3D charms",price:"+$15",p:15},
         {name:"Soak-off removal",price:"+$10",p:10}
       ]},
-      {key:"massage",label:"Massage & spa add-ons",type:"multi",optional:true,showIf:function(a){return a.service&&a.service.polish;},options:[
+      {key:"massage",label:"Massage & spa add-ons",type:"multi",optional:true,perVisit:true,options:[
         {name:"Foot & leg massage (10 min)",price:"+$10",p:10,icon:"\U0001F9B6"},
         {name:"Hand & arm massage (10 min)",price:"+$10",p:10,icon:"✋"},
         {name:"Shoulder & neck massage",price:"+$15",p:15,icon:"\U0001F486"},
         {name:"Paraffin dip",price:"+$12",p:12,icon:"\U0001F56F️"}
       ]},
-      {key:"drink",label:"Pick your drink",sub:"On the house — or add something bubbly.",type:"single",optional:true,options:[
+      {key:"drink",label:"Pick your drink",sub:"On the house — or add something bubbly.",type:"single",optional:true,perVisit:true,options:[
         {name:"Still water",price:"free",p:0,icon:"\U0001F4A7"},
         {name:"Sparkling water",price:"free",p:0,icon:"\U0001FAE7"},
         {name:"Hot tea",price:"free",p:0,icon:"\U0001F375"},
