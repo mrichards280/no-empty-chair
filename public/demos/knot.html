@@ -195,7 +195,12 @@
     <h2>Pick your <span class="ser">protective</span> style.</h2>
     <p class="lead">Clear pricing, real time estimates. Every style includes a scalp treatment and edge finish.</p>
     <div class="svc">
-      <div class="scard"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_180,q_auto,f_auto/noemptychair/demos/knot/reel-2');background-size:cover;background-position:center;"></div><h3>Takedown + Wash</h3><div class="dur">Full detangle &amp; scalp reset · 1 hr</div><div class="row"><span class="price">$45</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/hero-1');background-size:cover;background-position:center;"></div><h3>Knotless Braids</h3><div class="dur">Boho, jumbo or waist-length · 3–5 hrs</div><div class="row"><span class="price">$180+</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/reel-3');background-size:cover;background-position:center;"></div><h3>Stitch Cornrows</h3><div class="dur">Feed-in, straight back or design · 2–3 hrs</div><div class="row"><span class="price">$120+</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/reel-5');background-size:cover;background-position:center;"></div><h3>Boho / Goddess</h3><div class="dur">Curly ends, human-hair blend · 4–6 hrs</div><div class="row"><span class="price">$220+</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/reel-1');background-size:cover;background-position:center;"></div><h3>Passion Twists</h3><div class="dur">Lightweight, shoulder to mid-back · 3–4 hrs</div><div class="row"><span class="price">$160+</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/reel-4');background-size:cover;background-position:center;"></div><h3>Kids' Styles</h3><div class="dur">Gentle, patient, quick · 1–2 hrs</div><div class="row"><span class="price">$70+</span><span class="go">Book →</span></div></div>
+      <div class="scard" data-booking style="cursor:pointer"><div class="ico" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_200,q_auto,f_auto/noemptychair/demos/knot/reel-2');background-size:cover;background-position:center;"></div><h3>Takedown + Wash</h3><div class="dur">Full detangle &amp; scalp reset · 1 hr</div><div class="row"><span class="price">$45</span><span class="go">Book →</span></div></div>
     </div>
   </div>
 </section>
@@ -313,7 +318,7 @@
   var ids=Object.keys(map);function onS(){if(window.scrollY<140&&home){setA(home);return;}var mid=window.scrollY+window.innerHeight*0.35,cur=null,ct=-1;
   ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var top=el.offsetTop;if(top<=mid&&top>ct){ct=top;cur=map[id];}});if(cur)setA(cur);}
   window.addEventListener('scroll',onS,{passive:true});onS();
-  var els=[].slice.call(document.querySelectorAll('.sec-head,.scard,.pstep,.eyebrow'));
+  var els=[].slice.call(document.querySelectorAll('.sec-head,.pstep,.eyebrow'));
   els.forEach(function(e){e.classList.add('reveal');});
   if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
   else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});} setTimeout(function(){els.forEach(function(e){e.classList.add('in');});},1600);
