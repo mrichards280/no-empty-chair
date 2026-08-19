@@ -65,6 +65,12 @@
   .cell .tag{font-weight:600;font-size:17px;}
   .cell .bookmini{background:rgba(255,255,255,.9);color:var(--ink);align-self:flex-start;padding:9px 18px;border-radius:100px;font-weight:600;font-size:13px;}
   .cell.big .tag{font-size:26px;line-height:1.05;}
+  .cell .cellrows{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .cell .cellrows>div{display:flex;justify-content:space-between;font-size:13.5px;border-top:1px solid rgba(255,255,255,.18);padding-top:8px;}
+  .cell .cellrows b{font-weight:600;} .cell .cellrows span{opacity:.72;}
+  .cell .cellfoot{margin-top:12px;font-size:13px;line-height:1.5;opacity:.82;}
+  .cell .slotline{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .cell .slotline span{font-size:12px;font-weight:600;background:rgba(19,19,17,.06);border:1px solid var(--line);padding:5px 11px;border-radius:100px;}
   @media(max-width:820px){.hgrid{grid-template-columns:repeat(2,1fr);} .cell.big{grid-column:span 2;grid-row:span 2;}}
 
   section{padding:76px 0;}
@@ -172,10 +178,10 @@
           <a href="#book" class="bookmini" style="margin-top:14px;">Book from $180 →</a>
         </div>
       </div>
-      <div class="cell wide c-ink"><span class="lbl">Open late</span><div class="tag">Evening slots<br>Tue–Sat til 9pm</div></div>
-      <div class="cell tall c-butter"><div class="big-n">3–4h</div><span class="lbl">Avg. finish time</span></div>
+      <div class="cell wide c-ink"><span class="lbl">Open late</span><div><div class="tag">Evening slots<br>Tue–Sat til 9pm</div><div class="cellrows"><div><b>Tue – Fri</b><span>10a – 9p</span></div><div><b>Saturday</b><span>9a – 8p</span></div><div><b>Sun / Mon</b><span>By request</span></div></div></div></div>
+      <div class="cell tall c-butter"><div><div class="big-n">3–4h</div><span class="lbl">Avg. finish time</span></div><div class="cellfoot" style="color:var(--ink)">Most knotless done in one sitting — no all-day marathons. You get the real time before you book.</div></div>
       <div class="cell tall photo p-sky" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_780,q_auto,f_auto/noemptychair/demos/knot/hero-2');background-size:cover;background-position:center;"><span class="lbl">New</span><span class="tag">Stitch<br>Cornrows</span></div>
-      <div class="cell wide c-card"><span class="lbl" style="color:var(--muted)">Book online</span><div class="tag">In under 30 sec.<br>No deposit to browse</div></div>
+      <div class="cell wide c-card"><span class="lbl" style="color:var(--muted)">Book online</span><div><div class="tag">In under 30 sec.<br>No deposit to browse</div><div class="slotline"><span>Today 4:30p</span><span>Thu 11:00a</span><span>Fri 2:15p</span><span>Sat 9:30a</span></div><a href="#book" data-booking class="bookmini" style="margin-top:12px;background:var(--ink);color:#fff">Check live slots →</a></div></div>
     </div>
   </div>
 </header>
