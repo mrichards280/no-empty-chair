@@ -22,6 +22,16 @@
 .nec-bk-guide{background:var(--bk-accent-soft,rgba(0,0,0,.05));border:1px solid var(--bk-accent-soft,rgba(0,0,0,.08));border-radius:16px;padding:14px 12px 12px;margin:-4px 0 16px;}
 .nec-bk-guide svg{display:block;width:100%;height:auto;}
 .nec-bk-guide .gcap{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.55;text-align:center;margin-bottom:8px;}
+/* Skin tones rotate through a full range every ~30s, smoothly, so the figures represent everyone. */
+@keyframes necSkinCycle{0%{fill:#f6dcc8}20%{fill:#e3b393}40%{fill:#c78a62}60%{fill:#9c6440}80%{fill:#6b4530}100%{fill:#f6dcc8}}
+.nec-bk-guide .skn,.nec-bk-opt.has-ico .skn{animation:necSkinCycle 150s linear infinite;}
+.nec-bk-guide .skn{animation-delay:-15s;}
+.nec-bk-opt.has-ico:nth-of-type(1) .skn{animation-delay:0s;}
+.nec-bk-opt.has-ico:nth-of-type(2) .skn{animation-delay:-30s;}
+.nec-bk-opt.has-ico:nth-of-type(3) .skn{animation-delay:-60s;}
+.nec-bk-opt.has-ico:nth-of-type(4) .skn{animation-delay:-90s;}
+.nec-bk-opt.has-ico:nth-of-type(5) .skn{animation-delay:-120s;}
+@media (prefers-reduced-motion:reduce){.nec-bk-guide .skn,.nec-bk-opt.has-ico .skn{animation:none;}}
 .nec-bk-opt{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid rgba(128,128,128,.22);
   background:var(--bk-bg,#faf7fb);border-radius:16px;padding:13px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;font:inherit;color:inherit;}
 .nec-bk-opt:hover{border-color:var(--bk-accent,#ff3d92);}
