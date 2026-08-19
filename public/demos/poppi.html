@@ -259,7 +259,7 @@
 <section id="about">
   <div class="wrap">
     <div class="artist">
-      <div class="artist-photo" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_face,ar_4:5,w_760,q_auto,f_auto/noemptychair/demos/poppi/client-2')">
+      <div class="artist-photo" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_face,ar_4:5,w_760,q_auto,f_auto/noemptychair/demos/poppi/founder')">
         <span class="sticker">✦ 500+ sets</span>
       </div>
       <div class="artist-text">
@@ -390,24 +390,49 @@
   window.NEC_BOOKING={
     brand:"POPPI", markSrc:"/demos/_nec-mark.svg",
     theme:{accent:"#ff3d92",accentSoft:"rgba(255,61,146,.18)",onAccent:"#fff",surface:"#fff9f4",bg:"#fff",ink:"#20122e"},
-    serviceLabel:"base service", enhanceLabel:"Add your enhancements",
-    services:[
-      {name:"Gel Manicure",price:"$55",dur:"45 min",p:55},
-      {name:"Acrylic Full Set",price:"from $75",dur:"90 min",p:75},
-      {name:"Builder Gel Overlay",price:"from $70",dur:"75 min",p:70},
-      {name:"Dip Powder Set",price:"$65",dur:"60 min",p:65},
-      {name:"Luxe Pedicure",price:"$70",dur:"60 min",p:70},
-      {name:"Kids Mani (10 & under)",price:"$30",dur:"30 min",p:30}
-    ],
-    enhancements:[
-      {name:"Extra length (XL)",price:"+$15",p:15},
-      {name:"Hand-painted nail art (2 accents)",price:"+$10",p:10},
-      {name:"Chrome / cat-eye finish",price:"+$15",p:15},
-      {name:"French / ombré",price:"+$20",p:20},
-      {name:"Rhinestones / 3D charms",price:"+$20",p:20},
-      {name:"Soak-off removal",price:"+$10",p:10}
-    ],
-    deposit:"$20", address:"641 Edgewood Ave NE, ATL", confirmVerb:"booked"
+    deposit:"$20", address:"641 Edgewood Ave NE, ATL", confirmVerb:"booked",
+    flow:[
+      {key:"service",label:"What are you booking?",type:"single",options:[
+        {name:"Classic Manicure",price:"$30",p:30},
+        {name:"Gel Manicure",price:"$45",p:45},
+        {name:"Classic Pedicure",price:"$45",p:45},
+        {name:"Deluxe Spa Pedicure",price:"$65",p:65},
+        {name:"Enhancement — Full Set",price:"from $70",p:70,enh:true},
+        {name:"Enhancement — Fill / Refill",price:"from $50",p:50,enh:true},
+        {name:"Dip Powder",price:"$60",p:60},
+        {name:"Kids Mani (10 & under)",price:"$25",p:25}
+      ]},
+      {key:"enhType",label:"Enhancement type",sub:"What are we using to build the set?",type:"single",
+        showIf:function(a){return a.service&&a.service.enh;},options:[
+        {name:"Acrylic",price:"incl.",p:0},
+        {name:"Gel-X (soft gel)",price:"+$15",p:15},
+        {name:"Builder / hard gel",price:"+$15",p:15},
+        {name:"Dip powder",price:"+$5",p:5},
+        {name:"Polygel",price:"+$20",p:20}
+      ]},
+      {key:"length",label:"Length",type:"single",showIf:function(a){return a.service&&a.service.enh;},options:[
+        {name:"Short",price:"incl.",p:0},
+        {name:"Medium",price:"+$5",p:5},
+        {name:"Long",price:"+$15",p:15},
+        {name:"Extra long (XL)",price:"+$25",p:25}
+      ]},
+      {key:"shape",label:"Shape",type:"single",showIf:function(a){return a.service&&a.service.enh;},options:[
+        {name:"Square",p:0},{name:"Round",p:0},{name:"Almond",p:0},{name:"Coffin / ballerina",p:0},{name:"Stiletto",p:0}
+      ]},
+      {key:"finish",label:"Polish & finish",type:"single",options:[
+        {name:"Regular polish",price:"incl.",p:0},
+        {name:"Gel polish",price:"+$10",p:10},
+        {name:"Chrome / cat-eye",price:"+$15",p:15},
+        {name:"French",price:"+$15",p:15},
+        {name:"Ombré",price:"+$20",p:20}
+      ]},
+      {key:"art",label:"Nail art & add-ons",type:"multi",optional:true,options:[
+        {name:"Hand-painted art (2 accents)",price:"+$10",p:10},
+        {name:"Rhinestones / gems",price:"+$10",p:10},
+        {name:"3D charms",price:"+$15",p:15},
+        {name:"Soak-off removal",price:"+$10",p:10}
+      ]}
+    ]
   };
 </script>
 <script src="/demos/_booking.js" defer></script>
