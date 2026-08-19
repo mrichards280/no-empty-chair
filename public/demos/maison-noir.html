@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/_booking.css">
 <style>
   :root{
     --noir:#0e0d10; --noir-2:#181419; --plum:#241a24; --gold:#c8a45a; --gold-lt:#e6cf9a;
@@ -34,7 +35,7 @@
   nav ul a:hover{color:var(--gold);}
   .reserve{border:1px solid var(--gold);color:var(--gold) !important;padding:12px 26px;letter-spacing:2px;font-size:11px;text-transform:uppercase;transition:.3s;}
   .reserve:hover{background:var(--gold);color:var(--noir) !important;}
-  @media(max-width:860px){nav ul li:not(.cta){display:none;}}
+  @media(max-width:900px){nav ul li:not(.cta){display:none;}}
 
   /* HERO */
   .hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;
@@ -272,5 +273,80 @@
   </div>
 </footer>
 
+
+<style>
+  html{overflow-x:clip;}
+  .appbar{display:none;}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  nav ul a.active{color:var(--gold);}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+  @media(max-width:900px){
+    body{padding-bottom:80px;}
+    .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(24,20,25,.98);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);box-shadow:0 -12px 34px rgba(0,0,0,.4);}
+    .appbar-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-height:54px;
+      border-radius:14px;color:var(--ivory);opacity:.6;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:.2s;}
+    .appbar-tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+    .appbar-tab.is-active{opacity:1;color:var(--gold);}
+    .appbar-cta{background:var(--gold);color:var(--noir);opacity:1;}
+    .appbar-cta svg{stroke:var(--noir);} .appbar-cta.is-active{color:var(--noir);}
+  }
+</style>
+<nav class="appbar" aria-label="Quick navigation">
+  <a href="#" data-top data-tab class="appbar-tab is-active"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/></svg><span>Home</span></a>
+  <a href="#services" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span>Services</span></a>
+  <a href="#gallery" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M5 17l4.5-4 4 3.2L17 12l3 3.4"/></svg><span>Portfolio</span></a>
+  <a href="#reserve" data-tab class="appbar-tab appbar-cta"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg><span>Reserve</span></a>
+</nav>
+<script>
+  (function(){var bar=document.querySelector('.appbar');if(!bar)return;var tabs=[].slice.call(bar.querySelectorAll('[data-tab]'));var map={};
+  tabs.forEach(function(t){var h=t.getAttribute('href')||'';if(h.charAt(0)==='#'&&h.length>1)map[h.slice(1)]=t;});
+  var home=bar.querySelector('[data-top]');if(home)home.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+  function setA(t){tabs.forEach(function(x){x.classList.toggle('is-active',x===t);});}
+  var ids=Object.keys(map);function onS(){if(window.scrollY<160&&home){setA(home);return;}var mid=window.scrollY+window.innerHeight*0.35,cur=null,ct=-1;
+  ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var top=el.offsetTop;if(top<=mid&&top>ct){ct=top;cur=map[id];}});if(cur)setA(cur);}
+  window.addEventListener('scroll',onS,{passive:true});onS();
+  var els=[].slice.call(document.querySelectorAll('.sec-head,.svc-row,.eimg,.founder,.accolades div,.reserve-sec .card'));
+  els.forEach(function(e){e.classList.add('reveal');});
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});}
+  var links=[].slice.call(document.querySelectorAll('nav ul a[href^="#"]'));var lm={};links.forEach(function(l){var id=l.getAttribute('href').slice(1);if(id)lm[id]=l;});var lids=Object.keys(lm);
+  function spy(){var mid=window.scrollY+window.innerHeight*0.3,cur=null,ct=-1;lids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var t=el.offsetTop;if(t<=mid&&t>ct){ct=t;cur=lm[id];}});links.forEach(function(l){l.classList.toggle('active',l===cur);});}
+  window.addEventListener('scroll',spy,{passive:true});spy();
+  })();
+</script>
+<script>
+  window.NEC_BOOKING={
+    brand:"MAISON NOIR", markSrc:"/demos/_nec-mark-light.svg", apptTitle:"Maison Noir reservation (tentative)",
+    theme:{accent:"#c8a45a",accentSoft:"rgba(200,164,90,.2)",onAccent:"#0e0d10",surface:"#181419",bg:"#0e0d10",ink:"#f6f1e9"},
+    deposit:"$100", address:"Buckhead, Atlanta", confirmVerb:"reserved",
+    flow:[
+      {key:"service",label:"Reserve a service",sub:"Every reservation begins with a consultation.",type:"single",options:[
+        {name:"Bespoke Color",price:"from $280",p:280},
+        {name:"Precision Cut & Style",price:"from $150",p:150},
+        {name:"Silk Press & Treatment",price:"from $120",p:120},
+        {name:"Couture Bridal & Event",price:"from $350",p:350},
+        {name:"Extensions & Restoration",price:"from $500",p:500},
+        {name:"Gloss / Toner Refresh",price:"$75",p:75}
+      ]},
+      {key:"addons",label:"Enhance your service",type:"multi",optional:true,options:[
+        {name:"Bond repair (Olaplex)",price:"+$40",p:40},
+        {name:"Deep conditioning",price:"+$45",p:45},
+        {name:"Scalp treatment",price:"+$35",p:35},
+        {name:"Blowout finish",price:"+$50",p:50}
+      ]},
+      {key:"drink",label:"Your refreshment",sub:"Compliments of the house.",type:"single",optional:true,perVisit:true,options:[
+        {name:"Champagne",price:"—",p:0,icon:"🥂"},
+        {name:"Sparkling water",price:"—",p:0,icon:"🫧"},
+        {name:"Espresso",price:"—",p:0,icon:"☕"},
+        {name:"Herbal tea",price:"—",p:0,icon:"🍵"},
+        {name:"Glass of wine",price:"—",p:0,icon:"🍷"}
+      ]}
+    ]
+  };
+</script>
+<script src="/demos/_booking.js" defer></script>
 </body>
 </html>

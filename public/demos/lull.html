@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/_booking.css">
 <style>
   :root{
     --bg:#f6f3ee; --bg2:#efeae1; --white:#fffdfa;
@@ -300,5 +301,80 @@
   </div>
 </footer>
 
+
+<style>
+  html{overflow-x:clip;}
+  .appbar{display:none;}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  nav ul a.active{color:var(--sage-d);}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+  @media(max-width:900px){
+    body{padding-bottom:80px;}
+    .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,253,250,.98);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);box-shadow:0 -12px 34px rgba(55,55,47,.12);}
+    .appbar-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-height:54px;
+      border-radius:14px;color:var(--ink);opacity:.55;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:.2s;}
+    .appbar-tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+    .appbar-tab.is-active{opacity:1;color:var(--sage-d);}
+    .appbar-cta{background:linear-gradient(135deg,#7d8b76,#a98d63);color:#fff;opacity:1;}
+    .appbar-cta svg{stroke:#fff;} .appbar-cta.is-active{color:#fff;}
+  }
+</style>
+<nav class="appbar" aria-label="Quick navigation">
+  <a href="#" data-top data-tab class="appbar-tab is-active"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/></svg><span>Home</span></a>
+  <a href="#treatments" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><path d="M5 19c0-8 6-13 14-13 0 8-6 13-14 13z"/><path d="M5 19c3-4 6-6 9-7"/></svg><span>Treatments</span></a>
+  <a href="#visit" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg><span>Visit</span></a>
+  <a href="#reserve" data-tab class="appbar-tab appbar-cta"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg><span>Reserve</span></a>
+</nav>
+<script>
+  (function(){var bar=document.querySelector('.appbar');if(!bar)return;var tabs=[].slice.call(bar.querySelectorAll('[data-tab]'));var map={};
+  tabs.forEach(function(t){var h=t.getAttribute('href')||'';if(h.charAt(0)==='#'&&h.length>1)map[h.slice(1)]=t;});
+  var home=bar.querySelector('[data-top]');if(home)home.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+  function setA(t){tabs.forEach(function(x){x.classList.toggle('is-active',x===t);});}
+  var ids=Object.keys(map);function onS(){if(window.scrollY<160&&home){setA(home);return;}var mid=window.scrollY+window.innerHeight*0.35,cur=null,ct=-1;
+  ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var top=el.offsetTop;if(top<=mid&&top>ct){ct=top;cur=map[id];}});if(cur)setA(cur);}
+  window.addEventListener('scroll',onS,{passive:true});onS();
+  var els=[].slice.call(document.querySelectorAll('.sec-head,.mcard,.vcard,.trow,.tcard,.svc-row'));
+  els.forEach(function(e){e.classList.add('reveal');});
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});}
+  var links=[].slice.call(document.querySelectorAll('nav ul a[href^="#"]'));var lm={};links.forEach(function(l){var id=l.getAttribute('href').slice(1);if(id)lm[id]=l;});var lids=Object.keys(lm);
+  function spy(){var mid=window.scrollY+window.innerHeight*0.3,cur=null,ct=-1;lids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var t=el.offsetTop;if(t<=mid&&t>ct){ct=t;cur=lm[id];}});links.forEach(function(l){l.classList.toggle('active',l===cur);});}
+  window.addEventListener('scroll',spy,{passive:true});spy();
+  })();
+</script>
+<script>
+  window.NEC_BOOKING={
+    brand:"LULL", markSrc:"/demos/_nec-mark.svg", apptTitle:"LULL reservation (tentative)",
+    theme:{accent:"#5f6c59",accentSoft:"rgba(125,139,118,.2)",onAccent:"#fff",surface:"#fffdfa",bg:"#f6f3ee",ink:"#37372f"},
+    deposit:"$40", address:"Atlanta", confirmVerb:"reserved",
+    flow:[
+      {key:"treatment",label:"Choose your treatment",type:"single",options:[
+        {name:"Signature Facial (60 min)",price:"$120",p:120},
+        {name:"Hot Stone Massage (75 min)",price:"$165",p:165},
+        {name:"Deep Tissue Massage (60 min)",price:"$145",p:145},
+        {name:"Swedish Massage (60 min)",price:"$130",p:130},
+        {name:"Express Glow Facial (30 min)",price:"$85",p:85},
+        {name:"Body Scrub & Wrap (75 min)",price:"$150",p:150}
+      ]},
+      {key:"addons",label:"Elevate your ritual",type:"multi",optional:true,options:[
+        {name:"Aromatherapy",price:"+$20",p:20},
+        {name:"Gua sha facial sculpt",price:"+$25",p:25},
+        {name:"CBD upgrade",price:"+$30",p:30},
+        {name:"Extend +30 min",price:"+$55",p:55},
+        {name:"Scalp & neck massage",price:"+$18",p:18}
+      ]},
+      {key:"sip",label:"Your welcome sip",sub:"Enjoy before your treatment.",type:"single",optional:true,perVisit:true,options:[
+        {name:"Cucumber water",price:"—",p:0,icon:"💧"},
+        {name:"Herbal tea",price:"—",p:0,icon:"🍵"},
+        {name:"Kombucha",price:"—",p:0,icon:"🫧"},
+        {name:"Sparkling water",price:"—",p:0,icon:"🥂"}
+      ]}
+    ]
+  };
+</script>
+<script src="/demos/_booking.js" defer></script>
 </body>
 </html>
