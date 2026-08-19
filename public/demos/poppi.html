@@ -8,10 +8,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/_booking.css">
 <style>
   :root{
     --pink:#ff3d92; --tangerine:#ff8a3d; --violet:#8b4dff; --lime:#b6ff3d; --cyan:#3de0ff; --yellow:#ffd23d;
     --ink:#20122e; --cream:#fff9f4; --white:#ffffff; --muted:#7a6b85;
+    --rose:#a85a76; --plum:#413645; /* No Empty Chair signature thread */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
@@ -39,6 +41,7 @@
   .b1{width:320px;height:320px;background:var(--pink);top:-40px;left:-60px;}
   .b2{width:300px;height:300px;background:var(--cyan);top:40px;right:-70px;animation-delay:-3s;}
   .b3{width:260px;height:260px;background:var(--yellow);bottom:-80px;left:40%;animation-delay:-5s;}
+  .b4{width:240px;height:240px;background:var(--rose);top:130px;left:46%;animation-delay:-7s;opacity:.4;}
   @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-26px) scale(1.06);}}
   .hero .wrap{position:relative;z-index:1;}
   .tagpill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--ink);border-radius:100px;
@@ -56,7 +59,12 @@
   .btn-ghost{background:#fff;color:var(--ink);border:2px solid var(--ink);padding:15px 34px;border-radius:100px;font-weight:600;font-size:16px;transition:.2s;}
   .btn-ghost:hover{background:var(--yellow);}
   .hero .book30{margin-top:18px;font-size:13.5px;color:var(--muted);font-weight:500;}
-  @media(max-width:720px){.hero h1{font-size:54px;}}
+  .hero-strip{display:flex;gap:12px;justify-content:center;margin-top:40px;flex-wrap:nowrap;overflow-x:auto;padding:4px 4px 8px;-webkit-overflow-scrolling:touch;}
+  .hero-strip::-webkit-scrollbar{display:none;}
+  .hero-strip .hs{flex:0 0 116px;height:150px;border-radius:20px;background-size:cover;background-position:center;box-shadow:0 12px 26px rgba(32,18,46,.16);border:3px solid #fff;transform:rotate(var(--r,0deg));transition:.2s;}
+  .hero-strip .hs:hover{transform:rotate(0) translateY(-4px);}
+  .hero-strip .hs:nth-child(odd){--r:-3deg;} .hero-strip .hs:nth-child(even){--r:3deg;}
+  @media(max-width:720px){.hero h1{font-size:54px;} .hero-strip .hs{flex-basis:98px;height:128px;}}
 
   /* MARQUEE */
   .marquee{background:var(--ink);color:#fff;padding:15px 0;overflow:hidden;white-space:nowrap;}
@@ -147,6 +155,8 @@
   footer .socials a{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:600;transition:.2s;}
   footer .socials a:hover{background:var(--pink);color:#fff;}
   footer .info{font-size:14px;line-height:1.9;margin-top:10px;}
+  .nec-sig{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-family:'Marcellus',serif;font-size:13px;letter-spacing:.5px;color:#e6b8c6;transition:.2s;}
+  .nec-sig:hover{color:#fff;} .nec-sig b{color:#fff;font-weight:400;}
   .demo-band{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;
     background:linear-gradient(135deg,rgba(233,185,196,.55),rgba(205,196,236,.5),rgba(190,221,203,.5));
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#413645;text-align:center;
@@ -171,16 +181,23 @@
 </nav>
 
 <header class="hero">
-  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
   <div class="wrap">
     <div class="tagpill"><span class="dot"></span> Now booking August · Old Fourth Ward, ATL</div>
     <h1 class="display">Nails that make<br>people go <span class="grad">wait, where?!</span></h1>
     <p>Atlanta's most colorful nail &amp; color studio. Custom sets, wild color, zero judgment. Book in under 30 seconds — no app, no login.</p>
     <div class="actions">
-      <a href="#book" class="btn-big">Book your set</a>
+      <a href="#book" data-booking class="btn-big">Book your set</a>
       <a href="#gallery" class="btn-ghost">See the work</a>
     </div>
     <div class="book30"><svg width="13" height="13" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" style="vertical-align:-1px;"><path d="M18 3 L7 18 L15 18 L14 29 L25 14 L17 14 Z"/></svg> Average booking time: 24 seconds</div>
+    <div class="hero-strip" aria-hidden="true">
+      <div class="hs" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_320,q_auto,f_auto/noemptychair/demos/poppi/nail-1')"></div>
+      <div class="hs" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_320,q_auto,f_auto/noemptychair/demos/poppi/nail-3')"></div>
+      <div class="hs" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_320,q_auto,f_auto/noemptychair/demos/poppi/nail-5')"></div>
+      <div class="hs" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_320,q_auto,f_auto/noemptychair/demos/poppi/nail-2')"></div>
+      <div class="hs" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_320,q_auto,f_auto/noemptychair/demos/poppi/nail-6')"></div>
+    </div>
   </div>
 </header>
 
@@ -194,7 +211,7 @@
       <h2>Pick your vibe</h2>
       <p>Transparent pricing, always. Tap any service to book it directly.</p>
     </div>
-    <div class="bento">
+    <div class="bento" data-booking>
       <div class="tile t-a"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="13" y="3" width="6" height="4" rx="1"/><path d="M13 7 L19 7"/><path d="M12 12 Q12 10 14 10 L18 10 Q20 10 20 12 L20 26 Q20 28 18 28 L14 28 Q12 28 12 26 Z"/></svg></span><div><h3>Signature Custom Set</h3><span class="price">from $85</span></div></div>
       <div class="tile t-b"><span class="em"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 5 C8 5 4 11 4 16 C4 21 9 24 12 22 C14 21 13 18 16 18 C22 18 28 15 28 11 C28 7 22 5 16 5 Z"/><circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.3" fill="currentColor" stroke="none"/><circle cx="21" cy="11" r="1.3" fill="currentColor" stroke="none"/></svg></span><div><h3>Hand-Painted Nail Art</h3><span class="price">from $110</span></div></div>
       <div class="tile t-c"><span class="em"><svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M16 4 L18 13 L27 16 L18 19 L16 28 L14 19 L5 16 L14 13 Z"/></svg></span><div><h3>Gel Mani</h3><span class="price">$55</span></div></div>
@@ -284,7 +301,7 @@
       <div class="in">
         <h2 class="display">Ready to be obsessed?</h2>
         <p>Real-time availability. No deposit to browse times. Reschedule anytime up to 24 hrs.</p>
-        <a href="#" class="btn-big" style="background:var(--pink);box-shadow:0 7px 0 #c41f6a;">Book your appointment →</a>
+        <a href="#" data-booking class="btn-big" style="background:var(--pink);box-shadow:0 7px 0 #c41f6a;">Book your appointment →</a>
         <p style="margin-top:22px;font-size:14px;color:#c9b8d6;">641 Edgewood Ave NE, Atlanta · Tue–Sat 10a–7p · (404) 555-0199</p>
       </div>
     </div>
@@ -297,10 +314,11 @@
     <p>Nail &amp; Color Studio · Old Fourth Ward, Atlanta</p>
     <div class="socials"><a href="#">IG</a><a href="#">TT</a><a href="#">FB</a></div>
     <div class="info">Tue–Sat 10a–7p · Walk-in Wednesdays<br>Book online 24/7 · (404) 555-0199</div>
+    <a href="https://noemptychair.co" target="_blank" rel="noopener" class="nec-sig"><svg width="15" height="15" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#e6b8c6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M45 40 L21 40 L21 20 Q21 15 26 15"/><path d="M44 40 L46 55"/><path d="M22 40 L20 55"/></g><circle cx="31" cy="29" r="8.5" fill="#a85a76"/></svg> Designed by <b>No Empty Chair</b> · noemptychair.co</a>
   </div>
 </footer>
 
-<div class="chatbubble">
+<div class="chatbubble" data-booking style="cursor:pointer">
   <div class="ai"><span class="d"></span> BOOK POPPI</div>
   Got a set in mind? <b>Book online in ~30 sec</b> — or DM us your inspo pic.
 </div>
@@ -336,5 +354,21 @@
   ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var top=el.offsetTop;if(top<=mid&&top>curTop){curTop=top;cur=map[id];}});if(cur)setActive(cur);}
   window.addEventListener('scroll',onScroll,{passive:true});onScroll();})();
 </script>
+<script>
+  window.NEC_BOOKING={
+    brand:"POPPI", markColor:"#ff3d92",
+    theme:{accent:"#ff3d92",accentSoft:"rgba(255,61,146,.18)",onAccent:"#fff",surface:"#fff9f4",bg:"#fff",ink:"#20122e"},
+    services:[
+      {name:"Signature Custom Set",price:"from $85",dur:"60–90 min"},
+      {name:"Hand-Painted Nail Art",price:"from $110",dur:"90 min"},
+      {name:"Gel Mani",price:"$55",dur:"45 min"},
+      {name:"Lux Pedi",price:"$70",dur:"60 min"},
+      {name:"Color Party (4+)",price:"from $65/pp",dur:"group booking"},
+      {name:"Birthday Glam Set",price:"from $95",dur:"75 min"}
+    ],
+    deposit:"$20", address:"641 Edgewood Ave NE, ATL", confirmVerb:"booked"
+  };
+</script>
+<script src="/demos/_booking.js" defer></script>
 </body>
 </html>
