@@ -145,6 +145,9 @@ const jsonLd = {
     <meta name="twitter:description" content="An Atlanta brand and content studio that keeps talented salons fully booked." />
     <meta name="twitter:image" content={image} />
 
+    <!-- Warm up the Cloudinary connection early so demo-card images paint faster (helps LCP/FCP). -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+
     <!-- Self-hosted fonts (no third-party round trip). Preload the two that
          paint above the fold: Marcellus (the LCP headline) and Inter (body). -->
     <link rel="preload" href="/fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
