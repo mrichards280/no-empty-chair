@@ -204,6 +204,28 @@ const jsonLd = {
       <input type="text" name="bot-field" />
     </form>
 
+    <!-- Guarantees Netlify registers the "discovery" form + every column, even
+         if a dynamic /discovery/<slug> page ever fails detection. Field names
+         must match src/pages/discovery/[slug].astro. -->
+    <form name="discovery" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="text" name="client_slug" />
+      <input type="text" name="business_name" />
+      <input type="text" name="product_line" />
+      <input type="text" name="sell_where" />
+      <input type="text" name="domain" />
+      <input type="text" name="logo" />
+      <input type="text" name="colors" />
+      <input type="text" name="photos" />
+      <input type="text" name="descriptions" />
+      <input type="text" name="social_media" />
+      <input type="text" name="anything_else" />
+      <input type="text" name="tier_pick" />
+      <input type="text" name="timeline" />
+      <input type="text" name="budget" />
+      <input type="email" name="email" />
+      <input type="text" name="bot-field" />
+    </form>
+
     <slot />
     <!-- Layout "Arrange" tool: only appears with ?edit or when enabled from /admin -->
     <script src="/demos/_tinker.js" defer></script>
