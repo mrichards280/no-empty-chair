@@ -34,7 +34,9 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   position: relative;
-  overflow-x: hidden; /* guard against any horizontal shift on mobile */
+  /* No overflow-x:hidden here — on iOS Safari it makes <body> the scroll
+     container, which breaks the sticky nav and full-page screenshots.
+     Horizontal overflow is prevented at the source instead. */
 }
 body::before {
   content: "";
