@@ -162,7 +162,7 @@
       }
     ],
     "ctaLabel": "Share your vision",
-    "ctaHref": "mailto:info@noemptychair.co?subject=A la carte inquiry"
+    "ctaHref": "mailto:hello@noemptychair.co?subject=A la carte inquiry"
   },
   "proof": {
     "kicker": "Real results, real receipts",
@@ -264,7 +264,7 @@
   "faq": {
     "kicker": "Questions",
     "title": "What salon owners ask me",
-    "intro": "Have a question not on the list? Shoot us a message at info@noemptychair.co",
+    "intro": "Have a question not on the list? Shoot us a message at hello@noemptychair.co",
     "items": [
       {
         "q": "What does No Empty Chair actually do?",
@@ -358,8 +358,8 @@
     "kicker": "Ready?",
     "title": "Let's make your salon the one everyone wants.",
     "sub": "Start with a $200 teardown: a clear, expert look at exactly what's holding your bookings back, and the first step of every project. It credits toward another service.",
-    "email": "info@noemptychair.co",
-    "bookingEmail": "info@noemptychair.co",
+    "email": "hello@noemptychair.co",
+    "bookingEmail": "hello@noemptychair.co",
     "teardownCtaLabel": "Book my $200 teardown",
     "ig": "https://instagram.com/noemptychair",
     "igLabel": "@noemptychair",
@@ -369,7 +369,7 @@
   },
   "footer": {
     "tagline": "Brand & Content Studio · Atlanta, GA",
-    "email": "info@noemptychair.co",
+    "email": "hello@noemptychair.co",
     "site": "noemptychair.co",
     "ig": "https://instagram.com/noemptychair"
   },

@@ -117,7 +117,7 @@ export default function TeardownForm() {
               <button className="btn" type="submit" disabled={status === "sending"}>
                 {status === "sending" ? "Sending…" : "Send my teardown request →"}
               </button>
-              {status === "error" ? <div className="tp-err">Something went wrong — try again, or email info@noemptychair.co.</div> : null}
+              {status === "error" ? <div className="tp-err">Something went wrong — try again, or email hello@noemptychair.co.</div> : null}
               <p className="tp-fine">No payment now. I'll confirm receipt and send a payment link before anything's charged.</p>
             </form>
           </>
