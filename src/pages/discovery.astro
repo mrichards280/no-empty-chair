@@ -1,0 +1,165 @@
+---
+import Base from "../layouts/Base.astro";
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
+---
+<Base
+  title="Discovery | No Empty Chair"
+  description="Tell No Empty Chair about you and your business before we talk — a few quick questions ahead of a potential booking."
+  canonical="https://noemptychair.co/discovery"
+  noindex={true}>
+  <main id="main" class="disc-page">
+    <header class="tp-head">
+      <a href="/" class="tp-logo">No Empty <span>Chair</span></a>
+    </header>
+
+    <div class="tp-wrap disc-wrap">
+      <div class="tp-mark">
+        <svg width="40" height="50.5" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="img" aria-label="No Empty Chair mark">
+          <g fill="#413645" stroke="none"><g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g></g>
+          <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill="#a85a76" /></g>
+        </svg>
+      </div>
+
+      <div class="tp-intro">
+        <div class="disc-kick">No Empty Chair</div>
+        <h1>Let's talk shop</h1>
+        <p>A few quick questions so I show up to our chat already full of ideas for your brand. Fill in what you can — skip anything you're not sure about yet — and hit send. There's <b>no cost and no commitment</b> to this.</p>
+      </div>
+
+      <form
+        class="tform disc-form"
+        name="discovery"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/discovery-thanks"
+      >
+        <input type="hidden" name="form-name" value="discovery" />
+        <input class="tp-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">1</span>The Basics</div>
+          <div class="tp-row">
+            <label>Your name<input type="text" name="name" placeholder="First & last" /></label>
+            <label>Business / brand name<input type="text" name="business_name" placeholder="What do you go by?" /></label>
+          </div>
+          <div class="tp-row">
+            <label>What kind of work do you do?
+              <select name="trade">
+                <option value="">Choose one…</option>
+                <option>Hair / stylist</option>
+                <option>Braider / loctician</option>
+                <option>Barber</option>
+                <option>Nails</option>
+                <option>Lashes &amp; brows</option>
+                <option>Esthetician / skin</option>
+                <option>Spa / massage</option>
+                <option>Makeup</option>
+                <option>Product / beauty brand</option>
+                <option>Other beauty &amp; wellness</option>
+              </select>
+            </label>
+            <label>What city are you in?<input type="text" name="city" placeholder="Atlanta, GA" /></label>
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">2</span>Where You Are Now</div>
+          <div class="tp-row">
+            <label>How do clients find &amp; book you today?<input type="text" name="sell_where" placeholder="Instagram, Booksy, Square, walk-ins, word of mouth, nothing yet" /></label>
+            <label>Website, if you have one<input type="text" name="website" placeholder="yourname.com — or 'none yet'" /></label>
+          </div>
+          <div class="disc-social-q">Which social accounts does your business have?</div>
+          <div class="disc-checks">
+            <label class="disc-check"><input type="checkbox" name="social_media" value="Instagram" /> Instagram</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="TikTok" /> TikTok</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="Facebook" /> Facebook</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="Pinterest" /> Pinterest</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="X (Twitter)" /> X (Twitter)</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="YouTube" /> YouTube</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="Snapchat" /> Snapchat</label>
+            <label class="disc-check"><input type="checkbox" name="social_media" value="LinkedIn" /> LinkedIn</label>
+          </div>
+          <label style="margin-top:14px">Your main handle (so I can peek at your work)<input type="text" name="instagram" placeholder="@yourhandle" /></label>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">3</span>What You Already Have</div>
+          <div class="tp-row">
+            <label>Logo<input type="text" name="logo" placeholder="yes / no / needs one" /></label>
+            <label>Brand colors<input type="text" name="colors" placeholder="yes / no / not sure" /></label>
+          </div>
+          <div class="tp-row">
+            <label>Photos of your work<input type="text" name="photos" placeholder="yes / no / a few" /></label>
+            <label>Online booking set up?<input type="text" name="booking" placeholder="yes / no / which app" /></label>
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">4</span>What I Can Build For You</div>
+          <p class="disc-menu-note">Here's everything No Empty Chair does — check anything that speaks to you. Nothing here is a quote or a commitment; it just tells me where to focus for our chat.</p>
+
+          <div class="disc-group-lbl">Brand &amp; identity</div>
+          <div class="disc-checks">
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand identity & logo" /> Brand identity &amp; logo</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand voice + captions" /> Brand voice &amp; captions</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand session (do-it-with-me)" /> Brand session (do-it-with-me)</label>
+          </div>
+
+          <div class="disc-group-lbl">Website &amp; booking</div>
+          <div class="disc-checks">
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="A full custom website" /> A full custom website</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Website makeover / refresh" /> Website makeover / refresh</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Online booking setup" /> Online booking setup</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Online shop / selling products" /> Online shop / selling products</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Website session (do-it-with-me)" /> Website session (do-it-with-me)</label>
+          </div>
+
+          <div class="disc-group-lbl">Content &amp; social</div>
+          <div class="disc-checks">
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Reels & short-form edits" /> Reels &amp; short-form edits</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Social post templates" /> Social post templates</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Pinterest vibe pages" /> Pinterest vibe pages</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="A month of content" /> A month of content</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Help sourcing my team" /> Help sourcing my team</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Social session (do-it-with-me)" /> Social session (do-it-with-me)</label>
+          </div>
+
+          <div class="disc-group-lbl">Or start small</div>
+          <div class="disc-checks">
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="$200 teardown to start" /> Just the $200 teardown to start</label>
+            <label class="disc-check"><input type="checkbox" name="looking_for" value="Not sure yet — help me figure it out" /> Not sure — help me figure it out</label>
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">5</span>Timeline &amp; Budget</div>
+          <div class="tp-row">
+            <label>When would you like to be up &amp; running?<input type="text" name="timeline" placeholder="ASAP, next month, no rush" /></label>
+            <label>Budget range in mind?<input type="text" name="budget" placeholder="A ballpark helps me tailor it" /></label>
+          </div>
+        </div>
+
+        <div class="disc-sec">
+          <label>Anything else I should know?<textarea name="anything_else" rows="3" placeholder="Your vibe, goals, brands you love, what's held you back — anything at all"></textarea></label>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">6</span>How To Reach You</div>
+          <div class="tp-row">
+            <label>Best email<input required type="email" name="email" placeholder="you@email.com" /></label>
+            <label>Best cell (for a quick booking call)<input type="tel" name="phone" placeholder="(404) 555-0123" /></label>
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Send my answers →</button>
+        <p class="tp-fine">Goes straight to No Empty Chair — I'll reach out to set up a time.</p>
+      </form>
+    </div>
+  </main>
+  <style>
+    .disc-menu-note{font-size:14px;color:#6b5f57;margin:-2px 0 18px;line-height:1.55;}
+    .disc-group-lbl{font-weight:700;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#a85a76;margin:20px 0 8px;}
+    .disc-sec .disc-group-lbl:first-of-type{margin-top:8px;}
+  </style>
+</Base>
