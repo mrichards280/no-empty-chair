@@ -25,6 +25,15 @@ export default function TeardownForm() {
     e.preventDefault();
     if (form["bot-field"]) return;
     setStatus("sending");
+    // Backup notifier — emails you directly, independent of Netlify's spam filter.
+    try {
+      fetch("/.netlify/functions/lead-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ _form: "teardown", ...form }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
     try {
       const res = await fetch("/", {
         method: "POST",
@@ -69,6 +78,9 @@ export default function TeardownForm() {
                 Fill this out — it takes about 5–7 minutes. I'll confirm I got it, send a payment link for the
                 <b> $200 investment</b> (it credits toward any package), then deliver a short video breaking down
                 the changes that'll move the needle first. The more you share, the sharper your teardown.
+              </p>
+              <p className="tp-cross" style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 10 }}>
+                Not ready to invest yet? Start free with a quick <a href="/discovery" style={{ color: "var(--rose)", fontWeight: 600, borderBottom: "1px solid rgba(168,90,118,.4)" }}>discovery chat →</a>
               </p>
             </div>
 

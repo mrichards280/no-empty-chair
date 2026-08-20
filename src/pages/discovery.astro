@@ -21,9 +21,9 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
       </div>
 
       <div class="tp-intro">
-        <div class="disc-kick">No Empty Chair</div>
+        <div class="disc-kick">No Empty Chair <span class="disc-free">Free · no commitment</span></div>
         <h1>Let's talk shop</h1>
-        <p>A few quick questions so I show up to our chat already full of ideas for your brand. Fill in what you can — skip anything you're not sure about yet — and hit send. There's <b>no cost and no commitment</b> to this.</p>
+        <p>A few quick questions so I show up to our chat already full of ideas for your brand. Fill in what you can — skip anything you're not sure about yet — and hit send. This one's <b>free</b>: no cost, no obligation.</p>
       </div>
 
       <form
@@ -155,11 +155,43 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
         <button class="btn" type="submit">Send my answers →</button>
         <p class="tp-fine">Goes straight to No Empty Chair — I'll reach out to set up a time.</p>
       </form>
+
+      <p class="disc-cross">Already know you want a deep, paid audit of what you have now? Skip ahead to the <a href="/teardown">$200 Teardown →</a></p>
     </div>
   </main>
   <style>
     .disc-menu-note{font-size:14px;color:#6b5f57;margin:-2px 0 18px;line-height:1.55;}
     .disc-group-lbl{font-weight:700;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#a85a76;margin:20px 0 8px;}
     .disc-sec .disc-group-lbl:first-of-type{margin-top:8px;}
+    .disc-free{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:100px;background:rgba(168,90,118,.12);color:#a85a76;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
+    .disc-cross{max-width:620px;margin:22px auto 0;text-align:center;font-size:13.5px;color:#6b5f57;}
+    .disc-cross a{color:#a85a76;font-weight:600;border-bottom:1px solid rgba(168,90,118,.4);}
+    .disc-cross a:hover{color:#2a232e;}
   </style>
+  <script is:inline>
+    /* Backup notifier: on submit, also POST to a function that emails you directly,
+       so a spam-flagged Netlify submission never means a silently missed lead.
+       Fire-and-forget — the native Netlify submission still proceeds normally. */
+    (function () {
+      var f = document.querySelector('form[name="discovery"]');
+      if (!f) return;
+      f.addEventListener("submit", function () {
+        try {
+          var data = { _form: "discovery" };
+          new FormData(f).forEach(function (v, k) {
+            if (k === "bot-field" || k === "form-name") return;
+            if (data[k] !== undefined) data[k] = [].concat(data[k], v);
+            else data[k] = v;
+          });
+          fetch("/.netlify/functions/lead-notify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            keepalive: true,
+          }).catch(function () {});
+        } catch (e) {}
+        /* no preventDefault — let Netlify capture it too */
+      });
+    })();
+  </script>
 </Base>

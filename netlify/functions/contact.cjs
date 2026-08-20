@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     return json(400, { error: "Please enter a valid email." });
   }
 
-  const to = process.env.CONTACT_TO_EMAIL || "info@noemptychair.co";
+  const to = process.env.CONTACT_TO_EMAIL || "hello@noemptychair.co";
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
   if (RESEND_API_KEY) {
