@@ -53,9 +53,9 @@
   .hero h1 .grad{color:var(--pink);-webkit-text-fill-color:var(--pink);}
   .hero p{max-width:440px;margin:0 0 30px;font-size:17.5px;color:#5a4a68;}
   .hero .actions{display:flex;gap:14px;flex-wrap:wrap;}
-  .btn-big{background:var(--pink);color:#fff;padding:16px 34px;border-radius:100px;font-weight:700;font-size:15.5px;box-shadow:0 6px 0 #c41f6a;transition:.2s;}
+  .btn-big{display:inline-block;text-align:center;background:var(--pink);color:#fff;padding:16px 34px;border-radius:100px;font-weight:700;font-size:15.5px;box-shadow:0 6px 0 #c41f6a;transition:.2s;}
   .btn-big:hover{transform:translateY(-3px);box-shadow:0 9px 0 #c41f6a;}
-  .btn-ghost{background:transparent;color:var(--plum);border:1.5px solid var(--plum);padding:14px 28px;border-radius:100px;font-weight:600;font-size:15.5px;transition:.2s;}
+  .btn-ghost{display:inline-block;text-align:center;background:transparent;color:var(--plum);border:1.5px solid var(--plum);padding:14px 28px;border-radius:100px;font-weight:600;font-size:15.5px;transition:.2s;}
   .btn-ghost:hover{background:var(--plum);color:#fff;}
   .hero .book30{margin-top:18px;font-size:13px;color:var(--muted);font-weight:500;}
   .hphoto{position:relative;}
@@ -84,7 +84,7 @@
   .sec-head p{font-size:17px;color:#5a4a68;}
 
   /* BENTO SERVICES — photo-forward */
-  .bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:150px;gap:16px;}
+  .bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(150px,auto);gap:16px;}
   .tile{border-radius:24px;padding:22px;position:relative;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:space-between;
     transition:.28s;cursor:pointer;background:var(--plum);background-size:cover;background-position:center;}
   .tile:before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(65,54,69,.82),rgba(65,54,69,.12) 58%,transparent);z-index:0;transition:.28s;}
@@ -97,6 +97,7 @@
   .t-a{grid-column:span 2;grid-row:span 2;}
   .t-b{grid-column:span 2;} .t-e{grid-column:span 2;} .t-f{grid-column:span 2;}
   @media(max-width:900px){.bento{grid-template-columns:repeat(2,1fr);} .t-a,.t-b,.t-e,.t-f{grid-column:span 2;} .t-a{grid-row:span 1;}}
+  @media(max-width:480px){.t-c,.t-d{grid-column:span 2;}}
 
   /* GALLERY */
   .gal-sec{background:#fff;}
@@ -272,7 +273,7 @@
           <a href="https://instagram.com" target="_blank" rel="noopener" class="ig">@poppi.nails</a>
           <span>Licensed nail artist · Old Fourth Ward, ATL</span>
         </div>
-        <a href="#book" data-booking class="btn-big" style="display:inline-block;">Book with Sofia</a>
+        <a href="#book" data-booking class="btn-big">Book with Sofia</a>
       </div>
     </div>
   </div>
@@ -348,7 +349,7 @@
     <p>Nail &amp; Color Studio · Old Fourth Ward, Atlanta</p>
     <div class="socials"><a href="#">IG</a><a href="#">TT</a><a href="#">FB</a></div>
     <div class="info">Tue–Sat 10a–7p · Walk-in Wednesdays<br>Book online 24/7 · (404) 555-0199</div>
-    <a href="https://noemptychair.co" target="_blank" rel="noopener" class="nec-sig"><img src="/demos/_nec-mark-light.svg" alt="" width="13" height="16" style="display:inline-block;vertical-align:middle;"> Designed by <b>No Empty Chair</b> · noemptychair.co</a>
+    <a href="https://noemptychair.co" target="_blank" rel="noopener" class="nec-sig"><img src="/demos/_nec-mark-light.svg" alt="" width="13" height="16" style="display:inline-block;vertical-align:middle;"><span>Designed by <b>No Empty Chair</b> · noemptychair.co</span></a>
   </div>
 </footer>
 
