@@ -1,0 +1,142 @@
+---
+import Base from "../layouts/Base.astro";
+import ChairMark from "../components/ChairMark.astro";
+import content from "../../public/content.json";
+
+const c = content;
+const year = new Date().getFullYear();
+
+// The concept builds Makayla owns the rights to (photography licensed for
+// these demos). Ordered strongest-first. Sweet Pea's is intentionally excluded
+// from the public portfolio because its imagery belongs to the client.
+const items = c.demos.items;
+
+// One line on what each concept is actually demonstrating — the capability,
+// not just the vibe. Keyed by name so it survives reordering in the admin.
+const shows = {
+  "POPPI": "A playful brand system and a booking flow built to turn a scroll into a walk-in.",
+  "Maison Noir": "Editorial luxury layout with by-appointment booking and premium positioning.",
+  "KNOT": "A protective-style menu with honest timing, plus service-based booking.",
+  "Lull": "Quiet-luxury design and a calm, restful service menu that reads high-end.",
+  "The Lineup": "Order-your-cut checkout: build a ticket, watch it total, send it to your barber.",
+};
+---
+
+<Base
+  title="Concept Work | No Empty Chair"
+  description="A selection of concept website builds by No Empty Chair — booking-first sites across braids, luxury hair, nails, spa and barbering. Each one is its own world; your build is designed around you, never dropped into a template."
+  canonical="https://noemptychair.co/work"
+>
+  <nav>
+    <div class="wrap">
+      <a href="/" class="logo" aria-label={`${c.brand.name} ${c.brand.nameAccent} — home`}><span class="navmark" aria-hidden="true"><ChairMark size={24} /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></a>
+      <div class="navright">
+        <ul class="navlinks" id="primary-nav">
+          <li><a href="/#services">Services</a></li>
+          <li><a href="/#proof">Results</a></li>
+          <li><a href="/work" aria-current="page">Work</a></li>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#faq">FAQ</a></li>
+        </ul>
+        <a href="/#contact" class="navbtn">Book now</a>
+        <button type="button" class="navtoggle" aria-expanded="false" aria-controls="primary-nav">
+          <span class="navtoggle-bars" aria-hidden="true"></span>
+          <span class="visually-hidden">Menu</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main" class="workmain">
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">Selected Concepts</div>
+          <h1>Concept work</h1>
+          <p>These are concept builds, each one designed as its own world, down to the icons and link colors. They show the range and the craft. Your site is never one of these dropped in with your name swapped, it is designed around your brand from a blank page.</p>
+        </div>
+
+        <div class="workgrid">
+          {items.map((d) => (
+            <a class="democard glass" href={d.href} target="_blank" rel="noopener noreferrer">
+              <div class="demothumb" style={`background-image:url(${d.image})`}>
+                <span class="demopill">Concept</span>
+              </div>
+              <div class="demobody">
+                <h3>{d.name}</h3>
+                <div class="demotag">{d.tagline}</div>
+                <p>{d.desc}</p>
+                {shows[d.name] && <p class="shows"><b>What it shows:</b> {shows[d.name]}</p>}
+                <span class="go">View the live demo →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="workcta">
+          <h2>Yours won't be a template.</h2>
+          <p>Every build starts with a $200 teardown, so the design is grounded in what your business actually needs, not a guess.</p>
+          <a href="/#contact" class="btn">Start with a teardown</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="logo"><span class="footmark" aria-hidden="true"><ChairMark size={26} stroke="#e9dfe6" orb="#e6b8c6" /></span>{c.brand.name} <span>{c.brand.nameAccent}</span></div>
+      <p>{c.footer.tagline}</p>
+      <div class="socials">
+        <a href={c.footer.ig} target="_blank" rel="noopener noreferrer">IG</a>
+        <a href={`mailto:${c.footer.email}`}>@</a>
+      </div>
+      <div class="info">
+        <a href={`mailto:${c.footer.email}`}>{c.footer.email}</a> · {c.footer.site}
+      </div>
+      <div class="fine">
+        © {year} No Empty Chair. Founded by Makayla Richards.
+      </div>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  .workmain { padding: clamp(40px, 7vw, 84px) 0 clamp(60px, 9vw, 110px); }
+  .workmain .sec-head { max-width: 760px; }
+  .workmain h1 { font-size: clamp(38px, 6vw, 60px); color: var(--plum); margin-bottom: 16px; }
+
+  .workgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: clamp(20px, 3vw, 30px);
+    margin-top: 8px;
+  }
+  /* the global .democard is a flex carousel item; in the grid it just fills its cell */
+  .workgrid .democard { flex: initial; }
+  .shows { font-size: 13px !important; color: var(--plum) !important; opacity: 0.82; }
+  .shows b { color: var(--rose-deep); }
+
+  .workcta {
+    text-align: center;
+    max-width: 640px;
+    margin: clamp(56px, 8vw, 96px) auto 0;
+    padding: clamp(30px, 5vw, 48px) 28px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: 22px;
+  }
+  .workcta h2 { font-size: clamp(26px, 4vw, 36px); color: var(--plum); margin-bottom: 12px; }
+  .workcta p { font-size: 16px; color: var(--plum-soft); max-width: 48ch; margin: 0 auto 22px; }
+</style>
+
+<script>
+  // Minimal nav interactions for this subpage (the homepage ships its own).
+  const toggle = document.querySelector(".navtoggle");
+  const links = document.getElementById("primary-nav");
+  if (toggle && links) {
+    toggle.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+</script>
