@@ -212,14 +212,14 @@ html.gate-locked body>*:not(#gate){display:none!important}
   display: none; font-family: system-ui, -apple-system, sans-serif;
 }
 #necTourCard.show { display: block; }
-#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; padding: 2px 0 2px; }
+#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; margin: -6px -8px 12px; padding: 8px 8px; border-bottom: 1px solid #efe9e2; touch-action: none; }
 #necTourCard.dragging .nt-top { cursor: grabbing; }
-#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .04em; color: var(--nt-accent); text-decoration: none; }
+#necTourCard .nt-move { display: inline-flex; align-items: center; gap: 6px; font: 600 11.5px/1 system-ui, sans-serif; letter-spacing: .03em; color: #9a8f9c; user-select: none; }
+#necTourCard .nt-min { background: #f0ebe4; border: 0; color: #4a424e; font: 700 12px/1 system-ui, sans-serif; cursor: pointer; padding: 8px 12px; border-radius: 999px; }
+#necTourCard .nt-min:hover { background: var(--nt-accent); color: #fff; }
+#necTourCard .nt-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .03em; color: var(--nt-accent); text-decoration: none; }
 #necTourCard .nt-home:hover { text-decoration: underline; }
-#necTourCard .nt-min { background: none; border: 0; color: #9a8f9c; font-size: 22px; line-height: .7; cursor: pointer; padding: 0 8px 4px; border-radius: 8px; }
-#necTourCard .nt-min:hover { background: #f0ebe4; color: #1c1620; }
-#necTourCard .nt-grip { height: 5px; width: 46px; border-radius: 3px; background: #e0d8cf; margin: 6px auto 12px; cursor: grab; touch-action: none; }
-#necTourCard.dragging .nt-grip { background: var(--nt-accent); }
 #necTourCard .nt-step { font: 700 11.5px/1 system-ui, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nt-accent); }
 #necTourCard .nt-title { font-size: 20px; font-weight: 800; margin: 6px 0 6px; line-height: 1.15; color: #1c1620; }
 #necTourCard .nt-desc { font-size: 14px; line-height: 1.5; color: #4a424e; margin: 0; }
@@ -230,7 +230,7 @@ html.gate-locked body>*:not(#gate){display:none!important}
 #necTourCard .nt-dots { display: flex; gap: 6px; }
 #necTourCard .nt-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e0d8cf; display: block; }
 #necTourCard .nt-dots i.on { background: var(--nt-accent); }
-#necTourCard .nt-skip { display: block; margin: 12px auto 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
+#necTourCard .nt-skip { margin: 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
 
 /* minimized bubble (also the "pause" state) */
 #necTourBubble {
@@ -464,13 +464,13 @@ window.NEC_TOUR=[{"sel": ".hero", "t": "A homepage as bold as your feed", "d": "
   var card = document.createElement('div');
   card.id = 'necTourCard';
   card.innerHTML =
-    '<div class="nt-top"><a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair</a>' +
-    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">–</button></div>' +
-    '<div class="nt-grip" title="Drag to move"></div>' +
+    '<div class="nt-top"><span class="nt-move" title="Drag to move this box">⠿⠿ Drag to move</span>' +
+    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">– Minimize</button></div>' +
     '<div class="nt-step"></div><h4 class="nt-title"></h4><p class="nt-desc"></p>' +
     '<div class="nt-nav"><button class="nt-back" type="button">← Back</button>' +
     '<div class="nt-dots"></div><button class="nt-next" type="button">Next →</button></div>' +
-    '<button class="nt-skip" type="button">End tour</button>';
+    '<div class="nt-foot"><button class="nt-skip" type="button">End tour</button>' +
+    '<a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair ↗</a></div>';
   document.body.appendChild(card);
 
   var bubble = document.createElement('div');
@@ -523,7 +523,7 @@ window.NEC_TOUR=[{"sel": ".hero", "t": "A homepage as bold as your feed", "d": "
 
   // Drag via the top bar or the grip (mouse + touch).
   (function () {
-    var handles = [card.querySelector('.nt-top'), card.querySelector('.nt-grip')], dx = 0, dy = 0, drag = false;
+    var handles = [card.querySelector('.nt-top')], dx = 0, dy = 0, drag = false;
     function down(e) {
       if (e.target.closest('.nt-min') || e.target.closest('.nt-home')) return;
       drag = true; var r = card.getBoundingClientRect(); var p = e.touches ? e.touches[0] : e;

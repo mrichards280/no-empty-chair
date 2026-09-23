@@ -19,13 +19,13 @@
   var card = document.createElement('div');
   card.id = 'necTourCard';
   card.innerHTML =
-    '<div class="nt-top"><a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair</a>' +
-    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">–</button></div>' +
-    '<div class="nt-grip" title="Drag to move"></div>' +
+    '<div class="nt-top"><span class="nt-move" title="Drag to move this box">⠿⠿ Drag to move</span>' +
+    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">– Minimize</button></div>' +
     '<div class="nt-step"></div><h4 class="nt-title"></h4><p class="nt-desc"></p>' +
     '<div class="nt-nav"><button class="nt-back" type="button">← Back</button>' +
     '<div class="nt-dots"></div><button class="nt-next" type="button">Next →</button></div>' +
-    '<button class="nt-skip" type="button">End tour</button>';
+    '<div class="nt-foot"><button class="nt-skip" type="button">End tour</button>' +
+    '<a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair ↗</a></div>';
   document.body.appendChild(card);
 
   var bubble = document.createElement('div');
@@ -78,7 +78,7 @@
 
   // Drag via the top bar or the grip (mouse + touch).
   (function () {
-    var handles = [card.querySelector('.nt-top'), card.querySelector('.nt-grip')], dx = 0, dy = 0, drag = false;
+    var handles = [card.querySelector('.nt-top')], dx = 0, dy = 0, drag = false;
     function down(e) {
       if (e.target.closest('.nt-min') || e.target.closest('.nt-home')) return;
       drag = true; var r = card.getBoundingClientRect(); var p = e.touches ? e.touches[0] : e;

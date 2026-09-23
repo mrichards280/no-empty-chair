@@ -27,14 +27,14 @@
   display: none; font-family: system-ui, -apple-system, sans-serif;
 }
 #necTourCard.show { display: block; }
-#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; padding: 2px 0 2px; }
+#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; margin: -6px -8px 12px; padding: 8px 8px; border-bottom: 1px solid #efe9e2; touch-action: none; }
 #necTourCard.dragging .nt-top { cursor: grabbing; }
-#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .04em; color: var(--nt-accent); text-decoration: none; }
+#necTourCard .nt-move { display: inline-flex; align-items: center; gap: 6px; font: 600 11.5px/1 system-ui, sans-serif; letter-spacing: .03em; color: #9a8f9c; user-select: none; }
+#necTourCard .nt-min { background: #f0ebe4; border: 0; color: #4a424e; font: 700 12px/1 system-ui, sans-serif; cursor: pointer; padding: 8px 12px; border-radius: 999px; }
+#necTourCard .nt-min:hover { background: var(--nt-accent); color: #fff; }
+#necTourCard .nt-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .03em; color: var(--nt-accent); text-decoration: none; }
 #necTourCard .nt-home:hover { text-decoration: underline; }
-#necTourCard .nt-min { background: none; border: 0; color: #9a8f9c; font-size: 22px; line-height: .7; cursor: pointer; padding: 0 8px 4px; border-radius: 8px; }
-#necTourCard .nt-min:hover { background: #f0ebe4; color: #1c1620; }
-#necTourCard .nt-grip { height: 5px; width: 46px; border-radius: 3px; background: #e0d8cf; margin: 6px auto 12px; cursor: grab; touch-action: none; }
-#necTourCard.dragging .nt-grip { background: var(--nt-accent); }
 #necTourCard .nt-step { font: 700 11.5px/1 system-ui, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nt-accent); }
 #necTourCard .nt-title { font-size: 20px; font-weight: 800; margin: 6px 0 6px; line-height: 1.15; color: #1c1620; }
 #necTourCard .nt-desc { font-size: 14px; line-height: 1.5; color: #4a424e; margin: 0; }
@@ -45,7 +45,7 @@
 #necTourCard .nt-dots { display: flex; gap: 6px; }
 #necTourCard .nt-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e0d8cf; display: block; }
 #necTourCard .nt-dots i.on { background: var(--nt-accent); }
-#necTourCard .nt-skip { display: block; margin: 12px auto 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
+#necTourCard .nt-skip { margin: 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
 
 /* minimized bubble (also the "pause" state) */
 #necTourBubble {
