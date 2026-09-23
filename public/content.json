@@ -315,7 +315,7 @@
   "demos": {
     "kicker": "See it in action",
     "title": "Every brand, its own world",
-    "intro": "Real, clickable demo sites built to show the range — across hair, braids, barbering, nails, spa, and beyond. Every one is its own world, down to the icons and link colors. Yours gets built around you, never dropped into a template.",
+    "intro": "Real, clickable demo sites built to show the range across hair, braids, barbering, nails, spa, and beyond. Every one is its own world, down to the icons and link colors. Yours gets built around you, never dropped into a template.",
     "items": [
       {
         "name": "POPPI",
@@ -348,7 +348,7 @@
       {
         "name": "The Lineup",
         "tagline": "Barbershop, menu-style",
-        "desc": "Order your cut like a menu — build a check, watch it ring up, send it to your barber.",
+        "desc": "Order your cut like a menu: build a check, watch it ring up, send it to your barber.",
         "href": "/demos/barber.html",
         "image": "https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_16:10,w_760,q_auto,f_auto/noemptychair/demos/lineup/shopfront"
       }

@@ -13,6 +13,26 @@ const EMPTY = {
   audience: "", vision: "", "bot-field": "",
 };
 
+const STEPS = [
+  "Send me the basics",
+  "I send your $200 payment link",
+  "Full questionnaire + I get temporary access to your site & accounts",
+  "You get your teardown video",
+];
+
+function ProcessSteps({ activeIndex }) {
+  return (
+    <div className="td-steps">
+      {STEPS.map((label, i) => (
+        <div key={label} className={"td-step" + (i === activeIndex ? " active" : i < activeIndex ? " done" : "")}>
+          <span className="td-step-n">{i + 1}</span>
+          <span className="td-step-t">{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // The $200 Glow-Up Teardown intake. Submits to the Netlify form "teardown"
 // (exportable/private in the Netlify dashboard). Makayla confirms receipt,
 // requests payment, then delivers the video breakdown.
@@ -60,13 +80,9 @@ export default function TeardownForm() {
           <div className="tp-done">
             <div className="tp-mark"><ChairMark size={52} /></div>
             <h1>Got it. You're on my desk.</h1>
-            <p>
-              I'll confirm I got everything within a day and send a simple payment link for the
-              <b> $200 investment</b>. Once that's paid, I'll follow up with the full questionnaire and how to
-              give me temporary access to your site and accounts — then I get to work on your teardown: a short,
-              honest video on the highest-impact changes to fill your chair. The $200 credits toward any package
-              if you decide to build.
-            </p>
+            <p>I'll confirm I got everything within a day. Here's where you're at:</p>
+            <ProcessSteps activeIndex={1} />
+            <p>Once you're paid up, I get to work: a short, honest video on the highest-impact changes to fill your chair. The $200 credits toward any package if you decide to build.</p>
             <a href="/" className="btn">Back to the site</a>
           </div>
         ) : (
@@ -75,15 +91,11 @@ export default function TeardownForm() {
               <div className="tp-mark"><ChairMark size={50} /></div>
               <div className="eyebrow" style={{ color: "var(--rose)", letterSpacing: 3, textTransform: "uppercase", fontSize: 12, marginBottom: 14 }}>The $200 Glow-Up Teardown</div>
               <h1>Let's find what's costing you bookings.</h1>
-              <p>
-                Start here — it takes about 5–7 minutes and gets me enough to send a payment link for the
-                <b> $200 investment</b> (it credits toward any package). Once that's settled, I'll send the full
-                deep-dive questionnaire plus how to add me as a collaborator on your site and accounts for 48–72
-                hours, so I can actually click through everything myself. Then you get a short, honest video on
-                exactly what's costing you bookings.
-              </p>
+              <p>Start here. It takes about 5 to 7 minutes, then here's exactly what happens next.</p>
+              <ProcessSteps activeIndex={0} />
+              <p className="tp-fine" style={{ marginTop: -8, marginBottom: 20 }}>The $200 credits toward any package if you decide to build with me.</p>
               <p className="tp-cross" style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 10 }}>
-                Not ready to invest yet? Start free with a quick <a href="/discovery" style={{ color: "var(--rose)", fontWeight: 600, borderBottom: "1px solid rgba(168,90,118,.4)" }}>15-minute discovery chat →</a>
+                Not ready to spend yet? Start free with a quick <a href="/discovery" style={{ color: "var(--rose)", fontWeight: 600, borderBottom: "1px solid rgba(168,90,118,.4)" }}>15-minute discovery chat →</a>
               </p>
             </div>
 
@@ -102,15 +114,15 @@ export default function TeardownForm() {
                 <label>Website or Linktree<input type="text" placeholder="paste the link, or 'none yet'" value={form.website} onChange={set("website")} /></label>
                 <label>Instagram handle<input type="text" placeholder="@yoursalon" value={form.instagram} onChange={set("instagram")} /></label>
               </div>
-              <label>Other social handles<input type="text" placeholder="TikTok, Facebook, YouTube, Pinterest… whatever you're on" value={form.socials} onChange={set("socials")} /></label>
+              <label>Other social handles<input type="text" placeholder="TikTok, Facebook, YouTube, Pinterest, whatever you're on" value={form.socials} onChange={set("socials")} /></label>
 
               <label>Your numbers, if you have them
-                <span className="hint">Followers and reach/views over the last 30, 60, 90 days — and the past year if you can. Rough is fine; even screenshots you can send after.</span>
+                <span className="hint">Followers and reach/views over the last 30, 60, 90 days, and the past year if you can. Rough is fine, even screenshots you can send after.</span>
                 <textarea value={form.stats} onChange={set("stats")} placeholder="e.g. IG: 2,400 followers · ~18k views/30d · ~50k/90d · reels do best…" />
               </label>
 
               <label>Your current voice / branding
-                <span className="hint">Do you have a look or vibe already? Colors, fonts, how you talk to clients — or "totally starting over."</span>
+                <span className="hint">Do you have a look or vibe already? Colors, fonts, how you talk to clients, or "totally starting over."</span>
                 <textarea value={form.voice} onChange={set("voice")} />
               </label>
 
@@ -124,7 +136,7 @@ export default function TeardownForm() {
                 <textarea value={form.audience} onChange={set("audience")} />
               </label>
 
-              <label>Anything else — your vision
+              <label>Anything else, your vision
                 <span className="hint">Optional. Where you want this to go, styles you love, or à la carte pieces you're curious about.</span>
                 <textarea value={form.vision} onChange={set("vision")} />
               </label>
@@ -132,7 +144,7 @@ export default function TeardownForm() {
               <button className="btn" type="submit" disabled={status === "sending"}>
                 {status === "sending" ? "Sending…" : "Send my teardown request →"}
               </button>
-              {status === "error" ? <div className="tp-err" role="status" aria-live="polite">Something went wrong — try again, or email hello@noemptychair.co.</div> : null}
+              {status === "error" ? <div className="tp-err" role="status" aria-live="polite">Something went wrong, try again or email hello@noemptychair.co.</div> : null}
               <p className="tp-fine">No payment now. I'll confirm receipt and send a payment link before anything's charged.</p>
             </form>
           </>
