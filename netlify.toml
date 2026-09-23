@@ -1,0 +1,47 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# No SPA redirect: Astro emits real routes (/, /teardown/, /admin/, /demos/*).
+# A catch-all /* -> /index.html would shadow those, so it is intentionally absent.
+
+# Baseline security headers. The CSP allows 'unsafe-inline' for scripts/styles
+# because the site (and every public/demos/*.html page) relies heavily on
+# inline <script>/<style> blocks with no build step that could add nonces —
+# tightening that would need a larger refactor. It still restricts *which
+# hosts* can load a script/style/frame at all, which blunts the impact of any
+# injected <script src="..."> or third-party embed.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=(), payment=()"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://res.cloudinary.com https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com"
+
+# Discovery is now one general intake form at /discovery — send old per-client links there.
+[[redirects]]
+  from = "/discovery/lola"
+  to = "/discovery/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/discovery/lola/*"
+  to = "/discovery/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/discovery/beauty-body-butter"
+  to = "/discovery/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/discovery/beauty-body-butter/*"
+  to = "/discovery/"
+  status = 301
+  force = true

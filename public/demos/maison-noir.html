@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison Noir — Luxury Hair Atelier | Atlanta</title>
+<meta name="description" content="Maison Noir is Atlanta's luxury hair atelier. By appointment. Reserve your seat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/demos/_booking.css">
+<link rel="stylesheet" href="/demos/_tour.css">
+<style>
+  :root{
+    /* Clean editorial: warm ivory paper, espresso ink, soft terracotta accent */
+    --noir:#f4efe7; --noir-2:#eae1d4; --plum:#efe5d9; --gold:#c1603a; --gold-lt:#d17f52;
+    --ivory:#2c211b; --ivory-2:#3a2c24; --champ:#544a3f; --muted:#6e6153; --line:rgba(44,33,27,.15);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Instrument Sans',sans-serif;color:var(--ivory);background:var(--noir);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .serif{font-family:'Fraunces',serif;}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 32px;}
+  a{color:inherit;text-decoration:none;}
+  .gold{color:var(--gold);}
+
+  /* top bar */
+  .announce{background:var(--noir);color:var(--champ);text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:9px;border-bottom:1px solid var(--line);}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(244,239,231,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:84px;}
+  .logo{font-family:'Fraunces';font-weight:600;font-size:30px;letter-spacing:5px;text-transform:uppercase;color:var(--ivory);}
+  .logo b{color:var(--gold);font-weight:600;}
+  nav ul{display:flex;gap:36px;align-items:center;list-style:none;}
+  nav ul a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--champ);font-weight:400;transition:.2s;}
+  nav ul a:hover{color:var(--gold);}
+  .reserve{border:1px solid var(--gold);color:var(--gold) !important;padding:12px 26px;letter-spacing:2px;font-size:11px;text-transform:uppercase;transition:.3s;}
+  .reserve:hover{background:var(--gold);color:var(--noir) !important;}
+  @media(max-width:900px){nav ul li:not(.cta){display:none;}}
+
+  /* HERO */
+  .hero{position:relative;min-height:62vh;display:flex;align-items:center;overflow:hidden;
+    background:
+      linear-gradient(90deg, var(--noir) 0%, var(--noir) 48%, rgba(244,239,231,.7) 66%, rgba(244,239,231,0) 82%),
+      url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:2,w_1600,q_auto,f_auto/noemptychair/demos/maison/hero') right center/cover no-repeat,
+      var(--noir);}
+  @media(max-width:720px){.hero{background:
+      linear-gradient(180deg, rgba(244,239,231,.45) 0%, rgba(244,239,231,.9) 48%, var(--noir) 100%),
+      url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_3:4,w_900,q_auto,f_auto/noemptychair/demos/maison/hero') center/cover no-repeat,
+      var(--noir);}}
+  .hero:after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 78% 45%,rgba(193,96,58,.12),transparent 38%);pointer-events:none;}
+  .hero .frame{position:absolute;inset:26px;border:1px solid var(--line);pointer-events:none;}
+  .hero .wrap{position:relative;z-index:2;}
+  .hero .sub{font-size:12px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
+  .hero h1{font-family:'Fraunces';font-weight:500;font-size:88px;line-height:1.02;letter-spacing:1px;margin-bottom:26px;max-width:820px;}
+  .hero h1 em{font-style:italic;color:var(--gold-lt);}
+  .hero p{max-width:470px;color:var(--champ);font-size:16px;font-weight:300;margin-bottom:38px;}
+  .hero .actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+  .btn-gold{display:inline-block;text-align:center;background:var(--gold);color:var(--noir);padding:17px 42px;letter-spacing:2px;text-transform:uppercase;font-size:12px;font-weight:500;transition:.3s;}
+  .btn-gold:hover{background:var(--gold-lt);letter-spacing:3px;}
+  .btn-line{display:inline-block;text-align:center;border:1px solid var(--champ);color:var(--ivory);padding:16px 34px;letter-spacing:2px;text-transform:uppercase;font-size:12px;transition:.3s;}
+  .btn-line:hover{border-color:var(--gold);color:var(--gold);}
+  @media(max-width:720px){.hero h1{font-size:52px;}}
+
+  /* marquee of accolades */
+  .accolades{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--noir-2);padding:26px 0;}
+  .accolades .wrap{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:center;}
+  .accolades div{text-align:center;flex:1;min-width:150px;}
+  .accolades .n{font-family:'Fraunces';font-size:34px;color:var(--gold);line-height:1;}
+  .accolades .l{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+
+  section{padding:104px 0;}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 62px;}
+  .kicker{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+  h2{font-family:'Fraunces';font-weight:500;font-size:56px;line-height:1.05;letter-spacing:.5px;}
+  h2 em{font-style:italic;color:var(--gold-lt);}
+  .sec-head p{color:var(--champ);font-weight:300;margin-top:16px;}
+
+  /* SERVICES */
+  .svc-list{max-width:820px;margin:0 auto;}
+  .svc-row{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line);transition:.25s;}
+  .svc-row:hover{padding-left:14px;}
+  .svc-row .t{font-family:'Fraunces';font-size:28px;color:var(--ivory);}
+  .svc-row .d{font-size:13.5px;color:var(--muted);font-weight:300;margin-top:4px;max-width:520px;}
+  .svc-row .p{font-family:'Fraunces';font-size:26px;color:var(--gold);white-space:nowrap;}
+  .svc-row .p small{font-size:12px;color:var(--muted);letter-spacing:1px;}
+
+  /* GALLERY editorial */
+  .gal-sec{background:var(--noir-2);}
+  .egrid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;grid-auto-rows:140px;}
+  .eimg{border-radius:2px;position:relative;overflow:hidden;border:1px solid var(--line);display:flex;align-items:flex-end;padding:18px;}
+  .eimg span{position:relative;z-index:1;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#fff;}
+  .eimg:before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 55%);z-index:0;}
+  .m1{background:linear-gradient(135deg,#e5d4c4,#cbb49c);} .m2{background:linear-gradient(135deg,#ddcdbb,#c2a988);}
+  .m3{background:linear-gradient(135deg,#d8c6b4,#b89e84);} .m4{background:linear-gradient(135deg,#e2d2c0,#c7ad92);}
+  .e-a{grid-column:span 3;grid-row:span 2;} .e-b{grid-column:span 3;} .e-c{grid-column:span 3;}
+  .e-d{grid-column:span 2;grid-row:span 2;} .e-e{grid-column:span 2;} .e-f{grid-column:span 2;} .e-g{grid-column:span 4;}
+  @media(max-width:820px){.egrid{grid-template-columns:repeat(2,1fr);} .eimg{grid-column:span 1 !important;grid-row:span 1 !important;}}
+  .imgnote{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;font-style:italic;letter-spacing:1px;}
+
+  /* QUOTE */
+  .quote{text-align:center;background:radial-gradient(ellipse at center,var(--plum),var(--noir) 70%);}
+  .quote .stars{color:var(--gold);letter-spacing:6px;margin-bottom:26px;}
+  .quote blockquote{font-family:'Fraunces';font-style:italic;font-size:40px;line-height:1.3;max-width:900px;margin:0 auto 30px;color:var(--ivory);}
+  .quote cite{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-style:normal;}
+
+  /* STYLIST */
+  .founder{background:var(--noir-2);}
+  .founder .wrap{display:grid;grid-template-columns:.85fr 1fr;gap:64px;align-items:center;}
+  .founder .portrait{aspect-ratio:4/5;background:linear-gradient(160deg,#3a2c26,#181419);border:1px solid var(--line);position:relative;display:flex;align-items:flex-end;padding:30px;}
+  .founder .portrait .mono{font-family:'Fraunces';font-size:130px;color:var(--gold);opacity:.5;line-height:.75;}
+  .founder h2{text-align:left;}
+  .founder p{color:var(--champ);font-weight:300;margin-top:20px;font-size:15.5px;}
+  .founder .sig{font-family:'Fraunces';font-style:italic;font-size:30px;color:var(--gold);margin-top:22px;}
+  @media(max-width:820px){.founder .wrap{grid-template-columns:1fr;gap:36px;}.founder .portrait{max-width:340px;}}
+
+  /* RESERVE */
+  .reserve-sec{text-align:center;position:relative;}
+  .reserve-sec .card{border:1px solid var(--gold);padding:70px 40px;position:relative;background:linear-gradient(160deg,var(--plum),var(--noir));}
+  .reserve-sec .card:before{content:"❧";position:absolute;top:24px;left:0;right:0;color:var(--gold);font-size:24px;}
+  .reserve-sec h2{font-size:52px;}
+  .reserve-sec p{color:var(--champ);font-weight:300;max-width:460px;margin:18px auto 34px;}
+  .reserve-sec .fine{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:26px;}
+
+  footer{background:var(--noir);border-top:1px solid var(--line);padding:60px 32px 40px;text-align:center;}
+  footer .logo{font-size:30px;margin-bottom:14px;}
+  footer .socials{display:flex;gap:22px;justify-content:center;margin:18px 0;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--champ);}
+  footer .info{font-size:13px;color:var(--muted);font-weight:300;line-height:2;letter-spacing:1px;}
+
+  .demo-band{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(233,185,196,.5),rgba(205,196,236,.46),rgba(194,214,238,.5));
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#413645;text-align:center;
+    font-family:'Marcellus',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.55);}
+  .demo-band svg{flex:0 0 auto;}
+</style>
+</head>
+<body>
+
+<a class="demo-band" href="https://noemptychair.co" target="_blank" rel="noopener"><img src="/demos/_nec-mark.svg" alt="" width="13" height="16" style="display:inline-block;vertical-align:middle;"> NO MORE OVERDONE TEMPLATES &middot; DEMO CONCEPT BY NO EMPTY CHAIR &middot; LET&#39;S BUILD A SITE FOR YOU</a>
+
+<div class="announce">By appointment · Buckhead, Atlanta · Now reserving for the season</div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Maison <b>Noir</b></div>
+    <ul>
+      <li><a href="#atelier">The Atelier</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#gallery">Portfolio</a></li>
+      <li class="cta"><a href="#reserve" class="reserve">Reserve</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="frame"></div>
+  <div class="wrap">
+    <div class="sub">Luxury Hair Atelier · Est. Atlanta</div>
+    <h1 class="serif">Where your crown is<br><em>treated like one.</em></h1>
+    <p>An intimate, by-appointment atelier for bespoke color, precision cuts, and couture styling. Reserved seats. Undivided attention.</p>
+    <div class="actions">
+      <a href="#reserve" class="btn-gold">Reserve your seat</a>
+      <a href="#gallery" class="btn-line">View the portfolio</a>
+    </div>
+  </div>
+</header>
+
+<div class="accolades">
+  <div class="wrap">
+    <div><div class="n serif">15+</div><div class="l">Years mastery</div></div>
+    <div><div class="n serif">4.9★</div><div class="l">Guest rating</div></div>
+    <div><div class="n serif">By Appt.</div><div class="l">Private atelier</div></div>
+    <div><div class="n serif">Editorial</div><div class="l">& bridal specialists</div></div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The Services</div>
+      <h2>A menu of <em>quiet</em> luxury</h2>
+      <p>Every reservation begins with a consultation. Pricing begins at, and is tailored to your hair.</p>
+    </div>
+    <div class="svc-list">
+      <div class="svc-row"><div><div class="t serif">Bespoke Color</div><div class="d">Dimensional, hand-painted color designed entirely around you.</div></div><div class="p serif">$280<small> +</small></div></div>
+      <div class="svc-row"><div><div class="t serif">Precision Cut &amp; Style</div><div class="d">Architectural cutting and a finish worthy of the door you walk out of.</div></div><div class="p serif">$150<small> +</small></div></div>
+      <div class="svc-row"><div><div class="t serif">Silk Press &amp; Treatment</div><div class="d">Glass-smooth, mirror-shine, with a restorative bond treatment.</div></div><div class="p serif">$120<small> +</small></div></div>
+      <div class="svc-row"><div><div class="t serif">Couture Bridal &amp; Event</div><div class="d">On-site or in-atelier styling for the moments that are photographed forever.</div></div><div class="p serif">$350<small> +</small></div></div>
+      <div class="svc-row"><div><div class="t serif">Extensions &amp; Restoration</div><div class="d">Seamless, custom-blended lengths and volume, installed to last.</div></div><div class="p serif">$500<small> +</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="gal-sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The Portfolio</div>
+      <h2>Signed work</h2>
+    </div>
+    <div class="egrid">
+      <div class="eimg m1 e-a" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-1');background-size:cover;background-position:center;"><span>Fresh Blowout</span></div>
+      <div class="eimg m2 e-b" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-2');background-size:cover;background-position:center;"><span>The Silk Press</span></div>
+      <div class="eimg m3 e-c" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-3');background-size:cover;background-position:center;"><span>Bridal Chignon</span></div>
+      <div class="eimg m4 e-d" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-4');background-size:cover;background-position:center;"><span>Couture Color</span></div>
+      <div class="eimg m2 e-e" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-5');background-size:cover;background-position:center;"><span>Platinum Statement</span></div>
+      <div class="eimg m1 e-f" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-6');background-size:cover;background-position:center;"><span>In the Chair</span></div>
+      <div class="eimg m3 e-g" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:3,w_900,q_auto,f_auto/noemptychair/demos/maison/m-7');background-size:cover;background-position:center;"><span>Editorial Feature</span></div>
+    </div>
+    <p class="imgnote">A full custom build — never a template. Every photo, icon, font, and link color is designed around your brand.</p>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="wrap">
+    <div class="stars">★★★★★</div>
+    <blockquote>"I have never been somewhere that made me feel this considered. The color is art, and I have never had my hair last — or shine — like this."</blockquote>
+    <cite>— Simone A., Guest of the Atelier</cite>
+  </div>
+</section>
+
+<!-- STYLIST -->
+<section id="atelier" class="founder">
+  <div class="wrap">
+    <div class="portrait" style="background-image:url('https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_4:5,w_760,q_auto,f_auto/noemptychair/demos/maison/portrait');background-size:cover;background-position:center;"></div>
+    <div>
+      <div class="kicker">The Atelier</div>
+      <h2 class="serif">A house built on <em>devotion.</em></h2>
+      <p>Maison Noir was founded on a single belief: that exceptional hair is not rushed. We keep our chairs few and our attention complete — one guest, fully cared for, at a time.</p>
+      <p>From dimensional color to couture bridal, every service is a collaboration between master craft and your own vision. This is not a salon appointment. It is a reservation.</p>
+      <div class="sig serif">— The House of Noir</div>
+    </div>
+  </div>
+</section>
+
+<!-- GOOD TO KNOW -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Good to know</div>
+      <h2>The <em>reservation</em></h2>
+    </div>
+    <div class="svc-list">
+      <div class="svc-row"><div><div class="t serif">A consultation, first</div><div class="d">Every new guest begins with a complimentary consultation. Bespoke color and bridal are quoted there — shaped to your length, density, and hair's history, never guessed from a screen.</div></div></div>
+      <div class="svc-row"><div><div class="t serif">A deposit reserves your seat</div><div class="d">Color, extensions, and bridal reservations are secured with a deposit that applies in full to your service.</div></div></div>
+      <div class="svc-row"><div><div class="t serif">A gracious cancellation</div><div class="d">Plans shift. We ask only for 48 hours to move or release your appointment, so another guest may take the chair.</div></div></div>
+      <div class="svc-row"><div><div class="t serif">Between visits</div><div class="d">Sulfate-free at home, a bond treatment monthly, and a gloss refresh around week six keep dimensional color luminous.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVE -->
+<section id="reserve" class="reserve-sec">
+  <div class="wrap">
+    <div class="card">
+      <div class="kicker">By Appointment</div>
+      <h2 class="serif">Reserve your seat</h2>
+      <p>New guests begin with a complimentary consultation. Select your service and preferred time — confirmation is instant.</p>
+      <a href="#" class="btn-gold">Begin your reservation</a>
+      <div class="fine">Buckhead, Atlanta · Tue–Sat · (404) 555-0175</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo serif">Maison <span class="gold">Noir</span></div>
+    <div class="socials"><a href="#">Instagram</a><a href="#">Pinterest</a><a href="#">TikTok</a></div>
+    <div class="info">3400 Around Lenox Rd NE · Buckhead, Atlanta<br>By appointment · Tuesday through Saturday · (404) 555-0175</div>
+  </div>
+</footer>
+
+
+<style>
+  .appbar{display:none;}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  nav ul a.active{color:var(--gold);}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+  @media(max-width:900px){
+    body{padding-bottom:80px;}
+    .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(24,20,25,.98);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);box-shadow:0 -12px 34px rgba(0,0,0,.4);}
+    .appbar-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-height:54px;
+      border-radius:14px;color:var(--ivory);opacity:.6;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:.2s;}
+    .appbar-tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+    .appbar-tab.is-active{opacity:1;color:var(--gold);}
+    .appbar-cta{background:var(--gold);color:var(--noir);opacity:1;}
+    .appbar-cta svg{stroke:var(--noir);} .appbar-cta.is-active{color:var(--noir);}
+  }
+</style>
+<nav class="appbar" aria-label="Quick navigation">
+  <a href="#" data-top data-tab class="appbar-tab is-active"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/></svg><span>Home</span></a>
+  <a href="#services" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span>Services</span></a>
+  <a href="#gallery" data-tab class="appbar-tab"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M5 17l4.5-4 4 3.2L17 12l3 3.4"/></svg><span>Portfolio</span></a>
+  <a href="#reserve" data-tab class="appbar-tab appbar-cta"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg><span>Reserve</span></a>
+</nav>
+<script>
+  (function(){var bar=document.querySelector('.appbar');if(!bar)return;var tabs=[].slice.call(bar.querySelectorAll('[data-tab]'));var map={};
+  tabs.forEach(function(t){var h=t.getAttribute('href')||'';if(h.charAt(0)==='#'&&h.length>1)map[h.slice(1)]=t;});
+  var home=bar.querySelector('[data-top]');if(home)home.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
+  function setA(t){tabs.forEach(function(x){x.classList.toggle('is-active',x===t);});}
+  var ids=Object.keys(map);function onS(){if(window.scrollY<160&&home){setA(home);return;}var mid=window.scrollY+window.innerHeight*0.35,cur=null,ct=-1;
+  ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var top=el.offsetTop;if(top<=mid&&top>ct){ct=top;cur=map[id];}});if(cur)setA(cur);}
+  window.addEventListener('scroll',onS,{passive:true});onS();
+  var els=[].slice.call(document.querySelectorAll('.sec-head,.svc-row,.eimg,.founder,.accolades div,.reserve-sec .card'));
+  els.forEach(function(e){e.classList.add('reveal');});
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.1,rootMargin:'0px 0px -6% 0px'});els.forEach(function(e){io.observe(e);});} setTimeout(function(){els.forEach(function(e){e.classList.add('in');});},1600);
+  var links=[].slice.call(document.querySelectorAll('nav ul a[href^="#"]'));var lm={};links.forEach(function(l){var id=l.getAttribute('href').slice(1);if(id)lm[id]=l;});var lids=Object.keys(lm);
+  function spy(){var mid=window.scrollY+window.innerHeight*0.3,cur=null,ct=-1;lids.forEach(function(id){var el=document.getElementById(id);if(!el)return;var t=el.offsetTop;if(t<=mid&&t>ct){ct=t;cur=lm[id];}});links.forEach(function(l){l.classList.toggle('active',l===cur);});}
+  window.addEventListener('scroll',spy,{passive:true});spy();
+  })();
+</script>
+<script>
+  window.NEC_BOOKING={
+    brand:"MAISON NOIR", markSrc:"/demos/_nec-mark.svg", apptTitle:"Maison Noir reservation (tentative)",
+    theme:{accent:"#c1603a",accentSoft:"rgba(193,96,58,.16)",onAccent:"#f4efe7",surface:"#faf6f0",bg:"#f4efe7",ink:"#2c211b"},
+    deposit:"$100", address:"Buckhead, Atlanta", confirmVerb:"reserved",
+    flow:[
+      {key:"service",label:"Reserve a service",sub:"Every reservation begins with a consultation.",type:"single",options:[
+        {name:"Bespoke Color",price:"from $280",p:280,desc:"Dimensional, hand-painted color mapped to you.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-4"},
+        {name:"Precision Cut & Style",price:"from $150",p:150,desc:"Architectural cut with a runway-ready finish.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-6"},
+        {name:"Silk Press & Treatment",price:"from $120",p:120,desc:"Sleek, swingy, steam-pressed to last.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-2"},
+        {name:"Couture Bridal & Event",price:"from $350",p:350,desc:"Trial + day-of styling for your moment.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-3"},
+        {name:"Extensions & Restoration",price:"from $500",p:500,ext:true,desc:"Seamless length & volume, installed to last.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-5"},
+        {name:"Gloss / Toner Refresh",price:"$75",p:75,noLen:true,desc:"Shine + tone top-up between visits.",img:"https://res.cloudinary.com/djrmz717j/image/upload/c_fill,g_auto,ar_1:1,w_120,q_auto,f_auto/noemptychair/demos/maison/m-1"}
+      ]},
+      {key:"length",label:"Hair length",sub:"About how long is your hair? Helps us quote time & product.",type:"single",showIf:function(a){return a.service&&!a.service.noLen;},guide:'<div class="gcap">Where each length lands</div><svg viewBox="0 0 300 200" role="img" aria-label="Length guide"><path d="M34 200 L34 100 Q34 82 78 82 Q122 82 122 100 L122 200 Z" fill="#a99f92"/><rect x="69" y="62" width="18" height="24" rx="6" class="skn" fill="#d8c4b0"/><path d="M40 44 Q40 30 50 30 Q56 30 56 44 L56 186 Q56 194 48 194 Q40 194 40 186 Z" fill="#6a4a35"/><path d="M100 44 Q100 30 110 30 Q116 30 116 44 L116 186 Q116 194 108 194 Q100 194 100 186 Z" fill="#6a4a35"/><ellipse cx="78" cy="46" rx="23" ry="25" class="skn" fill="#d8c4b0"/><path d="M53 48 C53 8 103 8 103 48 C90 33 66 33 53 48 Z" fill="#6a4a35"/><g stroke="#c1603a"><line x1="124" y1="92" x2="150" y2="92" stroke-width="1.6" stroke-dasharray="3 3"/><line x1="124" y1="128" x2="150" y2="128" stroke-width="1.6" stroke-dasharray="3 3"/><line x1="124" y1="158" x2="150" y2="158" stroke-width="1.6" stroke-dasharray="3 3"/><line x1="124" y1="186" x2="150" y2="186" stroke-width="1.6" stroke-dasharray="3 3"/></g><g fill="#c1603a"><circle cx="150" cy="92" r="2.6"/><circle cx="150" cy="128" r="2.6"/><circle cx="150" cy="158" r="2.6"/><circle cx="150" cy="186" r="2.6"/></g><g font-family="Fraunces,serif" font-size="13" font-weight="600" fill="#2c211b"><text x="159" y="96">Collarbone</text><text x="159" y="132">Mid-back</text><text x="159" y="162">Waist</text><text x="159" y="190">Extra long</text></g></svg>',options:[
+        {name:"Collarbone",p:0,desc:"Just past the shoulders",icon:'<svg viewBox="0 0 44 60" width="26" height="34"><path d="M5 60 L5 33 Q5 27 22 27 Q39 27 39 33 L39 60 Z" fill="#a99f92"/><rect x="19" y="21" width="6" height="9" rx="2.5" class="skn" fill="#f6dcc8"/><path d="M11 16 Q11 10 14 10 Q17 10 17 16 L17 33 Q17 35 14 35 Q11 35 11 33 Z" fill="#6a4a35"/><path d="M27 16 Q27 10 30 10 Q33 10 33 16 L33 33 Q33 35 30 35 Q27 35 27 33 Z" fill="#6a4a35"/><ellipse cx="22" cy="16" rx="8" ry="9" class="skn" fill="#f6dcc8"/><path d="M13 17 C13 3 31 3 31 17 C27 11 17 11 13 17 Z" fill="#6a4a35"/><line x1="3" y1="33" x2="41" y2="33" stroke="#c1603a" stroke-width="1.3" stroke-dasharray="2.5 2.5" opacity=".8"/></svg>'},
+        {name:"Mid-back",p:0,desc:"Down the back",icon:'<svg viewBox="0 0 44 60" width="26" height="34"><path d="M5 60 L5 33 Q5 27 22 27 Q39 27 39 33 L39 60 Z" fill="#a99f92"/><rect x="19" y="21" width="6" height="9" rx="2.5" class="skn" fill="#c78a62"/><path d="M11 16 Q11 10 14 10 Q17 10 17 16 L17 44 Q17 46 14 46 Q11 46 11 44 Z" fill="#6a4a35"/><path d="M27 16 Q27 10 30 10 Q33 10 33 16 L33 44 Q33 46 30 46 Q27 46 27 44 Z" fill="#6a4a35"/><ellipse cx="22" cy="16" rx="8" ry="9" class="skn" fill="#c78a62"/><path d="M13 17 C13 3 31 3 31 17 C27 11 17 11 13 17 Z" fill="#6a4a35"/><line x1="3" y1="44" x2="41" y2="44" stroke="#c1603a" stroke-width="1.3" stroke-dasharray="2.5 2.5" opacity=".8"/></svg>'},
+        {name:"Waist",p:0,desc:"Waist length",icon:'<svg viewBox="0 0 44 60" width="26" height="34"><path d="M5 60 L5 33 Q5 27 22 27 Q39 27 39 33 L39 60 Z" fill="#a99f92"/><rect x="19" y="21" width="6" height="9" rx="2.5" class="skn" fill="#9c6440"/><path d="M11 16 Q11 10 14 10 Q17 10 17 16 L17 51 Q17 53 14 53 Q11 53 11 51 Z" fill="#6a4a35"/><path d="M27 16 Q27 10 30 10 Q33 10 33 16 L33 51 Q33 53 30 53 Q27 53 27 51 Z" fill="#6a4a35"/><ellipse cx="22" cy="16" rx="8" ry="9" class="skn" fill="#9c6440"/><path d="M13 17 C13 3 31 3 31 17 C27 11 17 11 13 17 Z" fill="#6a4a35"/><line x1="3" y1="51" x2="41" y2="51" stroke="#c1603a" stroke-width="1.3" stroke-dasharray="2.5 2.5" opacity=".8"/></svg>'},
+        {name:"Extra long",p:0,desc:"Hip length, full drama",icon:'<svg viewBox="0 0 44 60" width="26" height="34"><path d="M5 60 L5 33 Q5 27 22 27 Q39 27 39 33 L39 60 Z" fill="#a99f92"/><rect x="19" y="21" width="6" height="9" rx="2.5" class="skn" fill="#6b4530"/><path d="M11 16 Q11 10 14 10 Q17 10 17 16 L17 57 Q17 59 14 59 Q11 59 11 57 Z" fill="#6a4a35"/><path d="M27 16 Q27 10 30 10 Q33 10 33 16 L33 57 Q33 59 30 59 Q27 59 27 57 Z" fill="#6a4a35"/><ellipse cx="22" cy="16" rx="8" ry="9" class="skn" fill="#6b4530"/><path d="M13 17 C13 3 31 3 31 17 C27 11 17 11 13 17 Z" fill="#6a4a35"/><line x1="3" y1="57" x2="41" y2="57" stroke="#c1603a" stroke-width="1.3" stroke-dasharray="2.5 2.5" opacity=".8"/></svg>'}
+      ]},
+      {key:"addons",label:"Enhance your service",type:"multi",optional:true,options:[
+        {name:"Bond repair (Olaplex)",price:"+$40",p:40},
+        {name:"Deep conditioning",price:"+$45",p:45},
+        {name:"Scalp treatment",price:"+$35",p:35},
+        {name:"Blowout finish",price:"+$50",p:50}
+      ]},
+      {key:"drink",label:"Your refreshment",sub:"Compliments of the house.",type:"single",optional:true,perVisit:true,options:[
+        {name:"Champagne",price:"—",p:0,icon:"🥂"},
+        {name:"Sparkling water",price:"—",p:0,icon:"🫧"},
+        {name:"Espresso",price:"—",p:0,icon:"☕"},
+        {name:"Herbal tea",price:"—",p:0,icon:"🍵"},
+        {name:"Glass of wine",price:"—",p:0,icon:"🍷"}
+      ]}
+    ]
+  };
+</script>
+<script src="/demos/_booking.js" defer></script>
+<script src="/demos/_tinker.js" defer></script>
+<script>
+  window.NEC_TOUR_ACCENT = '#c1603a';
+  window.NEC_TOUR = [
+    { sel: '.hero', t: 'A first impression that reads luxury', d: 'The moment someone lands, the brand feels elevated and by-appointment, so premium clients take you seriously before you say a word.' },
+    { sel: '#atelier', t: 'Your story, told with intention', d: 'A little narrative builds trust and justifies premium pricing, instead of leaving clients to guess who you are.' },
+    { sel: '#services', t: 'Services with clear pricing', d: 'Each service shows what it costs and books in a tap, so inquiries arrive ready, not asking "how much?"' },
+    { sel: '#gallery', t: 'Your work, gallery-style', d: 'Your best transformations, framed like an editorial, do the selling while you are with a client.' },
+    { sel: '#reserve', t: 'One clear place to reserve', d: 'Every path leads to one booking flow, so a browser becomes a booked chair. This is a concept, your real build is designed around you, down to a custom icon set that is yours to keep.' }
+  ];
+</script>
+<script src="/demos/_tour.js" defer></script>
+</body>
+</html>
