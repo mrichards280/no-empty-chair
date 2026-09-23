@@ -6,11 +6,37 @@
 // Body: { password, content }  -> saves
 //       { password, verifyOnly: true } -> just checks the password (login)
 
+const crypto = require("crypto");
+
 const FILE_PATH = "public/content.json";
+
+// Best-effort throttle for wrong-password guesses. This resets on cold start
+// and isn't shared across concurrent function instances, but it still raises
+// the cost of brute-forcing the password from a single warm container.
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 5 * 60 * 1000;
+let failedAttempts = 0;
+let lockedUntil = 0;
+
+function passwordMatches(candidate, expected) {
+  const a = Buffer.from(String(candidate));
+  const b = Buffer.from(String(expected));
+  // timingSafeEqual requires equal-length buffers; pad rather than short-circuit
+  // on length so a length mismatch doesn't leak timing either.
+  if (a.length !== b.length) {
+    crypto.timingSafeEqual(a, a); // constant-time no-op to keep timing flat
+    return false;
+  }
+  return crypto.timingSafeEqual(a, b);
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return json(405, { error: "Method not allowed" });
+  }
+
+  if (Date.now() < lockedUntil) {
+    return json(429, { error: "Too many attempts. Try again in a few minutes." });
   }
 
   let body;
@@ -26,9 +52,15 @@ exports.handler = async (event) => {
   if (!ADMIN_PASSWORD) {
     return json(500, { error: "ADMIN_PASSWORD is not set on the server." });
   }
-  if (!password || password !== ADMIN_PASSWORD) {
+  if (!password || !passwordMatches(password, ADMIN_PASSWORD)) {
+    failedAttempts++;
+    if (failedAttempts >= MAX_ATTEMPTS) {
+      lockedUntil = Date.now() + LOCKOUT_MS;
+      failedAttempts = 0;
+    }
     return json(401, { error: "Wrong password." });
   }
+  failedAttempts = 0;
 
   if (verifyOnly) {
     return json(200, { ok: true });

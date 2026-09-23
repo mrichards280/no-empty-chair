@@ -6,6 +6,7 @@ import CompanionDoc from "../components/CompanionDoc.astro";
 import ContactSection from "../components/ContactSection.astro";
 import RadarModal from "../components/RadarModal.astro";
 import { bookingHref } from "../lib/booking.js";
+import { sanitizeRichText } from "../lib/sanitize.js";
 import content from "../../public/content.json";
 
 const c = content;
@@ -103,7 +104,7 @@ function alaIcon(name = "") {
       <div class="sec-head">
         <div class="kicker">{c.packages.kicker}</div>
         <h2>{c.packages.title}</h2>
-        <p set:html={c.packages.intro}></p>
+        <p set:html={sanitizeRichText(c.packages.intro)}></p>
       </div>
       <div class="svc">
         {c.packages.items.map((p) => (
@@ -126,7 +127,7 @@ function alaIcon(name = "") {
       <div class="sec-head">
         <div class="kicker">{c.consults.kicker}</div>
         <h2>{c.consults.title}</h2>
-        <p set:html={c.consults.intro}></p>
+        <p set:html={sanitizeRichText(c.consults.intro)}></p>
       </div>
       <div class="svc">
         {c.consults.items.map((p) => (
@@ -154,8 +155,8 @@ function alaIcon(name = "") {
       <div class="wrap">
         <div class="sec-head">
           <div class="kicker">{c.alacarte.kicker}</div>
-          <h2 set:html={c.alacarte.title.replace(/\?\s+/, "?<br>")}></h2>
-          <p set:html={c.alacarte.intro}></p>
+          <h2 set:html={sanitizeRichText(c.alacarte.title.replace(/\?\s+/, "?<br>"))}></h2>
+          <p set:html={sanitizeRichText(c.alacarte.intro)}></p>
         </div>
         <div class="ala">
           {c.alacarte.items.map((a) => (
@@ -301,7 +302,7 @@ function alaIcon(name = "") {
                 <span class="faq-icon" aria-hidden="true">+</span>
               </button>
               <div class="faq-a" hidden>
-                <p set:html={f.a}></p>
+                <p set:html={sanitizeRichText(f.a)}></p>
               </div>
             </div>
           ))}

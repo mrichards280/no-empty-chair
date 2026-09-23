@@ -13,6 +13,12 @@ exports.handler = async (event) => {
     return json(400, { error: "Bad JSON" });
   }
 
+  // Honeypot: real visitors never fill this hidden field. Pretend success so
+  // bots don't learn to look for a different signal.
+  if ((data["bot-field"] || "").toString().trim()) {
+    return json(200, { ok: true });
+  }
+
   const form = (data._form || "lead").toString().slice(0, 40);
   const skip = new Set(["_form", "bot-field", "form-name"]);
   const lines = Object.keys(data)
@@ -26,6 +32,8 @@ exports.handler = async (event) => {
   const who = (data.name || data.business_name || data.email || "someone").toString().slice(0, 120);
   const to = process.env.LEAD_TO_EMAIL || "hello@noemptychair.co";
   const KEY = process.env.RESEND_API_KEY;
+  const replyEmail = (data.email || "").toString().trim();
+  const validReplyTo = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(replyEmail) ? replyEmail : undefined;
 
   // Without a key the site still works; it just can't send. (Netlify's own
   // notification still covers the non-spam case.)
@@ -38,7 +46,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         from: "No Empty Chair Leads <onboarding@resend.dev>",
         to: [to],
-        reply_to: data.email || undefined,
+        reply_to: validReplyTo,
         subject: `New ${form} lead — ${who}`,
         text:
           `A new ${form} submission just came in:\n\n` +
