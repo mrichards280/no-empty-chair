@@ -182,23 +182,72 @@ html.gate-locked body>*:not(#gate){display:none!important}
 .gate-err{color:var(--magenta);font-size:13px;font-weight:600;min-height:16px;margin-top:10px}
 .gate-foot{margin-top:18px;font-size:11px;color:#7d7088}
 
-/* tour */
-#tourBtn{position:fixed;right:16px;bottom:80px;z-index:90;background:var(--magenta);color:#fff;border:none;cursor:pointer;font-family:'Space Grotesk';font-weight:600;font-size:14px;padding:13px 20px;border-radius:999px;box-shadow:0 10px 30px rgba(255,61,139,.4)}
-@media(min-width:761px){#tourBtn{bottom:20px}}
-.nt-hl{position:relative;z-index:998;box-shadow:0 0 0 3px var(--magenta),0 0 0 9999px rgba(10,7,14,.78);border-radius:14px}
-#tourCard{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:1000;width:min(430px,92vw);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 22px 16px;box-shadow:0 22px 60px rgba(0,0,0,.6);display:none}
-#tourCard.show{display:block}
-#tourCard .grip{height:5px;width:46px;border-radius:3px;background:var(--line);margin:-4px auto 12px;cursor:grab;touch-action:none}
-#tourCard.dragging .grip{background:var(--magenta)}
-#tourCard .st{font-family:'Space Grotesk';font-weight:700;font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--magenta)}
-#tourCard h4{font-family:'Space Grotesk';font-size:20px;margin:6px 0 6px}
-#tourCard p{font-size:14px;color:var(--muted);margin:0;line-height:1.5}
-#tourCard .nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
-#tourCard .nav button{font-family:'Space Grotesk';font-weight:700;font-size:13.5px;border:0;border-radius:999px;padding:10px 16px;cursor:pointer}
-#tourCard .back{background:var(--surface2);color:var(--muted)}
-#tourCard .next{background:var(--magenta);color:#fff}
-#tourCard .dots{display:flex;gap:6px}#tourCard .dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}#tourCard .dots i.on{background:var(--magenta)}
-#tourCard .skip{display:block;margin:12px auto 0;background:none;border:none;color:#7d7088;font-size:12px;text-decoration:underline;cursor:pointer}
+/* tour (shared enhanced engine, inlined) */
+/* No Empty Chair, shared guided-tour module (drop-in for every demo).
+   Opt in with window.NEC_TOUR = [{sel,t,d}, ...] and optional
+   window.NEC_TOUR_ACCENT. Box-shadow "spotlight" so it never fights the
+   demo's z-index. Card can be dragged, minimized to a bubble (pause), and
+   both the card and the bubble link back to the No Empty Chair homepage. */
+:root { --nt-accent: #e0a93a; --nt-home: https://noemptychair.co; }
+
+#necTourBtn {
+  position: fixed; right: 18px; bottom: 18px; z-index: 90;
+  background: var(--nt-accent); color: #fff; border: none; cursor: pointer;
+  font: 600 14px/1 system-ui, sans-serif; letter-spacing: .3px;
+  padding: 13px 20px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.28);
+}
+#necTourBtn:hover { filter: brightness(1.06); }
+
+.nt-hl {
+  position: relative; z-index: 998;
+  box-shadow: 0 0 0 4px var(--nt-accent), 0 0 0 9999px rgba(18,14,18,.66);
+  border-radius: 10px; transition: box-shadow .2s;
+}
+
+#necTourCard {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  z-index: 1000; width: min(430px, 92vw);
+  background: #fffdfb; color: #1c1620; border-radius: 18px;
+  padding: 14px 22px 16px; box-shadow: 0 22px 60px rgba(0,0,0,.45);
+  display: none; font-family: system-ui, -apple-system, sans-serif;
+}
+#necTourCard.show { display: block; }
+#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; padding: 2px 0 2px; }
+#necTourCard.dragging .nt-top { cursor: grabbing; }
+#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .04em; color: var(--nt-accent); text-decoration: none; }
+#necTourCard .nt-home:hover { text-decoration: underline; }
+#necTourCard .nt-min { background: none; border: 0; color: #9a8f9c; font-size: 22px; line-height: .7; cursor: pointer; padding: 0 8px 4px; border-radius: 8px; }
+#necTourCard .nt-min:hover { background: #f0ebe4; color: #1c1620; }
+#necTourCard .nt-grip { height: 5px; width: 46px; border-radius: 3px; background: #e0d8cf; margin: 6px auto 12px; cursor: grab; touch-action: none; }
+#necTourCard.dragging .nt-grip { background: var(--nt-accent); }
+#necTourCard .nt-step { font: 700 11.5px/1 system-ui, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nt-accent); }
+#necTourCard .nt-title { font-size: 20px; font-weight: 800; margin: 6px 0 6px; line-height: 1.15; color: #1c1620; }
+#necTourCard .nt-desc { font-size: 14px; line-height: 1.5; color: #4a424e; margin: 0; }
+#necTourCard .nt-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
+#necTourCard .nt-nav button { font: 700 13.5px/1 system-ui, sans-serif; border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+#necTourCard .nt-back { background: #f0ebe4; color: #6a6270; }
+#necTourCard .nt-next { background: var(--nt-accent); color: #fff; }
+#necTourCard .nt-dots { display: flex; gap: 6px; }
+#necTourCard .nt-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e0d8cf; display: block; }
+#necTourCard .nt-dots i.on { background: var(--nt-accent); }
+#necTourCard .nt-skip { display: block; margin: 12px auto 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
+
+/* minimized bubble (also the "pause" state) */
+#necTourBubble {
+  position: fixed; right: 18px; bottom: 18px; z-index: 1000; display: none;
+  align-items: center; background: #fffdfb; border-radius: 999px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.34); overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+#necTourBubble.show { display: inline-flex; }
+#necTourBubble .nt-resume { display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; cursor: pointer; padding: 12px 15px; font: 600 13px/1 system-ui, sans-serif; color: #1c1620; }
+#necTourBubble .nt-resume b { color: var(--nt-accent); font-weight: 700; }
+#necTourBubble .nt-bhome { border: 0; border-left: 1px solid #eee7de; background: none; cursor: pointer; padding: 12px 14px; color: #9a8f9c; font-size: 16px; text-decoration: none; line-height: 1; }
+#necTourBubble .nt-bhome:hover { color: var(--nt-accent); }
+
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+@media(max-width:760px){#necTourBtn{bottom:84px}}
 </style></head><body>
 
 <div id="gate"><div class="gate-card">
@@ -337,8 +386,6 @@ html.gate-locked body>*:not(#gate){display:none!important}
   </div>
 </div>
 <div class="mcta"><a class="btn btn-ghost" href="#gallery">Color work</a><button class="btn btn-pink book-open" type="button">Book now</button></div>
-<button id="tourBtn" type="button">✨ Take the tour</button>
-<div id="tourCard"><div class="grip"></div><div class="st"></div><h4></h4><p></p><div class="nav"><button class="back" type="button">← Back</button><div class="dots"></div><button class="next" type="button">Next →</button></div><button class="skip" type="button">Skip tour</button></div>
 <div id="toast"></div>
 
 <script>
@@ -392,33 +439,111 @@ function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeo
   document.querySelectorAll('.svc .add').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();open(+b.closest('.svc').dataset.id);toast('Great pick. Now choose your stylist.');});});
 })();
 
-/* ---- guided tour ---- */
-(function(){
-  var STEPS=[
-    {sel:'.hero',t:'A homepage as bold as your feed',d:'The first thing someone sees is your color work, full-bleed, built so Google can actually find you for "silk press Atlanta." The energy of your Instagram, finally on your own site.'},
-    {sel:'#services',t:'Services with real prices',d:'No more "DM for pricing." Every service shows a starting rate and adds to the visit in one tap, so clients arrive ready and you stop answering the same question all day.'},
-    {sel:'#book',t:'Book by appointment, in a few taps',d:'Clients pick a service, choose Charley, Dee, or Karma, then a date and time, and a small deposit holds the spot. One clear booking flow instead of Boulevard vs Fresha vs Booksy.'},
-    {sel:'#gallery',t:'Color that stops the scroll',d:'A gallery framed like an editorial does the selling while you are with a client. Your best transformations, front and center.'},
-    {sel:'#reels',t:'Your reels, doing the selling',d:'The content already pulling views sits right next to the booking button, quietly turning followers into appointments.'},
-    {sel:'#reviews',t:'Proof, on your own site',d:'Your 96% recommend rate and years of loyal clients headline the page, instead of living on Yelp where new clients never look.'},
-    {sel:'.final',t:'One clear place to book',d:'Every path leads here. This is a concept, your real build is designed around you from a blank page, down to a custom icon set that is yours to keep.'}
-  ];
-  var card=document.getElementById('tourCard'),btn=document.getElementById('tourBtn');
-  var stEl=card.querySelector('.st'),tEl=card.querySelector('h4'),dEl=card.querySelector('p'),dotsEl=card.querySelector('.dots'),bBack=card.querySelector('.back'),bNext=card.querySelector('.next'),bSkip=card.querySelector('.skip');
-  dotsEl.innerHTML=STEPS.map(function(){return '<i></i>';}).join('');var dots=dotsEl.querySelectorAll('i');var i=0,cur=null;
-  function clearHl(){if(cur){cur.classList.remove('nt-hl');cur=null;}}
-  function show(n){clearHl();i=Math.max(0,Math.min(STEPS.length-1,n));var s=STEPS[i];var tg=document.querySelector(s.sel);if(tg){tg.scrollIntoView({behavior:'smooth',block:'center'});cur=tg;setTimeout(function(){if(cur===tg)tg.classList.add('nt-hl');},380);}stEl.textContent='Step '+(i+1)+' of '+STEPS.length;tEl.textContent=s.t;dEl.textContent=s.d;dots.forEach(function(d,k){d.classList.toggle('on',k===i);});bBack.style.visibility=i===0?'hidden':'visible';bNext.textContent=i===STEPS.length-1?'Finish ✓':'Next →';}
-  function resetPos(){card.style.left='';card.style.top='';card.style.bottom='';card.style.transform='';}
-  function start(){resetPos();card.classList.add('show');show(0);}
-  function end(){card.classList.remove('show');clearHl();resetPos();}
-  btn.addEventListener('click',start);bNext.addEventListener('click',function(){if(i===STEPS.length-1)end();else show(i+1);});bBack.addEventListener('click',function(){show(i-1);});bSkip.addEventListener('click',end);
-  document.addEventListener('keydown',function(e){if(!card.classList.contains('show'))return;if(e.key==='Escape')end();else if(e.key==='ArrowRight'&&i<STEPS.length-1)show(i+1);else if(e.key==='ArrowLeft'&&i>0)show(i-1);});
-  (function(){var grip=card.querySelector('.grip'),dx=0,dy=0,drag=false;
-   function down(e){drag=true;var r=card.getBoundingClientRect();var p=e.touches?e.touches[0]:e;dx=p.clientX-r.left;dy=p.clientY-r.top;card.style.left=r.left+'px';card.style.top=r.top+'px';card.style.bottom='auto';card.style.transform='none';card.classList.add('dragging');if(e.cancelable)e.preventDefault();}
-   function move(e){if(!drag)return;var p=e.touches?e.touches[0]:e;var x=p.clientX-dx,y=p.clientY-dy;x=Math.max(6,Math.min(window.innerWidth-card.offsetWidth-6,x));y=Math.max(6,Math.min(window.innerHeight-card.offsetHeight-6,y));card.style.left=x+'px';card.style.top=y+'px';if(e.cancelable)e.preventDefault();}
-   function up(){drag=false;card.classList.remove('dragging');}
-   grip.addEventListener('mousedown',down);document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
-   grip.addEventListener('touchstart',down,{passive:false});document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',up);})();
+/* ---- guided tour (shared enhanced engine, inlined for self-containment) ---- */
+window.NEC_TOUR_ACCENT='#ff3d8b';
+window.NEC_TOUR_HOME='https://noemptychair.co';
+window.NEC_TOUR=[{"sel": ".hero", "t": "A homepage as bold as your feed", "d": "The first thing someone sees is your color work, full-bleed, built so Google can actually find you for \u201csilk press Atlanta.\u201d The energy of your Instagram, finally on your own site."}, {"sel": "#services", "t": "Services with real prices", "d": "No more \u201cDM for pricing.\u201d Every service shows a starting rate and books in a tap, so clients arrive ready and you stop answering the same question all day."}, {"sel": "#book", "t": "Book by appointment, in a few taps", "d": "Clients pick a service, choose Charley, Dee, or Karma, then a date and time, and a small deposit holds the spot. One clear booking flow instead of Boulevard vs Fresha vs Booksy."}, {"sel": "#gallery", "t": "Color that stops the scroll", "d": "A gallery framed like an editorial does the selling while you are with a client. Your best transformations, front and center."}, {"sel": "#reels", "t": "Your reels, doing the selling", "d": "The content already pulling views sits right next to the booking button, quietly turning followers into appointments."}, {"sel": "#reviews", "t": "Proof, on your own site", "d": "Your 96% recommend rate and years of loyal clients headline the page, instead of living on Yelp where new clients never look."}, {"sel": ".final", "t": "One clear place to book", "d": "Every path leads here. This is a concept, your real build is designed around you from a blank page, down to a custom icon set that is yours to keep."}];
+/* No Empty Chair, shared guided-tour engine.
+   Opt in per page:
+     window.NEC_TOUR_ACCENT = '#c25b3a';            // optional accent
+     window.NEC_TOUR_HOME   = 'https://noemptychair.co'; // optional
+     window.NEC_TOUR = [{ sel:'.hero', t:'Title', d:'One line.' }, ...];
+   Then include with `defer`. Card can be dragged, minimized to a bubble
+   (pause), and both card + bubble link back to the No Empty Chair homepage. */
+(function () {
+  var STEPS = window.NEC_TOUR;
+  if (!STEPS || !STEPS.length) return;
+  var accent = window.NEC_TOUR_ACCENT || '#e0a93a';
+  var HOME = window.NEC_TOUR_HOME || 'https://noemptychair.co';
+  document.documentElement.style.setProperty('--nt-accent', accent);
+
+  var btn = document.createElement('button');
+  btn.id = 'necTourBtn'; btn.type = 'button'; btn.textContent = '✨ Take the tour';
+  document.body.appendChild(btn);
+
+  var card = document.createElement('div');
+  card.id = 'necTourCard';
+  card.innerHTML =
+    '<div class="nt-top"><a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair</a>' +
+    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">–</button></div>' +
+    '<div class="nt-grip" title="Drag to move"></div>' +
+    '<div class="nt-step"></div><h4 class="nt-title"></h4><p class="nt-desc"></p>' +
+    '<div class="nt-nav"><button class="nt-back" type="button">← Back</button>' +
+    '<div class="nt-dots"></div><button class="nt-next" type="button">Next →</button></div>' +
+    '<button class="nt-skip" type="button">End tour</button>';
+  document.body.appendChild(card);
+
+  var bubble = document.createElement('div');
+  bubble.id = 'necTourBubble';
+  bubble.innerHTML =
+    '<button class="nt-resume" type="button">✨ Resume tour <b></b></button>' +
+    '<a class="nt-bhome" href="' + HOME + '" target="_blank" rel="noopener" title="No Empty Chair">⌂</a>';
+  document.body.appendChild(bubble);
+
+  var elStep = card.querySelector('.nt-step'), elTitle = card.querySelector('.nt-title'),
+      elDesc = card.querySelector('.nt-desc'), elDots = card.querySelector('.nt-dots'),
+      bBack = card.querySelector('.nt-back'), bNext = card.querySelector('.nt-next'),
+      bSkip = card.querySelector('.nt-skip'), bMin = card.querySelector('.nt-min'),
+      bResume = bubble.querySelector('.nt-resume'), bCount = bubble.querySelector('.nt-resume b');
+
+  elDots.innerHTML = STEPS.map(function () { return '<i></i>'; }).join('');
+  var dots = elDots.querySelectorAll('i');
+  var i = 0, cur = null;
+
+  function clearHl() { if (cur) { cur.classList.remove('nt-hl'); cur = null; } }
+  function show(n) {
+    clearHl();
+    i = Math.max(0, Math.min(STEPS.length - 1, n));
+    var step = STEPS[i], target = step.sel && document.querySelector(step.sel);
+    if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); cur = target; setTimeout(function () { if (cur === target) target.classList.add('nt-hl'); }, 380); }
+    elStep.textContent = 'Step ' + (i + 1) + ' of ' + STEPS.length;
+    elTitle.textContent = step.t || ''; elDesc.textContent = step.d || '';
+    dots.forEach(function (d, k) { d.classList.toggle('on', k === i); });
+    bBack.style.visibility = i === 0 ? 'hidden' : 'visible';
+    bNext.textContent = i === STEPS.length - 1 ? 'Finish ✓' : 'Next →';
+  }
+  function resetPos() { card.style.left = ''; card.style.top = ''; card.style.bottom = ''; card.style.transform = ''; }
+  function start() { resetPos(); bubble.classList.remove('show'); card.classList.add('show'); btn.style.display = 'none'; show(0); }
+  function end() { card.classList.remove('show'); bubble.classList.remove('show'); clearHl(); resetPos(); btn.style.display = ''; }
+  function minimize() { clearHl(); card.classList.remove('show'); bCount.textContent = (i + 1) + '/' + STEPS.length; bubble.classList.add('show'); }
+  function resume() { bubble.classList.remove('show'); card.classList.add('show'); show(i); }
+
+  btn.addEventListener('click', start);
+  bNext.addEventListener('click', function () { if (i === STEPS.length - 1) end(); else show(i + 1); });
+  bBack.addEventListener('click', function () { show(i - 1); });
+  bSkip.addEventListener('click', end);
+  bMin.addEventListener('click', minimize);
+  bResume.addEventListener('click', resume);
+  document.addEventListener('keydown', function (e) {
+    if (!card.classList.contains('show')) return;
+    if (e.key === 'Escape') minimize();
+    else if (e.key === 'ArrowRight' && i < STEPS.length - 1) show(i + 1);
+    else if (e.key === 'ArrowLeft' && i > 0) show(i - 1);
+  });
+
+  // Drag via the top bar or the grip (mouse + touch).
+  (function () {
+    var handles = [card.querySelector('.nt-top'), card.querySelector('.nt-grip')], dx = 0, dy = 0, drag = false;
+    function down(e) {
+      if (e.target.closest('.nt-min') || e.target.closest('.nt-home')) return;
+      drag = true; var r = card.getBoundingClientRect(); var p = e.touches ? e.touches[0] : e;
+      dx = p.clientX - r.left; dy = p.clientY - r.top;
+      card.style.left = r.left + 'px'; card.style.top = r.top + 'px'; card.style.bottom = 'auto'; card.style.transform = 'none';
+      card.classList.add('dragging'); if (e.cancelable) e.preventDefault();
+    }
+    function move(e) {
+      if (!drag) return; var p = e.touches ? e.touches[0] : e;
+      var x = p.clientX - dx, y = p.clientY - dy;
+      x = Math.max(6, Math.min(window.innerWidth - card.offsetWidth - 6, x));
+      y = Math.max(6, Math.min(window.innerHeight - card.offsetHeight - 6, y));
+      card.style.left = x + 'px'; card.style.top = y + 'px'; if (e.cancelable) e.preventDefault();
+    }
+    function up() { drag = false; card.classList.remove('dragging'); }
+    handles.forEach(function (h) { h.addEventListener('mousedown', down); h.addEventListener('touchstart', down, { passive: false }); });
+    document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false }); document.addEventListener('touchend', up);
+  })();
 })();
+
 </script>
 </body></html>
