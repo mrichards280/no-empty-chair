@@ -1,15 +1,15 @@
 /* No Empty Chair — shared guided-tour module (drop-in for every demo).
-   A page opts in with window.NEC_TOUR = [{sel,t,d}, ...] and optional
-   window.NEC_TOUR_ACCENT. Uses a box-shadow "spotlight" so it never has to
-   fight each demo's z-index/stacking context. */
-:root { --nt-accent: #e0a93a; }
+   Opt in with window.NEC_TOUR = [{sel,t,d}, ...] and optional
+   window.NEC_TOUR_ACCENT. Box-shadow "spotlight" so it never fights the
+   demo's z-index. Card can be dragged, minimized to a bubble (pause), and
+   both the card and the bubble link back to the No Empty Chair homepage. */
+:root { --nt-accent: #e0a93a; --nt-home: https://noemptychair.co; }
 
 #necTourBtn {
   position: fixed; right: 18px; bottom: 18px; z-index: 90;
   background: var(--nt-accent); color: #fff; border: none; cursor: pointer;
   font: 600 14px/1 system-ui, sans-serif; letter-spacing: .3px;
-  padding: 13px 20px; border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  padding: 13px 20px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.28);
 }
 #necTourBtn:hover { filter: brightness(1.06); }
 
@@ -23,12 +23,18 @@
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
   z-index: 1000; width: min(430px, 92vw);
   background: #fffdfb; color: #1c1620; border-radius: 18px;
-  padding: 20px 22px 16px; box-shadow: 0 22px 60px rgba(0,0,0,.45);
+  padding: 14px 22px 16px; box-shadow: 0 22px 60px rgba(0,0,0,.45);
   display: none; font-family: system-ui, -apple-system, sans-serif;
 }
 #necTourCard.show { display: block; }
-#necTourCard .nt-grip { height: 5px; width: 46px; border-radius: 3px; background: #e0d8cf; margin: -4px auto 12px; cursor: grab; touch-action: none; }
-#necTourCard.dragging .nt-grip { cursor: grabbing; background: var(--nt-accent); }
+#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; padding: 2px 0 2px; }
+#necTourCard.dragging .nt-top { cursor: grabbing; }
+#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .04em; color: var(--nt-accent); text-decoration: none; }
+#necTourCard .nt-home:hover { text-decoration: underline; }
+#necTourCard .nt-min { background: none; border: 0; color: #9a8f9c; font-size: 22px; line-height: .7; cursor: pointer; padding: 0 8px 4px; border-radius: 8px; }
+#necTourCard .nt-min:hover { background: #f0ebe4; color: #1c1620; }
+#necTourCard .nt-grip { height: 5px; width: 46px; border-radius: 3px; background: #e0d8cf; margin: 6px auto 12px; cursor: grab; touch-action: none; }
+#necTourCard.dragging .nt-grip { background: var(--nt-accent); }
 #necTourCard .nt-step { font: 700 11.5px/1 system-ui, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nt-accent); }
 #necTourCard .nt-title { font-size: 20px; font-weight: 800; margin: 6px 0 6px; line-height: 1.15; color: #1c1620; }
 #necTourCard .nt-desc { font-size: 14px; line-height: 1.5; color: #4a424e; margin: 0; }
@@ -40,5 +46,18 @@
 #necTourCard .nt-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e0d8cf; display: block; }
 #necTourCard .nt-dots i.on { background: var(--nt-accent); }
 #necTourCard .nt-skip { display: block; margin: 12px auto 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
+
+/* minimized bubble (also the "pause" state) */
+#necTourBubble {
+  position: fixed; right: 18px; bottom: 18px; z-index: 1000; display: none;
+  align-items: center; background: #fffdfb; border-radius: 999px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.34); overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+#necTourBubble.show { display: inline-flex; }
+#necTourBubble .nt-resume { display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; cursor: pointer; padding: 12px 15px; font: 600 13px/1 system-ui, sans-serif; color: #1c1620; }
+#necTourBubble .nt-resume b { color: var(--nt-accent); font-weight: 700; }
+#necTourBubble .nt-bhome { border: 0; border-left: 1px solid #eee7de; background: none; cursor: pointer; padding: 12px 14px; color: #9a8f9c; font-size: 16px; text-decoration: none; line-height: 1; }
+#necTourBubble .nt-bhome:hover { color: var(--nt-accent); }
 
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
