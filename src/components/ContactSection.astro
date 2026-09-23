@@ -21,7 +21,7 @@ const { contact } = Astro.props;
       <label class="visually-hidden" for="nec-contact-message">Tell me about your salon</label>
       <textarea id="nec-contact-message" name="message" required placeholder="Tell me about your salon"></textarea>
       <button class="btn" type="submit" style="justify-self:center">{contact.formButton}</button>
-      <div class="status" data-contact-status hidden></div>
+      <div class="status" data-contact-status role="status" aria-live="polite" hidden></div>
     </form>
   </div>
 </section>

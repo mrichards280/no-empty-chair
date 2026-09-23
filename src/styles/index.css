@@ -446,7 +446,7 @@ h2 { font-size: clamp(30px, 4.6vw, 46px); color: var(--plum); margin-bottom: 12p
 
 /* contact */
 .cta { text-align: center; background: var(--cream-2); }
-.cta h2 { font-size: 50px; max-width: 720px; margin: 0 auto 18px; }
+.cta h1, .cta h2 { font-size: 50px; max-width: 720px; margin: 0 auto 18px; }
 .cta p { font-size: 18px; color: var(--plum-soft); max-width: 520px; margin: 0 auto 30px; }
 
 /* contact form */
@@ -877,7 +877,9 @@ nav ul a:hover { color: var(--rose-text); }
 
 .card .from,
 .work-card .meta,
-.pstep .num { color: var(--gold-text); }
+.pstep .num,
+.disc-tier.b .disc-tier-lbl,
+.disc-tier.b .disc-tier-price { color: var(--gold-text); }
 
 .card .tag { background: var(--gold-deep); }
 
@@ -886,7 +888,7 @@ footer .fine, footer .adminlink { color: #c9b3bb; }
 footer .logo span { color: #e6b8c6; }
 
 /* ============================================================
-   Private "Website Discovery" forms (/discovery/[slug])
+   Website Discovery intake form (/discovery)
    Reuses the .tp-* / .tform system from the teardown page for
    layout + inputs; these .disc-* rules add the sectioned
    Q&A / tier-picker / cost-table look on top of it.
@@ -897,6 +899,8 @@ footer .logo span { color: #e6b8c6; }
 .disc-sec { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 22px; }
 .disc-sec:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
 /* social-media checkbox group */
+.disc-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.disc-social-q, .disc-group-lbl { padding: 0; }
 .disc-social-q { font-size: 13px; font-weight: 600; color: var(--plum); letter-spacing: 0.3px; margin-bottom: 12px; }
 .disc-checks { display: flex; flex-wrap: wrap; gap: 10px 18px; }
 .disc-form .disc-check { display: inline-flex; align-items: center; gap: 8px; font-weight: 400; font-size: 14.5px; color: var(--plum); cursor: pointer; }

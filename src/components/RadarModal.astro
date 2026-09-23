@@ -24,11 +24,14 @@ const delay = Number(radar.delaySeconds) > 0 ? Number(radar.delaySeconds) : 8;
           <p class="radar-sub">{radar.sub}</p>
           <form class="radar-form" name="leads" data-radar-form>
             <input class="radar-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
-            <input required type="text" name="business" placeholder={radar.businessLabel || "Salon / business name"} />
-            <input type="text" name="instagram" placeholder={radar.instagramLabel || "Instagram handle"} />
-            <input required type="text" name="contact" placeholder={radar.contactLabel || "Best email or phone"} />
+            <label class="visually-hidden" for="nec-radar-business">{radar.businessLabel || "Salon / business name"}</label>
+            <input id="nec-radar-business" required type="text" name="business" placeholder={radar.businessLabel || "Salon / business name"} />
+            <label class="visually-hidden" for="nec-radar-instagram">{radar.instagramLabel || "Instagram handle"}</label>
+            <input id="nec-radar-instagram" type="text" name="instagram" placeholder={radar.instagramLabel || "Instagram handle"} />
+            <label class="visually-hidden" for="nec-radar-contact">{radar.contactLabel || "Best email or phone"}</label>
+            <input id="nec-radar-contact" required type="text" name="contact" placeholder={radar.contactLabel || "Best email or phone"} />
             <button class="btn" type="submit" data-radar-submit>{radar.button || "Check now"}</button>
-            <div class="radar-err" data-radar-err hidden>Hmm, that didn't go through. Try again in a moment.</div>
+            <div class="radar-err" data-radar-err role="status" aria-live="polite" hidden>Hmm, that didn't go through. Try again in a moment.</div>
           </form>
         </div>
 

@@ -69,17 +69,19 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
             <label>How do clients find &amp; book you today?<input type="text" name="sell_where" placeholder="Instagram, Booksy, Square, walk-ins, word of mouth, nothing yet" /></label>
             <label>Website, if you have one<input type="text" name="website" placeholder="yourname.com — or 'none yet'" /></label>
           </div>
-          <div class="disc-social-q">Which social accounts does your business have?</div>
-          <div class="disc-checks">
-            <label class="disc-check"><input type="checkbox" name="social_media" value="Instagram" /> Instagram</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="TikTok" /> TikTok</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="Facebook" /> Facebook</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="Pinterest" /> Pinterest</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="X (Twitter)" /> X (Twitter)</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="YouTube" /> YouTube</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="Snapchat" /> Snapchat</label>
-            <label class="disc-check"><input type="checkbox" name="social_media" value="LinkedIn" /> LinkedIn</label>
-          </div>
+          <fieldset>
+            <legend class="disc-social-q">Which social accounts does your business have?</legend>
+            <div class="disc-checks">
+              <label class="disc-check"><input type="checkbox" name="social_media" value="Instagram" /> Instagram</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="TikTok" /> TikTok</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="Facebook" /> Facebook</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="Pinterest" /> Pinterest</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="X (Twitter)" /> X (Twitter)</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="YouTube" /> YouTube</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="Snapchat" /> Snapchat</label>
+              <label class="disc-check"><input type="checkbox" name="social_media" value="LinkedIn" /> LinkedIn</label>
+            </div>
+          </fieldset>
           <label style="margin-top:14px">Your main handle (so I can peek at your work)<input type="text" name="instagram" placeholder="@yourhandle" /></label>
         </div>
 
@@ -99,37 +101,45 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
           <div class="disc-sec-h"><span class="disc-num">4</span>What I Can Build For You</div>
           <p class="disc-menu-note">Here's everything No Empty Chair does — check anything that speaks to you. Nothing here is a quote or a commitment; it just tells me where to focus for our chat.</p>
 
-          <div class="disc-group-lbl">Brand &amp; identity</div>
-          <div class="disc-checks">
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand identity & logo" /> Brand identity &amp; logo</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand voice + captions" /> Brand voice &amp; captions</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand session (do-it-with-me)" /> Brand session (do-it-with-me)</label>
-          </div>
+          <fieldset>
+            <legend class="disc-group-lbl">Brand &amp; identity</legend>
+            <div class="disc-checks">
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand identity & logo" /> Brand identity &amp; logo</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand voice + captions" /> Brand voice &amp; captions</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Brand session (do-it-with-me)" /> Brand session (do-it-with-me)</label>
+            </div>
+          </fieldset>
 
-          <div class="disc-group-lbl">Website &amp; booking</div>
-          <div class="disc-checks">
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="A full custom website" /> A full custom website</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Website makeover / refresh" /> Website makeover / refresh</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Online booking setup" /> Online booking setup</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Online shop / selling products" /> Online shop / selling products</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Website session (do-it-with-me)" /> Website session (do-it-with-me)</label>
-          </div>
+          <fieldset>
+            <legend class="disc-group-lbl">Website &amp; booking</legend>
+            <div class="disc-checks">
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="A full custom website" /> A full custom website</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Website makeover / refresh" /> Website makeover / refresh</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Online booking setup" /> Online booking setup</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Online shop / selling products" /> Online shop / selling products</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Website session (do-it-with-me)" /> Website session (do-it-with-me)</label>
+            </div>
+          </fieldset>
 
-          <div class="disc-group-lbl">Content &amp; social</div>
-          <div class="disc-checks">
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Reels & short-form edits" /> Reels &amp; short-form edits</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Social post templates" /> Social post templates</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Pinterest vibe pages" /> Pinterest vibe pages</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="A month of content" /> A month of content</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Help sourcing my team" /> Help sourcing my team</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Social session (do-it-with-me)" /> Social session (do-it-with-me)</label>
-          </div>
+          <fieldset>
+            <legend class="disc-group-lbl">Content &amp; social</legend>
+            <div class="disc-checks">
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Reels & short-form edits" /> Reels &amp; short-form edits</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Social post templates" /> Social post templates</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Pinterest vibe pages" /> Pinterest vibe pages</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="A month of content" /> A month of content</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Help sourcing my team" /> Help sourcing my team</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Social session (do-it-with-me)" /> Social session (do-it-with-me)</label>
+            </div>
+          </fieldset>
 
-          <div class="disc-group-lbl">Or start small</div>
-          <div class="disc-checks">
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="$200 teardown to start" /> Just the $200 teardown to start</label>
-            <label class="disc-check"><input type="checkbox" name="looking_for" value="Not sure yet — help me figure it out" /> Not sure — help me figure it out</label>
-          </div>
+          <fieldset>
+            <legend class="disc-group-lbl">Or start small</legend>
+            <div class="disc-checks">
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="$200 teardown to start" /> Just the $200 teardown to start</label>
+              <label class="disc-check"><input type="checkbox" name="looking_for" value="Not sure yet — help me figure it out" /> Not sure — help me figure it out</label>
+            </div>
+          </fieldset>
         </div>
 
         <div class="disc-sec">
@@ -162,7 +172,7 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
   <style>
     .disc-menu-note{font-size:14px;color:#6b5f57;margin:-2px 0 18px;line-height:1.55;}
     .disc-group-lbl{font-weight:700;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#a85a76;margin:20px 0 8px;}
-    .disc-sec .disc-group-lbl:first-of-type{margin-top:8px;}
+    .disc-sec fieldset:first-of-type .disc-group-lbl{margin-top:8px;}
     .disc-free{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:100px;background:rgba(168,90,118,.12);color:#a85a76;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
     .disc-cross{max-width:620px;margin:22px auto 0;text-align:center;font-size:13.5px;color:#6b5f57;}
     .disc-cross a{color:#a85a76;font-weight:600;border-bottom:1px solid rgba(168,90,118,.4);}

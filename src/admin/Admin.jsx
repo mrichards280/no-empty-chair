@@ -63,7 +63,7 @@ function StringList({ label, list, onChange }) {
       {(list || []).map((item, i) => (
         <div className="listrow" key={i}>
           <input type="text" value={item} onChange={(e) => set(i, e.target.value)} />
-          <button type="button" className="mini danger" onClick={() => del(i)}>✕</button>
+          <button type="button" className="mini danger" onClick={() => del(i)} aria-label={`Remove item ${i + 1}`}>✕</button>
         </div>
       ))}
       <button type="button" className="mini" onClick={add}>+ Add</button>
@@ -131,8 +131,8 @@ function Value({ keyName, value, onChange }) {
             <div className="objtools">
               <span>#{i + 1}</span>
               <div>
-                <button type="button" className="mini" onClick={() => move(i, -1)}>↑</button>
-                <button type="button" className="mini" onClick={() => move(i, 1)}>↓</button>
+                <button type="button" className="mini" onClick={() => move(i, -1)} aria-label={`Move item ${i + 1} up`}>↑</button>
+                <button type="button" className="mini" onClick={() => move(i, 1)} aria-label={`Move item ${i + 1} down`}>↓</button>
                 <button type="button" className="mini danger" onClick={() => delItem(i)}>Delete</button>
               </div>
             </div>
@@ -195,9 +195,10 @@ export default function Admin() {
           <form className="loginbox" onSubmit={login}>
             <div className="logo">No Empty <span>Chair</span> · Admin</div>
             <p className="muted">Sign in to edit your site content.</p>
-            <input type="password" placeholder="Admin password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <label className="visually-hidden" htmlFor="nec-admin-password">Admin password</label>
+            <input id="nec-admin-password" type="password" placeholder="Admin password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button className="save" type="submit">Sign in</button>
-            {authErr ? <div className="err">{authErr}</div> : null}
+            {authErr ? <div className="err" role="status" aria-live="polite">{authErr}</div> : null}
           </form>
         </div>
       ) : loading || !content ? (
