@@ -72,7 +72,8 @@
   .course-h h2{font-family:'Anton',sans-serif;font-size:32px;letter-spacing:1px;text-transform:uppercase;}
   .course-h .sub{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--red);}
   .course > .cline{height:2px;background:var(--ink);margin-bottom:6px;}
-  .item{display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:15px 0;border-bottom:1px dashed var(--line);cursor:pointer;transition:background .15s;position:relative;}
+  .item{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:15px 0;border-bottom:1px dashed var(--line);cursor:pointer;transition:background .15s;position:relative;font-family:inherit;text-align:left;}
+  .item:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
   .item:hover{background:rgba(198,139,46,.09);}
   .item .nm{font-family:'Oswald',sans-serif;font-weight:600;font-size:19px;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:9px;}
   .item .pr{font-family:'Space Mono',monospace;font-weight:700;font-size:18px;white-space:nowrap;align-self:start;}
@@ -173,14 +174,16 @@
   .co .cosub{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:18px;}
   .co label{display:block;font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-2);margin:16px 0 8px;}
   .chips{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{border:2px solid var(--line);background:#fff;border-radius:100px;padding:9px 15px;font-family:'Space Mono',monospace;font-size:13px;cursor:pointer;transition:.15s;}
+  .chip{appearance:none;-webkit-appearance:none;color:inherit;border:2px solid var(--line);background:#fff;border-radius:100px;padding:9px 15px;font-family:'Space Mono',monospace;font-size:13px;cursor:pointer;transition:.15s;}
+  .chip:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
   .chip:hover{border-color:var(--ink);}
   .chip.sel{background:var(--ink);color:var(--paper);border-color:var(--ink);}
   .co input{width:100%;border:2px solid var(--line);border-radius:5px;padding:12px 14px;font-family:'Space Mono',monospace;font-size:14px;background:#fff;margin-top:2px;}
   .co input:focus{outline:none;border-color:var(--red);}
   .co-go{width:100%;margin-top:22px;background:var(--red);color:#fff;border:none;border-radius:4px;padding:16px;font-family:'Oswald';font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
   .co-go:disabled{background:#cbb894;}
-  .co-x{position:absolute;} .co-close{float:right;font-family:'Space Mono';font-size:20px;cursor:pointer;color:var(--muted);line-height:1;}
+  .co-x{position:absolute;} .co-close{all:unset;float:right;font-family:'Space Mono';font-size:20px;cursor:pointer;color:var(--muted);line-height:1;}
+  .co-close:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
   .co-mini{background:#fff;border:1px dashed var(--line);border-radius:6px;padding:12px 14px;font-family:'Space Mono',monospace;font-size:12.5px;margin-bottom:6px;}
   .co-mini .l{display:flex;justify-content:space-between;padding:2px 0;}
   .co-mini .tt{display:flex;justify-content:space-between;font-weight:700;border-top:1px solid var(--ink);margin-top:6px;padding-top:6px;}
@@ -227,13 +230,13 @@
       <section class="course">
         <div class="course-h"><h2>The Mains</h2><span class="sub">The Cuts</span></div>
         <div class="cline"></div>
-        <div class="item" data-name="The Regular" data-price="30"><div class="nm">The Regular <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Scissor + clipper, blended and styled clean.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Skin Fade" data-price="35"><div class="nm">Skin Fade <span class="add">+</span></div><div class="pr">$35</div><div class="ds">Low, mid, or high — blended down to the skin.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="The Taper" data-price="30"><div class="nm">The Taper <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Length up top, tight and tidy round the edges.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="The Buzz" data-price="20"><div class="nm">The Buzz <span class="add">+</span></div><div class="pr">$20</div><div class="ds">One guard, in and out. Simple and sharp.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="The Executive" data-price="50"><div class="nm">The Executive <span class="add">+</span></div><div class="pr">$50</div><div class="ds">Full cut + beard, finished with a hot towel.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Kids' Cut" data-price="25"><div class="nm">Kids' Cut · 10 &amp; under <span class="add">+</span></div><div class="pr">$25</div><div class="ds">Patient hands, no fuss, plenty of patience.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="The Retiree · 55+" data-price="25"><div class="nm">The Retiree · 55+ <span class="add">+</span></div><div class="pr">$25</div><div class="ds">Classic cut, classic price. Every visit.</div><span class="flash">+ added</span></div>
+        <button type="button" class="item" data-name="The Regular" data-price="30"><div class="nm">The Regular <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Scissor + clipper, blended and styled clean.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Skin Fade" data-price="35"><div class="nm">Skin Fade <span class="add">+</span></div><div class="pr">$35</div><div class="ds">Low, mid, or high — blended down to the skin.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="The Taper" data-price="30"><div class="nm">The Taper <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Length up top, tight and tidy round the edges.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="The Buzz" data-price="20"><div class="nm">The Buzz <span class="add">+</span></div><div class="pr">$20</div><div class="ds">One guard, in and out. Simple and sharp.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="The Executive" data-price="50"><div class="nm">The Executive <span class="add">+</span></div><div class="pr">$50</div><div class="ds">Full cut + beard, finished with a hot towel.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Kids' Cut" data-price="25"><div class="nm">Kids' Cut · 10 &amp; under <span class="add">+</span></div><div class="pr">$25</div><div class="ds">Patient hands, no fuss, plenty of patience.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="The Retiree · 55+" data-price="25"><div class="nm">The Retiree · 55+ <span class="add">+</span></div><div class="pr">$25</div><div class="ds">Classic cut, classic price. Every visit.</div><span class="flash">+ added</span></button>
       </section>
 
       <div class="shots">
@@ -245,29 +248,29 @@
       <section class="course">
         <div class="course-h"><h2>The Sides</h2><span class="sub">Add-Ons</span></div>
         <div class="cline"></div>
-        <div class="item" data-name="Lineup / Shape-Up" data-price="15"><div class="nm">Lineup / Shape-Up <span class="add">+</span></div><div class="pr">$15</div><div class="ds">Razor-sharp edges, hairline on point.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Beard Trim + Razor Outline" data-price="20"><div class="nm">Beard + Razor Outline <span class="add">+</span></div><div class="pr">$20</div><div class="ds">Shaped, lined, and oiled up right.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Hot-Towel Straight-Razor Shave" data-price="30"><div class="nm">Hot-Towel Shave <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Steamed, lathered, straight razor — the full ritual.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Hard Part" data-price="5"><div class="nm">Hard Part <span class="add">+</span></div><div class="pr">$5</div><div class="ds">One clean line, extra structure.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Eyebrows" data-price="8"><div class="nm">Eyebrows <span class="add">+</span></div><div class="pr">$8</div><div class="ds">Cleaned up and shaped.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Gray Blending" data-price="15"><div class="nm">Gray Blending <span class="add">+</span></div><div class="pr">$15</div><div class="ds">Grays gone — nobody has to know.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Custom Design / Parts" data-price="10"><div class="nm">Custom Design / Parts <span class="add">+</span></div><div class="pr">$10</div><div class="ds">Freehand art, your call.</div><span class="flash">+ added</span></div>
+        <button type="button" class="item" data-name="Lineup / Shape-Up" data-price="15"><div class="nm">Lineup / Shape-Up <span class="add">+</span></div><div class="pr">$15</div><div class="ds">Razor-sharp edges, hairline on point.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Beard Trim + Razor Outline" data-price="20"><div class="nm">Beard + Razor Outline <span class="add">+</span></div><div class="pr">$20</div><div class="ds">Shaped, lined, and oiled up right.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Hot-Towel Straight-Razor Shave" data-price="30"><div class="nm">Hot-Towel Shave <span class="add">+</span></div><div class="pr">$30</div><div class="ds">Steamed, lathered, straight razor — the full ritual.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Hard Part" data-price="5"><div class="nm">Hard Part <span class="add">+</span></div><div class="pr">$5</div><div class="ds">One clean line, extra structure.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Eyebrows" data-price="8"><div class="nm">Eyebrows <span class="add">+</span></div><div class="pr">$8</div><div class="ds">Cleaned up and shaped.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Gray Blending" data-price="15"><div class="nm">Gray Blending <span class="add">+</span></div><div class="pr">$15</div><div class="ds">Grays gone — nobody has to know.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Custom Design / Parts" data-price="10"><div class="nm">Custom Design / Parts <span class="add">+</span></div><div class="pr">$10</div><div class="ds">Freehand art, your call.</div><span class="flash">+ added</span></button>
       </section>
 
       <section class="course">
         <div class="course-h"><h2>The Works</h2><span class="sub">Combos</span></div>
         <div class="cline"></div>
-        <div class="item" data-name="The Works" data-price="65"><div class="nm">The Works <span class="add">+</span></div><div class="pr">$65</div><div class="ds">Cut + beard + hot towel + lineup. The whole thing.</div><span class="flash">+ added</span></div>
-        <div class="item" data-name="Cut + Lineup" data-price="40"><div class="nm">Cut + Lineup <span class="add">+</span></div><div class="pr">$40</div><div class="ds">The essentials — fresh for the whole week.</div><span class="flash">+ added</span></div>
-        <div class="item pick" data-name="Barber's Pick: Mid-Fade + Beard" data-price="55"><div class="nm">★ Barber's Pick · Mid-Fade + Beard <span class="add">+</span></div><div class="pr">$55</div><div class="ds">This week only — the shop's most-booked combo.</div><span class="flash">+ added</span></div>
+        <button type="button" class="item" data-name="The Works" data-price="65"><div class="nm">The Works <span class="add">+</span></div><div class="pr">$65</div><div class="ds">Cut + beard + hot towel + lineup. The whole thing.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item" data-name="Cut + Lineup" data-price="40"><div class="nm">Cut + Lineup <span class="add">+</span></div><div class="pr">$40</div><div class="ds">The essentials — fresh for the whole week.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item pick" data-name="Barber's Pick: Mid-Fade + Beard" data-price="55"><div class="nm">★ Barber's Pick · Mid-Fade + Beard <span class="add">+</span></div><div class="pr">$55</div><div class="ds">This week only — the shop's most-booked combo.</div><span class="flash">+ added</span></button>
       </section>
 
       <section class="course">
         <div class="course-h"><h2>On the House</h2><span class="sub">Free with any cut</span></div>
         <div class="cline"></div>
-        <div class="item free" data-name="Edge Check" data-price="0"><div class="nm">Edge Check <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Quick touch-up between visits.</div><span class="flash">+ added</span></div>
-        <div class="item free" data-name="Neck Shave" data-price="0"><div class="nm">Neck Shave <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Clipper-clean at the finish.</div><span class="flash">+ added</span></div>
-        <div class="item free" data-name="Line of the Day" data-price="0"><div class="nm">Line of the Day <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Ask your barber — dealer's choice.</div><span class="flash">+ added</span></div>
+        <button type="button" class="item free" data-name="Edge Check" data-price="0"><div class="nm">Edge Check <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Quick touch-up between visits.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item free" data-name="Neck Shave" data-price="0"><div class="nm">Neck Shave <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Clipper-clean at the finish.</div><span class="flash">+ added</span></button>
+        <button type="button" class="item free" data-name="Line of the Day" data-price="0"><div class="nm">Line of the Day <span class="add">+</span></div><div class="pr">FREE</div><div class="ds">Ask your barber — dealer's choice.</div><span class="flash">+ added</span></button>
       </section>
     </main>
 
@@ -326,7 +329,7 @@
 </footer>
 
 <!-- CHECKOUT -->
-<div class="co-back" id="coBack"><div class="co" id="coBody"></div></div>
+<div class="co-back" id="coBack"><div class="co" id="coBody" role="dialog" aria-modal="true" aria-label="Send your check"></div></div>
 
 <script>
 (function(){
@@ -411,12 +414,12 @@
   function coRender(){
     var lines=items.map(function(i){ return '<div class="l"><span>'+i.qty+'x '+i.name+'</span><span>'+(i.price===0?"FREE":money(i.price*i.qty))+'</span></div>'; }).join("");
     coBody.innerHTML=
-      '<span class="co-close" id="coClose">✕</span>'+
+      '<button type="button" class="co-close" id="coClose" aria-label="Close">✕</button>'+
       '<h3>Send your check</h3><div class="cosub">Pick your barber & time — nothing\'s charged, the shop confirms.</div>'+
       '<div class="co-mini">'+lines+'<div class="tt"><span>TOTAL</span><span>'+money(sum())+'</span></div></div>'+
-      '<label>Your barber</label><div class="chips" id="cBarber">'+BARBERS.map(function(b){return '<span class="chip" data-b="'+b+'">'+b+'</span>';}).join("")+'</div>'+
-      '<label>Day</label><div class="chips" id="cDay">'+nextDays().map(function(x){return '<span class="chip" data-day="'+x.key+'">'+x.lbl+'</span>';}).join("")+'</div>'+
-      '<label>Time</label><div class="chips" id="cTime">'+TIMES.map(function(t){return '<span class="chip" data-time="'+t+'">'+t+'</span>';}).join("")+'</div>'+
+      '<label>Your barber</label><div class="chips" id="cBarber">'+BARBERS.map(function(b){return '<button type="button" class="chip" data-b="'+b+'">'+b+'</button>';}).join("")+'</div>'+
+      '<label>Day</label><div class="chips" id="cDay">'+nextDays().map(function(x){return '<button type="button" class="chip" data-day="'+x.key+'">'+x.lbl+'</button>';}).join("")+'</div>'+
+      '<label>Time</label><div class="chips" id="cTime">'+TIMES.map(function(t){return '<button type="button" class="chip" data-time="'+t+'">'+t+'</button>';}).join("")+'</div>'+
       '<label>Name</label><input id="coName" placeholder="First & last">'+
       '<label>Cell (for the confirm text)</label><input id="coPhone" placeholder="(404) 555-0123">'+
       '<button class="co-go" id="coGo" disabled>Send to the shop →</button>';
@@ -455,10 +458,30 @@
       '<button class="co-go" id="coDone">Done</button></div>';
     document.getElementById("coDone").onclick=function(){ items=[]; render(); closeCo(); };
   }
-  function openCo(){ if(!items.length)return; coRender(); coBack.classList.add("show"); pick={barber:null,day:null,time:null}; }
-  function closeCo(){ coBack.classList.remove("show"); }
+  function openCo(){
+    if(!items.length)return;
+    coRender(); coBack.classList.add("show"); pick={barber:null,day:null,time:null};
+    setTimeout(function(){ var el=coBody.querySelector("button, input"); if(el)el.focus(); },0);
+  }
+  function closeCo(){
+    coBack.classList.remove("show");
+    if(sendBtn && document.contains(sendBtn)) sendBtn.focus();
+  }
   sendBtn.addEventListener("click",openCo);
   coBack.addEventListener("click",function(e){ if(e.target===coBack)closeCo(); });
+  document.addEventListener("keydown",function(e){
+    if(!coBack.classList.contains("show"))return;
+    if(e.key==="Escape"){ closeCo(); return; }
+    if(e.key!=="Tab")return;
+    var focusable=Array.prototype.filter.call(
+      coBody.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'),
+      function(el){ return !el.disabled && el.offsetParent!==null; }
+    );
+    if(!focusable.length)return;
+    var first=focusable[0], last=focusable[focusable.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
 
   render();
 })();

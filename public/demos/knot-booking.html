@@ -172,7 +172,8 @@
   .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--line);}
   .toggle-row:first-of-type{border-top:none;}
   .toggle-row .tl{font-size:13.5px;font-weight:500;} .toggle-row .ts{font-size:11.5px;color:var(--muted);}
-  .sw{width:44px;height:26px;border-radius:100px;background:var(--line);position:relative;transition:.2s;flex:0 0 44px;}
+  .sw{appearance:none;-webkit-appearance:none;border:none;padding:0;cursor:pointer;width:44px;height:26px;border-radius:100px;background:var(--line);position:relative;transition:.2s;flex:0 0 44px;}
+  .sw:focus-visible{outline:2px solid var(--clay);outline-offset:2px;}
   .sw:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
   .sw.on{background:var(--olive);} .sw.on:after{left:21px;}
   .stepper{display:flex;align-items:center;gap:12px;}
@@ -194,7 +195,8 @@
   .req-card .ra button{flex:1;padding:9px;border-radius:100px;font-size:12.5px;font-weight:700;}
   .req-card .ok{background:var(--olive);color:#fff;} .req-card .no{background:var(--card);color:var(--warn);border:1.5px solid #e2c9c0;}
   .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .pgrid .pc{aspect-ratio:1;border-radius:12px;background-size:cover;background-position:center;position:relative;overflow:hidden;border:1.5px solid var(--line);}
+  .pgrid .pc{appearance:none;-webkit-appearance:none;padding:0;font:inherit;cursor:pointer;aspect-ratio:1;border-radius:12px;background-size:cover;background-position:center;position:relative;overflow:hidden;border:1.5px solid var(--line);}
+  .pgrid .pc:focus-visible{outline:2px solid var(--clay);outline-offset:2px;}
   .pgrid .pc .x{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(19,19,17,.7);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;}
   .pgrid .pc.hidden{opacity:.3;} .pgrid .pc.hidden .x{background:var(--olive);}
   .cal-day{margin-bottom:14px;} .cal-day .cd-h{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
@@ -244,7 +246,7 @@
 
   <div class="foot" id="foot"></div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* ============================================================
@@ -519,10 +521,10 @@ function renderVisits(){
   if(!visitsUnlocked){
     el.innerHTML=`<div class="eyebrow">My visits</div><h1 class="big">Your <span class="ser">appointments.</span></h1>
       <p class="sub">No password, no app. Enter your mobile and we'll text a code.</p>
-      <input id="lkPhone" placeholder="Mobile number" inputmode="tel" value="${lastPhone||''}"
+      <input id="lkPhone" placeholder="Mobile number" aria-label="Mobile number" inputmode="tel" value="${lastPhone||''}"
         style="width:100%;padding:15px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);font-size:16px;font-family:inherit">
-      <div class="otp" id="otpRow" style="display:none">
-        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"></div>
+      <div class="otp" id="otpRow" style="display:none" role="group" aria-label="Verification code">
+        <input maxlength="1" inputmode="numeric" aria-label="Digit 1 of 4"><input maxlength="1" inputmode="numeric" aria-label="Digit 2 of 4"><input maxlength="1" inputmode="numeric" aria-label="Digit 3 of 4"><input maxlength="1" inputmode="numeric" aria-label="Digit 4 of 4"></div>
       <p class="note" id="otpNote"></p>
       <button class="btn" style="margin-top:16px" onclick="sendCode()">Text me a code</button>
       <p class="hint">Demo: the code auto-fills. In the live build it arrives by SMS in seconds.<br>Try phone <b>404 555 0111</b> to see existing visits.</p>`;
@@ -604,7 +606,7 @@ function studioRules(){
   </div>
 
   <div class="stsec"><h4>Deposit</h4>
-    <div class="toggle-row"><div><div class="tl">Require a deposit</div><div class="ts">Holds the seat, cuts no-shows</div></div><div class="sw ${r.depositRequired?'on':''}" onclick="setRule('depositRequired',${!r.depositRequired})"></div></div>
+    <div class="toggle-row"><div><div class="tl">Require a deposit</div><div class="ts">Holds the seat, cuts no-shows</div></div><button type="button" class="sw ${r.depositRequired?'on':''}" role="switch" aria-checked="${r.depositRequired}" aria-label="Require a deposit" onclick="setRule('depositRequired',${!r.depositRequired})"></button></div>
     <div class="toggle-row"><div><div class="tl">Deposit amount</div></div><div class="stepper"><button onclick="bump('deposit',-5)">−</button><span class="val">$${r.deposit}</span><button onclick="bump('deposit',5)">+</button></div></div>
   </div>`;
 }
@@ -612,20 +614,20 @@ function studioServices(){
   return `<div class="stsec"><h4>Your menu</h4><div class="h-sub">Toggle a style off and it disappears from booking instantly.</div>
     ${state.services.map(s=>`<div class="st-svc"><span class="sdot" style="background:${s.color}"></span>
       <span class="sn">${s.name}<div class="sp">${durLabel(s.dur)} · from $${s.base}</div></span>
-      <div class="sw ${s.active?'on':''}" onclick="toggleSvc('${s.id}')"></div></div>`).join('')}
+      <button type="button" class="sw ${s.active?'on':''}" role="switch" aria-checked="${s.active}" aria-label="${s.name} active" onclick="toggleSvc('${s.id}')"></button></div>`).join('')}
   </div>
   <div class="stsec"><h4>Your team</h4><div class="h-sub">Who's taking bookings.</div>
     ${state.artists.map(a=>`<div class="st-svc"><span class="sdot" style="background:${a.color}"></span>
       <span class="sn">${a.name}<div class="sp">${a.spec}</div></span>
-      <div class="sw ${a.active?'on':''}" onclick="toggleArtist('${a.id}')"></div></div>`).join('')}
+      <button type="button" class="sw ${a.active?'on':''}" role="switch" aria-checked="${a.active}" aria-label="${a.name} active" onclick="toggleArtist('${a.id}')"></button></div>`).join('')}
   </div>`;
 }
 function studioPhotos(){
   const ids=Object.keys(state.portfolio);
   return `<div class="stsec"><h4>Portfolio</h4><div class="h-sub">Tap a photo to show/hide it on the style. In your live build this is fully custom — your real work, your colors.</div>`
     +ids.map(id=>`<div style="margin-bottom:14px"><div class="fieldlbl" style="margin:6px 0 8px">${svc(id).name}</div>
-      <div class="pgrid">${state.portfolio[id].map((p,i)=>`<div class="pc ${p.on?'':'hidden'}" style="background-image:url('${img(p.n)}')" onclick="togglePhoto('${id}',${i})"><span class="x">${p.on?'✓':'+'}</span></div>`).join('')}
-      <div class="pc" style="display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--muted);font-size:26px" onclick="toast('Fully custom build — your real before/afters live here')">＋</div></div></div>`).join('')
+      <div class="pgrid">${state.portfolio[id].map((p,i)=>`<button type="button" class="pc ${p.on?'':'hidden'}" style="background-image:url('${img(p.n)}')" aria-pressed="${p.on}" aria-label="${p.on?'Hide':'Show'} photo ${i+1} of ${svc(id).name}" onclick="togglePhoto('${id}',${i})"><span class="x">${p.on?'✓':'+'}</span></button>`).join('')}
+      <button type="button" class="pc" style="display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--muted);font-size:26px" aria-label="Add a photo" onclick="toast('Fully custom build — your real before/afters live here')">＋</button></div></div>`).join('')
     +`</div>`;
 }
 function studioRequests(){

@@ -294,7 +294,7 @@
   .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);}
   .reveal.in{opacity:1;transform:none;}
   nav ul a.active{color:var(--clay);}
-  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;} .strip span{animation:none;}}
   @media(max-width:900px){
     body{padding-bottom:80px;}
     .appbar{display:flex;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:300;justify-content:space-around;align-items:stretch;gap:4px;

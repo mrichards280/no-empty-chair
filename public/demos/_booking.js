@@ -75,8 +75,17 @@
     state.answers = {};
   }
 
-  function open() { state = blank(); render(); overlay.classList.add("open"); document.body.style.overflow = "hidden"; }
-  function close() { overlay.classList.remove("open"); document.body.style.overflow = ""; }
+  var returnFocusEl = null;
+  function open() {
+    returnFocusEl = document.activeElement;
+    state = blank(); render(); overlay.classList.add("open"); document.body.style.overflow = "hidden";
+    setTimeout(function () { var el = sheet.querySelector("button, input, [href]"); if (el) el.focus(); }, 0);
+  }
+  function close() {
+    overlay.classList.remove("open"); document.body.style.overflow = "";
+    var t = returnFocusEl;
+    setTimeout(function () { if (t && t !== document.body && t.focus && document.contains(t)) t.focus(); }, 0);
+  }
 
   function head() { return '<div class="nec-bk-head"><div class="nec-bk-brand">' + markImg(17) + " " + esc(CFG.brand || "Book") + '</div><button class="nec-bk-x" data-close aria-label="Close">&times;</button></div>'; }
   function signature() { return '<div class="nec-bk-fine">' + markImg(14) + " Booking flow designed by No Empty Chair</div>"; }
@@ -238,7 +247,19 @@
       r.readAsDataURL(f);
     });
   });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && overlay.classList.contains("open")) close(); });
+  document.addEventListener("keydown", function (e) {
+    if (!overlay.classList.contains("open")) return;
+    if (e.key === "Escape") { close(); return; }
+    if (e.key !== "Tab") return;
+    var focusable = Array.prototype.filter.call(
+      sheet.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'),
+      function (el) { return !el.disabled && el.offsetParent !== null; }
+    );
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   document.addEventListener("click", function (e) { var t = e.target.closest("[data-booking], a[href='#book'], a[href='#reserve'], a[href='#book-flow']"); if (!t) return; e.preventDefault(); open(); });
   window.NEC_openBooking = open;
 })();
