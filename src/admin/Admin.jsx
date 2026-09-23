@@ -239,7 +239,7 @@ export default function Admin() {
 const ADMIN_CSS = `
 .admin{font-family:'Inter',sans-serif;color:#413645;min-height:100vh;}
 .admin .loading{min-height:60vh;display:flex;align-items:center;justify-content:center;}
-.admin .logo{font-family:'Cinzel',serif;font-weight:600;color:#413645;letter-spacing:1px;}
+.admin .logo{display:block;font-family:'Cinzel',serif;font-weight:600;color:#413645;letter-spacing:1px;}
 .admin .logo span{color:#a85a76;}
 .admin .muted{color:#6e6172;font-size:13px;}
 .admin .err{color:#b5434f;font-size:13px;margin-top:6px;}
