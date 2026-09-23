@@ -131,12 +131,21 @@ const shows = {
 
 <script>
   // Minimal nav interactions for this subpage (the homepage ships its own).
+  // The mobile dropdown CSS is `nav.open .navlinks`, so the "open" class has
+  // to land on <nav> itself, not on the <ul> — toggling it on the wrong
+  // element left the hamburger button visually inert on this page.
+  const nav = document.querySelector("nav");
   const toggle = document.querySelector(".navtoggle");
-  const links = document.getElementById("primary-nav");
-  if (toggle && links) {
+  if (nav && toggle) {
     toggle.addEventListener("click", () => {
-      const open = links.classList.toggle("open");
+      const open = nav.classList.toggle("open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("click", (e) => {
+      if (!nav.contains(e.target)) {
+        nav.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
     });
   }
 </script>
