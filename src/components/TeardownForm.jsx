@@ -61,10 +61,11 @@ export default function TeardownForm() {
             <div className="tp-mark"><ChairMark size={52} /></div>
             <h1>Got it. You're on my desk.</h1>
             <p>
-              I'll confirm I received everything within a day, send you a simple payment link for the
-              <b> $200 investment</b>, and then get to work on your teardown — a short, honest video breaking
-              down the highest-impact changes to fill your chair. The $200 credits toward any package if you
-              decide to build.
+              I'll confirm I got everything within a day and send a simple payment link for the
+              <b> $200 investment</b>. Once that's paid, I'll follow up with the full questionnaire and how to
+              give me temporary access to your site and accounts — then I get to work on your teardown: a short,
+              honest video on the highest-impact changes to fill your chair. The $200 credits toward any package
+              if you decide to build.
             </p>
             <a href="/" className="btn">Back to the site</a>
           </div>
@@ -75,12 +76,14 @@ export default function TeardownForm() {
               <div className="eyebrow" style={{ color: "var(--rose)", letterSpacing: 3, textTransform: "uppercase", fontSize: 12, marginBottom: 14 }}>The $200 Glow-Up Teardown</div>
               <h1>Let's find what's costing you bookings.</h1>
               <p>
-                Fill this out — it takes about 5–7 minutes. I'll confirm I got it, send a payment link for the
-                <b> $200 investment</b> (it credits toward any package), then deliver a short video breaking down
-                the changes that'll move the needle first. The more you share, the sharper your teardown.
+                Start here — it takes about 5–7 minutes and gets me enough to send a payment link for the
+                <b> $200 investment</b> (it credits toward any package). Once that's settled, I'll send the full
+                deep-dive questionnaire plus how to add me as a collaborator on your site and accounts for 48–72
+                hours, so I can actually click through everything myself. Then you get a short, honest video on
+                exactly what's costing you bookings.
               </p>
               <p className="tp-cross" style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 10 }}>
-                Not ready to invest yet? Start free with a quick <a href="/discovery" style={{ color: "var(--rose)", fontWeight: 600, borderBottom: "1px solid rgba(168,90,118,.4)" }}>discovery chat →</a>
+                Not ready to invest yet? Start free with a quick <a href="/discovery" style={{ color: "var(--rose)", fontWeight: 600, borderBottom: "1px solid rgba(168,90,118,.4)" }}>15-minute discovery chat →</a>
               </p>
             </div>
 
