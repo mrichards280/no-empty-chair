@@ -46,10 +46,15 @@
   var i = 0, cur = null;
 
   function clearHl() { if (cur) { cur.classList.remove('nt-hl'); cur = null; } }
+  // Optional page-provided hook to close any modals the tour opened. Steps may
+  // carry an act() to open a modal/drive the UI (used by the bakery concept).
+  function runReset() { if (typeof window.NEC_TOUR_RESET === 'function') { try { window.NEC_TOUR_RESET(); } catch (e) {} } }
   function show(n) {
-    clearHl();
+    clearHl(); runReset();
     i = Math.max(0, Math.min(STEPS.length - 1, n));
-    var step = STEPS[i], target = step.sel && document.querySelector(step.sel);
+    var step = STEPS[i];
+    if (typeof step.act === 'function') { try { step.act(); } catch (e) {} }
+    var target = step.sel && document.querySelector(step.sel);
     if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); cur = target; setTimeout(function () { if (cur === target) target.classList.add('nt-hl'); }, 380); }
     elStep.textContent = 'Step ' + (i + 1) + ' of ' + STEPS.length;
     elTitle.textContent = step.t || ''; elDesc.textContent = step.d || '';
@@ -59,8 +64,8 @@
   }
   function resetPos() { card.style.left = ''; card.style.top = ''; card.style.bottom = ''; card.style.transform = ''; }
   function start() { resetPos(); bubble.classList.remove('show'); card.classList.add('show'); btn.style.display = 'none'; show(0); }
-  function end() { card.classList.remove('show'); bubble.classList.remove('show'); clearHl(); resetPos(); btn.style.display = ''; }
-  function minimize() { clearHl(); card.classList.remove('show'); bCount.textContent = (i + 1) + '/' + STEPS.length; bubble.classList.add('show'); }
+  function end() { card.classList.remove('show'); bubble.classList.remove('show'); clearHl(); runReset(); resetPos(); btn.style.display = ''; }
+  function minimize() { clearHl(); runReset(); card.classList.remove('show'); bCount.textContent = (i + 1) + '/' + STEPS.length; bubble.classList.add('show'); }
   function resume() { bubble.classList.remove('show'); card.classList.add('show'); show(i); }
 
   btn.addEventListener('click', start);

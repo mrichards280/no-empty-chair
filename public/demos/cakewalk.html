@@ -343,6 +343,74 @@ html.gate-locked #gate{display:flex}
 .gate-card button{margin-top:14px;width:100%;padding:14px;border:none;border-radius:14px;background:var(--cherry);color:#fff;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer}
 .gate-err{color:var(--cherry);font-size:13px;font-weight:600;min-height:16px;margin-top:10px}
 .gate-foot{margin-top:18px;font-size:11px;color:#a08d76}
+
+/* ---- enhanced tour (ported) ---- */
+/* No Empty Chair — shared guided-tour module (drop-in for every demo).
+   Opt in with window.NEC_TOUR = [{sel,t,d}, ...] and optional
+   window.NEC_TOUR_ACCENT. Box-shadow "spotlight" so it never fights the
+   demo's z-index. Card can be dragged, minimized to a bubble (pause), and
+   both the card and the bubble link back to the No Empty Chair homepage. */
+:root { --nt-accent: #e0a93a; --nt-home: https://noemptychair.co; }
+
+#necTourBtn {
+  position: fixed; right: 18px; bottom: 18px; z-index: 90;
+  background: var(--nt-accent); color: #fff; border: none; cursor: pointer;
+  font: 600 14px/1 system-ui, sans-serif; letter-spacing: .3px;
+  padding: 13px 20px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.28);
+}
+#necTourBtn:hover { filter: brightness(1.06); }
+
+.nt-hl {
+  position: relative; z-index: 998;
+  box-shadow: 0 0 0 4px var(--nt-accent), 0 0 0 9999px rgba(18,14,18,.66);
+  border-radius: 10px; transition: box-shadow .2s;
+}
+
+#necTourCard {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  z-index: 1000; width: min(430px, 92vw);
+  background: #fffdfb; color: #1c1620; border-radius: 18px;
+  padding: 14px 22px 16px; box-shadow: 0 22px 60px rgba(0,0,0,.45);
+  display: none; font-family: system-ui, -apple-system, sans-serif;
+}
+#necTourCard.show { display: block; }
+#necTourCard .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: grab; margin: -6px -8px 12px; padding: 8px 8px; border-bottom: 1px solid #efe9e2; touch-action: none; }
+#necTourCard.dragging .nt-top { cursor: grabbing; }
+#necTourCard .nt-move { display: inline-flex; align-items: center; gap: 6px; font: 600 11.5px/1 system-ui, sans-serif; letter-spacing: .03em; color: #9a8f9c; user-select: none; }
+#necTourCard .nt-min { background: #f0ebe4; border: 0; color: #4a424e; font: 700 12px/1 system-ui, sans-serif; cursor: pointer; padding: 8px 12px; border-radius: 999px; }
+#necTourCard .nt-min:hover { background: var(--nt-accent); color: #fff; }
+#necTourCard .nt-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+#necTourCard .nt-home { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .03em; color: var(--nt-accent); text-decoration: none; }
+#necTourCard .nt-home:hover { text-decoration: underline; }
+#necTourCard .nt-step { font: 700 11.5px/1 system-ui, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: var(--nt-accent); }
+#necTourCard .nt-title { font-size: 20px; font-weight: 800; margin: 6px 0 6px; line-height: 1.15; color: #1c1620; }
+#necTourCard .nt-desc { font-size: 14px; line-height: 1.5; color: #4a424e; margin: 0; }
+#necTourCard .nt-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
+#necTourCard .nt-nav button { font: 700 13.5px/1 system-ui, sans-serif; border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+#necTourCard .nt-back { background: #f0ebe4; color: #6a6270; }
+#necTourCard .nt-next { background: var(--nt-accent); color: #fff; }
+#necTourCard .nt-dots { display: flex; gap: 6px; }
+#necTourCard .nt-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e0d8cf; display: block; }
+#necTourCard .nt-dots i.on { background: var(--nt-accent); }
+#necTourCard .nt-skip { margin: 0; background: none; border: none; color: #9a8f9c; font-size: 12px; text-decoration: underline; cursor: pointer; }
+
+/* minimized bubble (also the "pause" state) */
+#necTourBubble {
+  position: fixed; right: 18px; bottom: 18px; z-index: 1000; display: none;
+  align-items: center; background: #fffdfb; border-radius: 999px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.34); overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+#necTourBubble.show { display: inline-flex; }
+#necTourBubble .nt-resume { display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; cursor: pointer; padding: 12px 15px; font: 600 13px/1 system-ui, sans-serif; color: #1c1620; }
+#necTourBubble .nt-resume b { color: var(--nt-accent); font-weight: 700; }
+#necTourBubble .nt-bhome { border: 0; border-left: 1px solid #eee7de; background: none; cursor: pointer; padding: 12px 14px; color: #9a8f9c; font-size: 16px; text-decoration: none; line-height: 1; }
+#necTourBubble .nt-bhome:hover { color: var(--nt-accent); }
+
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.tourbtn,#tourBtn,#tourCard,.tour{display:none!important}
+@media(max-width:760px){#necTourBtn{bottom:84px}}
 </style></head><body>
 <div id="gate"><div class="gate-card">
   <div class="gicon"><svg viewBox="0 0 1273 1609" width="46" height="58" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,1609) scale(0.1,-0.1)"><path fill="#413645" d="M4945 14836 c-27 -13 -96 -57 -152 -98 -526 -382 -967 -1091 -1302 -2093 -193 -581 -299 -1063 -363 -1660 -20 -187 -17 -863 5 -1090 57 -584 170 -1018 385 -1476 63 -136 136 -267 357 -644 232 -396 315 -548 416 -765 243 -522 402 -1022 470 -1475 32 -206 11 -1037 -37 -1465 -39 -360 -134 -700 -275 -985 -137 -279 -257 -390 -496 -461 -75 -23 -112 -27 -260 -31 -148 -5 -190 -2 -300 17 -167 29 -290 68 -438 140 -212 102 -348 204 -510 379 -209 227 -329 398 -354 505 -33 135 -126 220 -242 219 -86 -1 -153 -46 -190 -128 -26 -56 -23 -104 11 -207 85 -254 328 -620 552 -833 308 -293 722 -489 1164 -551 177 -24 480 -15 624 19 456 108 732 375 949 918 97 244 171 515 211 776 44 291 74 805 74 1273 0 380 -7 468 -59 725 -14 65 -22 122 -17 126 47 44 736 235 1222 339 614 131 896 155 1715 146 862 -9 1191 -31 1730 -111 490 -74 876 -196 1095 -345 85 -58 114 -93 106 -127 -16 -61 -120 -173 -316 -339 -261 -220 -415 -378 -557 -568 -267 -358 -526 -968 -584 -1376 -15 -111 -16 -400 0 -520 41 -319 117 -570 250 -835 163 -322 383 -588 653 -792 163 -123 344 -223 403 -223 41 1 113 35 152 72 42 40 67 116 59 174 -11 84 -26 100 -272 299 -125 101 -289 259 -364 350 -266 325 -421 766 -423 1210 -1 130 3 182 21 275 68 339 291 835 496 1105 91 120 261 291 451 454 398 341 505 498 505 742 0 144 -42 240 -158 357 -86 87 -169 146 -312 220 -341 178 -739 284 -1350 361 -426 54 -641 68 -1225 82 -808 19 -1245 4 -1660 -57 -451 -66 -1301 -269 -1650 -394 -128 -46 -123 -47 -152 35 -198 561 -352 879 -787 1618 -137 234 -237 418 -294 542 -249 545 -353 1137 -339 1925 6 322 22 500 72 795 130 760 414 1594 733 2155 174 307 305 474 598 765 251 250 261 266 251 356 -11 90 -67 159 -150 184 -67 20 -83 19 -142 -9z"/><path fill="#a85a76" d="M7055 12184 c-449 -79 -839 -276 -1164 -589 -320 -308 -538 -696 -650 -1152 -58 -237 -63 -302 -59 -657 5 -295 7 -332 31 -457 139 -717 537 -1329 1117 -1714 303 -202 587 -316 935 -375 151 -26 625 -29 770 -5 987 162 1735 946 1880 1969 21 146 20 652 -1 795 -69 468 -266 922 -561 1291 -88 110 -275 298 -383 384 -337 269 -702 435 -1114 507 -92 16 -156 19 -415 18 -215 -1 -330 -5 -386 -15z"/></g></svg></div>
@@ -692,63 +760,22 @@ b.addEventListener('click',chk);i.addEventListener('keydown',function(ev){if(ev.
   modal.querySelector('.modal-back').addEventListener('click',closeMenu);
   modal.querySelector('.menu-start').addEventListener('click',closeMenu);
 
-  /* ---- guided tour ---- */
-  var TOUR=[
-    {sel:'#startHere', s:'👋🏾 Start here', t:'Welcome to your concept', d:'This is a live concept of your new Cakewalk Bakeshop. Tap Next and I’ll actually open things up for you, about 90 seconds: the site, your menu, booking, and the back office where you run everything.'},
-    {sel:'.hero', s:'Step 1', t:'A homepage that gets found', d:'Your cool & fun brand, built so Google can actually read it. When couples search “custom cakes Atlanta,” you show up. That means more of the right people finding you, without posting any more than you already do.'},
-    {act:'menu', s:'Step 2', t:'Your menu, right here', d:'Here is your real pricing in a clean pop-up: wedding, single-tier, and treats. Clients see what things cost and start an order right from here, so you stop answering “how much?” in your DMs all day. Tap Next and I’ll close it back up.'},
-    {sel:'#book', s:'Step 3', t:'A booking path they understand', d:'Five simple steps show every client exactly what happens next. That means fewer confused messages, fewer no-shows, and people who show up ready to work with you.'},
-    {sel:'#inquire', s:'Step 4', t:'One form that does the work', d:'Clients pick the occasion, size, and date, add inspo links and photos one by one, and hit send. It lands in your inbox as a full brief, so the details never get lost in a DM thread.'},
-    {sel:'#hub', s:'Step 5', t:'The client’s side', d:'Once you accept, the client gets their own project page with design approvals, payments, tasting notes, and delivery. No more scrolling texts to find one answer. Now let me show you YOUR side.'},
-    {act:'inbox', s:'Step 6', t:'Your inbox', d:'This is your back office. Every inquiry lands here in New, so nothing gets buried. You have two waiting right now. Let’s open one.'},
-    {act:'brief', id:1, s:'Step 7', t:'Open the full brief', d:'One tap and the whole request opens: event, size, date, their vision in their own words, plus every inspo photo and link they attached. Everything you need to quote, in one place, instead of scrolling a DM thread.'},
-    {act:'messages', id:3, s:'Step 8', t:'Message before you commit', d:'On another request you can see the back-and-forth. Ask about flavors, florals, or timing right here and it stays attached to the brief. You only accept once it feels right, no awkward DMs.'},
-    {act:'cal', s:'Step 9', t:'A calendar that fills itself', d:'The moment you accept, tastings, bake days, deposits, and deliveries drop onto your calendar automatically. This is your month at a glance, so nothing slips through the cracks.'},
-    {sel:'#watch', s:'Step 10', t:'Your reels, doing the selling', d:'The content that already gets views sits right next to your booking button, quietly turning fans into inquiries while you sleep.'},
-    {sel:'.foot', s:'One last thing', t:'Made yours, down to the icons', d:'A quick note: the little emojis you see here are just placeholders. When we start, we design a custom icon set that is uniquely yours, and it is yours to keep forever. This whole concept is a starting point, and we build it around you from here.'}
+  /* ---- guided tour: shared enhanced engine (ported) ---- */
+  window.NEC_TOUR_ACCENT='#c4432f';
+  window.NEC_TOUR_HOME='https://noemptychair.co';
+  window.NEC_TOUR_RESET=function(){try{['menuModal','studioModal'].forEach(function(id){var m=document.getElementById(id);if(m)m.classList.remove('open','tourtop');});document.body.style.overflow='';}catch(e){}};
+  window.NEC_TOUR=[
+    {sel:'#startHere',t:'Welcome to your concept',d:'Tap through and I will open the whole thing up for you: your site, your menu, booking, and the back office where you run every order. About 60 seconds.'},
+    {sel:'.hero',t:'A homepage that gets found',d:'Your cool + fun brand up top, built so Google can actually read it, so the right clients find you without posting any more than you already do.'},
+    {act:function(){var b=document.querySelector('.menu-open');if(b)b.click();},t:'Your menu, in a pop-up',d:'Your real flavors and prices open right here. Clients see what things cost and start an order, instead of DMing you "how much?" all day.'},
+    {sel:'#book',t:'A booking path they understand',d:'A few simple steps show clients exactly what happens next, which means fewer confused messages and fewer no-shows.'},
+    {sel:'#inquire',t:'One form that does the work',d:'Occasion, size, date, inspo links and photos, all in one brief that lands in your inbox instead of a scattered DM thread.'},
+    {sel:'#hub',t:'One home for every order',d:'Once you accept, the client gets their own project page: approvals, payments, and a direct line to you. No more scrolling texts to find one answer.'},
+    {act:function(){var s=document.querySelector('.studio-open,.loginlink');if(s)s.click();var o=document.querySelector('.inq-open');if(o)o.click();},t:'Your back office',d:'This is your side. New inquiries arrive as full briefs so you can ask questions before you commit, then accept to open a project. Your calendar even fills itself. Click around, then hit Next.'},
+    {sel:'#watch',t:'Your reels, doing the selling',d:'The content that already gets views sits right next to your booking button, quietly turning fans into orders while you sleep.'},
+    {sel:'.foot',t:'Made yours, down to the icons',d:'The little icons here are placeholders. When we build for real, we design a custom icon set that is uniquely yours, and this whole concept becomes a starting point we build around you.'}
   ];
-  var tour=document.getElementById('tour'), card=document.getElementById('tourCard'), i=0, cur=null;
-  var elStep=card.querySelector('.tour-step'), elTitle=card.querySelector('.tour-title'), elDesc=card.querySelector('.tour-desc'), elDots=card.querySelector('.tour-dots');
-  var bBack=card.querySelector('.tour-back'), bNext=card.querySelector('.tour-next');
-  elDots.innerHTML=TOUR.map(function(){return '<i></i>';}).join('');
-  function setStab(t){studio.querySelectorAll('.stab').forEach(function(s){s.classList.toggle('on',s.dataset.tab===t);});}
-  function resetTourModal(){var st=document.getElementById('studioModal');if(st&&st.dataset.tourOpened==='1'){st.classList.remove('open','tourtop');st.dataset.tourOpened='';}if(modal&&modal.dataset.tourOpened==='1'){modal.classList.remove('open');modal.dataset.tourOpened='';}tour.classList.remove('clear');document.body.style.overflow='';}
-  function show(n){
-    if(cur){cur.classList.remove('tour-hl');cur=null;}
-    resetTourModal();
-    i=Math.max(0,Math.min(TOUR.length-1,n));
-    var step=TOUR[i];
-    if(step.act){
-      if(step.act==='menu'){modal.classList.add('open');modal.dataset.tourOpened='1';document.body.style.overflow='hidden';tour.classList.add('clear');}
-      else{var st=document.getElementById('studioModal');st.classList.add('open','tourtop');st.dataset.tourOpened='1';document.body.style.overflow='hidden';tour.classList.add('clear');
-        if(step.act==='inbox'){activeTab='new';setStab('new');showList();}
-        else if(step.act==='brief'){activeTab='new';setStab('new');showList();openDetail(step.id);}
-        else if(step.act==='messages'){activeTab='prog';setStab('prog');showList();openDetail(step.id);}
-        else if(step.act==='cal'){activeTab='cal';setStab('cal');showList();}
-      }
-    }
-    else if(step.sel){var target=document.querySelector(step.sel);cur=target;if(target){target.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){if(cur===target)target.classList.add('tour-hl');},430);}}
-    elStep.textContent=step.s; elTitle.textContent=step.t; elDesc.textContent=step.d;
-    elDots.querySelectorAll('i').forEach(function(d,k){d.classList.toggle('on',k===i);});
-    bBack.style.visibility=i===0?'hidden':'visible';
-    bNext.textContent=i===TOUR.length-1?'Finish ✓':'Next →';
-  }
-  function resetCardPos(){card.style.left='';card.style.top='';card.style.bottom='';card.style.transform='';}
-  (function(){var grip=card.querySelector('.tour-grip');if(!grip)return;var dx=0,dy=0,drag=false;
-    function down(e){drag=true;var r=card.getBoundingClientRect();var p=e.touches?e.touches[0]:e;dx=p.clientX-r.left;dy=p.clientY-r.top;card.style.left=r.left+'px';card.style.top=r.top+'px';card.style.bottom='auto';card.style.transform='none';card.classList.add('dragging');e.preventDefault();}
-    function move(e){if(!drag)return;var p=e.touches?e.touches[0]:e;var x=p.clientX-dx,y=p.clientY-dy;x=Math.max(6,Math.min(window.innerWidth-card.offsetWidth-6,x));y=Math.max(6,Math.min(window.innerHeight-card.offsetHeight-6,y));card.style.left=x+'px';card.style.top=y+'px';if(e.cancelable)e.preventDefault();}
-    function up(){drag=false;card.classList.remove('dragging');}
-    grip.addEventListener('mousedown',down);document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
-    grip.addEventListener('touchstart',down,{passive:false});document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',up);
-  })();
-  function startTour(){closeMenu();resetCardPos();tour.classList.add('open');card.classList.add('show');show(0);}
-  function endTour(){tour.classList.remove('open','clear');card.classList.remove('show');resetCardPos();if(cur){cur.classList.remove('tour-hl');cur=null;}var st=document.getElementById('studioModal');if(st&&st.dataset.tourOpened==='1'){st.classList.remove('open','tourtop');st.dataset.tourOpened='';}if(modal&&modal.dataset.tourOpened==='1'){modal.classList.remove('open');modal.dataset.tourOpened='';}document.body.style.overflow='';}
-  document.getElementById('tourBtn').addEventListener('click',startTour);
-  var sh=document.getElementById('startHere'); if(sh)sh.addEventListener('click',startTour);
-  bNext.addEventListener('click',function(){if(i===TOUR.length-1)endTour();else show(i+1);});
-  bBack.addEventListener('click',function(){show(i-1);});
-  card.querySelector('.tour-close').addEventListener('click',endTour);
-
+  var _sh=document.getElementById('startHere');if(_sh)_sh.addEventListener('click',function(){var b=document.getElementById('necTourBtn');if(b)b.click();});
   /* ---- toast ---- */
   var toastEl=document.getElementById('toast'), toastT;
   function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2600);}
@@ -801,5 +828,114 @@ b.addEventListener('click',chk);i.addEventListener('keydown',function(ev){if(ev.
 
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeMenu();closeStudio();endTour();}});
 })();
+</script>
+<script>
+/* No Empty Chair — shared guided-tour engine.
+   Opt in per page:
+     window.NEC_TOUR_ACCENT = '#c25b3a';            // optional accent
+     window.NEC_TOUR_HOME   = 'https://noemptychair.co'; // optional
+     window.NEC_TOUR = [{ sel:'.hero', t:'Title', d:'One line.' }, ...];
+   Then include with `defer`. Card can be dragged, minimized to a bubble
+   (pause), and both card + bubble link back to the No Empty Chair homepage. */
+(function () {
+  var STEPS = window.NEC_TOUR;
+  if (!STEPS || !STEPS.length) return;
+  var accent = window.NEC_TOUR_ACCENT || '#e0a93a';
+  var HOME = window.NEC_TOUR_HOME || 'https://noemptychair.co';
+  document.documentElement.style.setProperty('--nt-accent', accent);
+
+  var btn = document.createElement('button');
+  btn.id = 'necTourBtn'; btn.type = 'button'; btn.textContent = '✨ Take the tour';
+  document.body.appendChild(btn);
+
+  var card = document.createElement('div');
+  card.id = 'necTourCard';
+  card.innerHTML =
+    '<div class="nt-top"><span class="nt-move" title="Drag to move this box">⠿⠿ Drag to move</span>' +
+    '<button class="nt-min" type="button" title="Minimize" aria-label="Minimize tour">– Minimize</button></div>' +
+    '<div class="nt-step"></div><h4 class="nt-title"></h4><p class="nt-desc"></p>' +
+    '<div class="nt-nav"><button class="nt-back" type="button">← Back</button>' +
+    '<div class="nt-dots"></div><button class="nt-next" type="button">Next →</button></div>' +
+    '<div class="nt-foot"><button class="nt-skip" type="button">End tour</button>' +
+    '<a class="nt-home" href="' + HOME + '" target="_blank" rel="noopener">✦ No Empty Chair ↗</a></div>';
+  document.body.appendChild(card);
+
+  var bubble = document.createElement('div');
+  bubble.id = 'necTourBubble';
+  bubble.innerHTML =
+    '<button class="nt-resume" type="button">✨ Resume tour <b></b></button>' +
+    '<a class="nt-bhome" href="' + HOME + '" target="_blank" rel="noopener" title="No Empty Chair">⌂</a>';
+  document.body.appendChild(bubble);
+
+  var elStep = card.querySelector('.nt-step'), elTitle = card.querySelector('.nt-title'),
+      elDesc = card.querySelector('.nt-desc'), elDots = card.querySelector('.nt-dots'),
+      bBack = card.querySelector('.nt-back'), bNext = card.querySelector('.nt-next'),
+      bSkip = card.querySelector('.nt-skip'), bMin = card.querySelector('.nt-min'),
+      bResume = bubble.querySelector('.nt-resume'), bCount = bubble.querySelector('.nt-resume b');
+
+  elDots.innerHTML = STEPS.map(function () { return '<i></i>'; }).join('');
+  var dots = elDots.querySelectorAll('i');
+  var i = 0, cur = null;
+
+  function clearHl() { if (cur) { cur.classList.remove('nt-hl'); cur = null; } }
+  // Optional page-provided hook to close any modals the tour opened. Steps may
+  // carry an act() to open a modal/drive the UI (used by the bakery concept).
+  function runReset() { if (typeof window.NEC_TOUR_RESET === 'function') { try { window.NEC_TOUR_RESET(); } catch (e) {} } }
+  function show(n) {
+    clearHl(); runReset();
+    i = Math.max(0, Math.min(STEPS.length - 1, n));
+    var step = STEPS[i];
+    if (typeof step.act === 'function') { try { step.act(); } catch (e) {} }
+    var target = step.sel && document.querySelector(step.sel);
+    if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); cur = target; setTimeout(function () { if (cur === target) target.classList.add('nt-hl'); }, 380); }
+    elStep.textContent = 'Step ' + (i + 1) + ' of ' + STEPS.length;
+    elTitle.textContent = step.t || ''; elDesc.textContent = step.d || '';
+    dots.forEach(function (d, k) { d.classList.toggle('on', k === i); });
+    bBack.style.visibility = i === 0 ? 'hidden' : 'visible';
+    bNext.textContent = i === STEPS.length - 1 ? 'Finish ✓' : 'Next →';
+  }
+  function resetPos() { card.style.left = ''; card.style.top = ''; card.style.bottom = ''; card.style.transform = ''; }
+  function start() { resetPos(); bubble.classList.remove('show'); card.classList.add('show'); btn.style.display = 'none'; show(0); }
+  function end() { card.classList.remove('show'); bubble.classList.remove('show'); clearHl(); runReset(); resetPos(); btn.style.display = ''; }
+  function minimize() { clearHl(); runReset(); card.classList.remove('show'); bCount.textContent = (i + 1) + '/' + STEPS.length; bubble.classList.add('show'); }
+  function resume() { bubble.classList.remove('show'); card.classList.add('show'); show(i); }
+
+  btn.addEventListener('click', start);
+  bNext.addEventListener('click', function () { if (i === STEPS.length - 1) end(); else show(i + 1); });
+  bBack.addEventListener('click', function () { show(i - 1); });
+  bSkip.addEventListener('click', end);
+  bMin.addEventListener('click', minimize);
+  bResume.addEventListener('click', resume);
+  document.addEventListener('keydown', function (e) {
+    if (!card.classList.contains('show')) return;
+    if (e.key === 'Escape') minimize();
+    else if (e.key === 'ArrowRight' && i < STEPS.length - 1) show(i + 1);
+    else if (e.key === 'ArrowLeft' && i > 0) show(i - 1);
+  });
+
+  // Drag via the top bar or the grip (mouse + touch).
+  (function () {
+    var handles = [card.querySelector('.nt-top')], dx = 0, dy = 0, drag = false;
+    function down(e) {
+      if (e.target.closest('.nt-min') || e.target.closest('.nt-home')) return;
+      drag = true; var r = card.getBoundingClientRect(); var p = e.touches ? e.touches[0] : e;
+      dx = p.clientX - r.left; dy = p.clientY - r.top;
+      card.style.left = r.left + 'px'; card.style.top = r.top + 'px'; card.style.bottom = 'auto'; card.style.transform = 'none';
+      card.classList.add('dragging'); if (e.cancelable) e.preventDefault();
+    }
+    function move(e) {
+      if (!drag) return; var p = e.touches ? e.touches[0] : e;
+      var x = p.clientX - dx, y = p.clientY - dy;
+      x = Math.max(6, Math.min(window.innerWidth - card.offsetWidth - 6, x));
+      y = Math.max(6, Math.min(window.innerHeight - card.offsetHeight - 6, y));
+      card.style.left = x + 'px'; card.style.top = y + 'px'; if (e.cancelable) e.preventDefault();
+    }
+    function up() { drag = false; card.classList.remove('dragging'); }
+    handles.forEach(function (h) { h.addEventListener('mousedown', down); h.addEventListener('touchstart', down, { passive: false }); });
+    document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false }); document.addEventListener('touchend', up);
+  })();
+})();
+
 </script>
 </body></html>
