@@ -6,7 +6,10 @@
 */
 (function () {
   var KEY = "nec_layout_" + location.pathname;
-  var applyLocal = /[?&]edit\b/.test(location.search); // in-progress drags only apply while editing
+  // The Arrange toolbar is admin-only: it requires BOTH ?edit AND the admin flag
+  // that /admin sets after sign-in. A random visitor adding ?edit gets nothing.
+  var isAdmin = false; try { isAdmin = localStorage.getItem("nec-admin-edit") === "1"; } catch (e) {}
+  var applyLocal = isAdmin && /[?&]edit\b/.test(location.search); // in-progress drags only apply while editing
   var store = {};
   // a baked-in layout applies for everyone (the clean/even, approved arrangement)
   if (window.NEC_BAKED_LAYOUT) { try { store = JSON.parse(JSON.stringify(window.NEC_BAKED_LAYOUT)); } catch (e) {} }
