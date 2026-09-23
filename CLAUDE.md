@@ -48,3 +48,45 @@ services *with visible prices* → book-24/7 → process → reels → reviews �
 transparent pricing → final CTA. New salon concepts should follow this vocabulary
 in a distinct world. Concept mockups: emojis/icons are placeholders; the real
 build includes a custom icon set designed with the client, theirs to keep.
+
+**Guided-tour features (shared engine):** the tour card can be dragged (by the
+top bar or grip), **minimized to a bubble** (this is the pause — collapse it, use
+the page, resume at the same step), and both the card and the bubble link to the
+No Empty Chair homepage. Arrow keys navigate; Esc minimizes. The engine lives in
+`public/demos/_tour.css` + `_tour.js`; standalone concept previews (Hair Loft,
+Cakewalk) inline those same shared files at build time so there is one source of
+truth. Give each page its own accent via `window.NEC_TOUR_ACCENT`.
+
+**On-page copy vs the tour:** the visible page always speaks **brand → customer**
+(client-facing). The "here's what this does for your business / how it helps you"
+explanation belongs in the **tour steps**, never in the page copy. The only
+NEC-facing element on a page is the demo band / concept banner at the very top.
+
+**Booking UX matches the business:** a salon books by **appointment** — a modal
+that pops open over the page (never an inline section you scroll to): service
+(with photos) → stylist → date → time → confirm + deposit. A barber "orders like
+a menu" (build-a-check). Don't reuse the barber check flow for a salon.
+
+**Concept banner:** concept previews carry the NEC chair-mark logo in the top
+concept/demo band (not just text).
+
+**Concept vs public demo:** a prospect concept preview stays watermarked +
+disclaimed and password-gated (optionally hosted gated, e.g. Hair Loft). A public
+gallery demo (KNOT, Cakewalk) is open, un-gated, and listed in `content.json`
+`demos.items`. Cakewalk was made by genericizing the Sweet Pea concept (fictional
+brand, licensed stock photos, gate removed) — see `build_bakery_demo.py`.
+
+**Admin security:** `/admin` is behind a Netlify **edge function** Basic-Auth
+wall (`netlify/edge-functions/admin-gate.js`, checks `ADMIN_PASSWORD`, fails
+closed). The Arrange tool (`_tinker.js`) is **admin-only** (requires the
+`nec-admin-edit` localStorage flag set after admin sign-in) and is client-only —
+it never writes to the server. Real content saves go through
+`netlify/functions/save-content.cjs`, which validates `ADMIN_PASSWORD` and uses a
+`GITHUB_TOKEN` — both **env vars, never in this public repo**. Never hardcode
+those secrets.
+
+**CMS reality:** today's `/admin` is a content-field editor (edits
+`content.json` → commits to GitHub → redeploys) plus a client-only Arrange
+helper. A true visual page-builder (drag blocks on a grid, resize, mixed content
+types) is a separate project — the right fit is a git-based block editor like
+**Puck** or **TinaCMS**, not extending the Arrange tool.
