@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Admin from "../admin/Admin.jsx";
 ---
-<Base title="Admin · No Empty Chair">
+<Base title="Admin · No Empty Chair" noindex={true}>
   <main id="main" class="admin-main">
   <script is:inline>try{localStorage.setItem("nec-admin-edit","1");}catch(e){}</script>
   <div class="arrange-launch" style="max-width:900px;margin:0 auto 18px;padding:14px 18px;background:#f4efea;border:1px solid #e4ddd2;border-radius:14px;font-family:system-ui,-apple-system,sans-serif;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
