@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Tenor+Sans&family=Mulish:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Marcellus&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/demos/_booking.css">
+<link rel="stylesheet" href="/demos/_tour.css">
 <style>
   :root{
     --bg:#e8ebe2; --bg2:#dfe3d8; --white:#f4f6f0;
@@ -378,5 +379,16 @@
 </script>
 <script src="/demos/_booking.js" defer></script>
 <script src="/demos/_tinker.js" defer></script>
+<script>
+  window.NEC_TOUR_ACCENT = '#7f9075';
+  window.NEC_TOUR = [
+    { sel: '.hero', t: 'A calm that reads high-end', d: 'The moment someone lands, the spa feels serene and premium, so clients trust it before they book.' },
+    { sel: '#treatments', t: 'Treatments with clear pricing', d: 'Every treatment shows what it costs and books in a tap, so inquiries arrive ready instead of asking "how much?"' },
+    { sel: '#memberships', t: 'Recurring revenue, built in', d: 'A simple membership turns one-time guests into monthly regulars, the calmest way to keep the calendar full.' },
+    { sel: '#reserve', t: 'One clear place to reserve', d: 'Every path leads to one booking flow, so a browser becomes a booked appointment.' },
+    { sel: '#visit', t: 'Easy to find, easy to trust', d: 'Hours and location up front remove the last bit of friction. This is a concept, your real build is designed around you, down to a custom icon set that is yours to keep.' }
+  ];
+</script>
+<script src="/demos/_tour.js" defer></script>
 </body>
 </html>

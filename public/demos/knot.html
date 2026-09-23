@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/demos/_booking.css">
+<link rel="stylesheet" href="/demos/_tour.css">
 <style>
   :root{
     --bg:#ece7df; --ink:#131311; --card:#f7f4ee; --white:#fff;
@@ -379,5 +380,17 @@
 </script>
 <script src="/demos/_booking.js" defer></script>
 <script src="/demos/_tinker.js" defer></script>
+<script>
+  window.NEC_TOUR_ACCENT = '#c25b3a';
+  window.NEC_TOUR = [
+    { sel: '.hero', t: 'A homepage that gets found', d: 'Your brand up top, built so Google can actually read it, so the right clients find you without posting any more than you already do.' },
+    { sel: '#services', t: 'Styles with real prices', d: 'Every style shows a starting price and books in one tap. You stop answering "how much?" in your DMs all day.' },
+    { sel: '#process', t: 'A booking path they understand', d: 'Simple steps show clients exactly what happens next, which means fewer confused messages and fewer no-shows.' },
+    { sel: '.reelrow', t: 'Your reels, doing the selling', d: 'The content that already gets views sits right next to your booking button, quietly turning viewers into appointments.' },
+    { sel: '#reviews', t: 'Proof, front and center', d: 'Your real reviews build instant trust the moment someone lands, instead of living on Yelp where new clients never look.' },
+    { sel: '#book', t: 'One clear place to book', d: 'Every path on the page leads here, so a browser becomes a booked chair. This is a concept, your real build is designed around you, down to a custom icon set that is yours to keep.' }
+  ];
+</script>
+<script src="/demos/_tour.js" defer></script>
 </body>
 </html>

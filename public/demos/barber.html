@@ -194,6 +194,7 @@
   .cal a{font-family:'Space Mono',monospace;font-size:12px;border:2px solid var(--ink);border-radius:100px;padding:8px 14px;}
   .cal a:hover{background:var(--ink);color:var(--paper);}
 </style>
+<link rel="stylesheet" href="/demos/_tour.css">
 </head>
 <body>
 <div class="demo-band">
@@ -486,5 +487,15 @@
   render();
 })();
 </script>
+<script>
+  window.NEC_TOUR_ACCENT = '#b3271e';
+  window.NEC_TOUR = [
+    { sel: '.hero', t: 'A shop that feels like your chair', d: 'Bold, clean, and built so Google can find you, so the right clients walk in without you posting more than you already do.' },
+    { sel: '#menu', t: 'Order a cut like a menu', d: 'Clients build their service like a check: add a cut, a lineup, a beard. No back-and-forth about what you offer or what it costs.' },
+    { sel: '#peek', t: 'Watch it total in real time', d: 'The running ticket adds up as they pick, so there are zero surprises at the chair and no awkward price talk.' },
+    { sel: '#barbers', t: 'Pick your barber, book the slot', d: 'Clients choose who they want and lock a time, so a browser becomes a booked chair. This is a concept, your real build is designed around you, down to a custom icon set that is yours to keep.' }
+  ];
+</script>
+<script src="/demos/_tour.js" defer></script>
 </body>
 </html>
