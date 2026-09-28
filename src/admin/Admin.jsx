@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useContent, verifyPassword, saveContent } from "../hooks/useContent";
+import { useSchedule, saveSchedule } from "../hooks/useSchedule";
 import { uploadImage, cloudinaryConfigured } from "../lib/cloudinary";
+import SocialCalendar, { SOCIAL_CSS } from "./SocialComposer";
 
 /* ---------- immutable helpers ---------- */
 function clone(v) {
@@ -160,11 +162,13 @@ function Value({ keyName, value, onChange }) {
 /* ---------- main admin ---------- */
 export default function Admin() {
   const { content, setContent, loading } = useContent();
+  const { schedule, setSchedule, loading: schedLoading } = useSchedule();
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
   const [authErr, setAuthErr] = useState("");
   const [status, setStatus] = useState("");
   const [open, setOpen] = useState({});
+  const [tab, setTab] = useState("content");
 
   const login = async (e) => {
     e.preventDefault();
@@ -201,18 +205,30 @@ export default function Admin() {
             {authErr ? <div className="err" role="status" aria-live="polite">{authErr}</div> : null}
           </form>
         </div>
-      ) : loading || !content ? (
-        <div className="loading">Loading content…</div>
       ) : (
         <div className="editor">
           <div className="topbar">
             <div className="logo">No Empty <span>Chair</span> · Editor</div>
+            <div className="tabs">
+              <button type="button" className={`tabbtn${tab === "content" ? " active" : ""}`} onClick={() => setTab("content")}>Site content</button>
+              <button type="button" className={`tabbtn${tab === "social" ? " active" : ""}`} onClick={() => setTab("social")}>Social calendar</button>
+            </div>
             <div className="topactions">
               <a href="/" target="_blank" rel="noopener noreferrer" className="mini">View site</a>
-              <button className="save" onClick={save}>Save &amp; Deploy</button>
+              {tab === "content" ? <button className="save" onClick={save}>Save &amp; Deploy</button> : null}
             </div>
           </div>
-          {status ? <div className="statusbar">{status}</div> : null}
+          {tab === "content" && status ? <div className="statusbar">{status}</div> : null}
+
+          {tab === "social" ? (
+            schedLoading || !schedule ? (
+              <div className="loading">Loading social calendar…</div>
+            ) : (
+              <SocialCalendar schedule={schedule} setSchedule={setSchedule} onSave={() => saveSchedule(password, schedule)} />
+            )
+          ) : loading || !content ? (
+            <div className="loading">Loading content…</div>
+          ) : (
           <div className="sections">
             {Object.keys(content).map((key) => (
               <div className="section" key={key}>
@@ -228,11 +244,15 @@ export default function Admin() {
               </div>
             ))}
           </div>
+          )}
+          {tab === "content" && content ? (
           <div className="footersave">
             <button className="save" onClick={save}>Save &amp; Deploy</button>
           </div>
+          ) : null}
         </div>
       )}
+      <style>{SOCIAL_CSS}</style>
     </div>
   );
 }
@@ -250,10 +270,14 @@ const ADMIN_CSS = `
 .admin input,.admin textarea{width:100%;padding:11px 13px;border:1px solid #e6ddec;border-radius:10px;font-family:inherit;font-size:14px;background:#fffdfb;color:#413645;}
 .admin textarea{min-height:80px;resize:vertical;}
 .save{background:#a85a76;color:#fff;border:none;padding:12px 22px;border-radius:100px;font-weight:600;font-size:14px;cursor:pointer;}
+.save:disabled{opacity:.45;cursor:not-allowed;}
 .save:hover{background:#8a4560;}
 .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(244,239,234,.9);backdrop-filter:blur(12px);border-bottom:1px solid #e6ddec;}
 .topbar .logo{font-size:18px;}
 .topactions{display:flex;gap:12px;align-items:center;}
+.tabs{display:flex;gap:6px;}
+.tabbtn{background:none;border:1px solid transparent;padding:8px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.tabbtn.active{background:#efe8f2;color:#8a4560;border-color:#e2d6ea;}
 .statusbar{background:#efe8f2;color:#8a4560;padding:10px 24px;font-size:14px;}
 .sections{max-width:820px;margin:24px auto;padding:0 20px;display:grid;gap:12px;}
 .section{border:1px solid #e6ddec;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.6);}

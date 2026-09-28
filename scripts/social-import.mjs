@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Import a content calendar into social/schedule.json and copy its media into
+// Import a content calendar into public/social/schedule.json and copy its media into
 // public/social/media (PNG/WebP/HEIC images are converted to JPEG for Instagram).
 //
 //   npm run social:import -- <calendar.csv|calendar.json> [--media <folder>] [--replace] [--ready]
-//   npm run social:check     (validate social/schedule.json only)
+//   npm run social:check     (validate public/social/schedule.json only)
 //
 // CSV columns (header row, any order, case-insensitive):
 //   date        2026-10-05            (Eastern time is assumed)
@@ -28,7 +28,7 @@ import { fileURLToPath } from "node:url";
 import { validateSchedule } from "../netlify/lib/social-publisher.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SCHEDULE = path.join(ROOT, "social/schedule.json");
+const SCHEDULE = path.join(ROOT, "public/social/schedule.json");
 const MEDIA_DIR = path.join(ROOT, "public/social/media");
 
 const args = process.argv.slice(2);
@@ -70,7 +70,7 @@ for (const r of rows) {
 
 const next = { ...current, posts: [...byId.values()].sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at)) };
 fs.writeFileSync(SCHEDULE, JSON.stringify(next, null, 2) + "\n");
-console.log(`Wrote ${rows.length} post(s) to social/schedule.json (${next.posts.length} total).`);
+console.log(`Wrote ${rows.length} post(s) to public/social/schedule.json (${next.posts.length} total).`);
 report(next);
 
 // ------------------------------------------------------------------ helpers

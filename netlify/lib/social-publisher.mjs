@@ -1,4 +1,4 @@
-// Social publisher core: reads social/schedule.json and publishes due posts to
+// Social publisher core: reads public/social/schedule.json and publishes due posts to
 // the No Empty Chair Instagram account and Facebook Page through Meta's Graph API.
 //
 // Used by:
@@ -17,14 +17,21 @@
 //   RESEND_API_KEY            optional, reused from lead-notify for failure emails
 //   SOCIAL_MEDIA_BASE         optional, default `${URL}/social/media`
 
+// A post with manual_only: true is never auto-published, regardless of status
+// or publish_at. It exists to hold a Story's caption/media as a reference while
+// you add interactive elements (polls, stickers, quizzes, music) yourself in the
+// Instagram/Facebook app — the Graph API cannot attach those, so any Story that
+// needs them has to go out by hand.
 export const TYPES = ["image", "carousel", "reel", "story"];
 export const PLATFORMS = ["instagram", "facebook"];
 const IMAGE_EXT = /\.(jpe?g)(\?|#|$)/i;
 const ANY_IMAGE_EXT = /\.(jpe?g|png|webp|gif|heic)(\?|#|$)/i;
 const VIDEO_EXT = /\.(mp4|mov)(\?|#|$)/i;
 
+// Safe in the browser too (no `process` global there) so the admin composer
+// can import validatePost/validateSchedule directly instead of duplicating them.
 const env = (k, d) => {
-  const v = (globalThis.Netlify?.env?.get?.(k) ?? process.env[k]);
+  const v = (globalThis.Netlify?.env?.get?.(k) ?? (typeof process !== "undefined" ? process.env[k] : undefined));
   return v === undefined || v === "" ? d : v;
 };
 
@@ -64,6 +71,7 @@ export function validatePost(p, cfg = config()) {
   const media = Array.isArray(p.media) ? p.media : [];
   if (!media.length) errs.push("media is empty");
   if (!["ready", "draft", "paused"].includes(p.status || "draft")) errs.push("status must be ready, draft, or paused");
+  if (p.manual_only !== undefined && typeof p.manual_only !== "boolean") errs.push("manual_only must be true or false");
 
   const imgs = media.filter((m) => !isVideo(m));
   const vids = media.filter(isVideo);
@@ -305,6 +313,7 @@ export async function runTick({ schedule, store, now = Date.now(), graph, cfg = 
     const bad = new Set(problems.map((p) => p.id));
     for (const post of posts) {
       if (onlyId && post.id !== onlyId) continue;
+      if (post.manual_only) { if (dryRun) report.waiting.push({ id: post.id, manual: true }); continue; }
       if ((post.status || "draft") !== "ready") continue;
       const at = Date.parse(post.publish_at);
       if (at > now) continue;

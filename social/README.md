@@ -1,6 +1,6 @@
 # Social publisher (Instagram + Facebook)
 
-Posts from `social/schedule.json` go out automatically to @noemptychair and the
+Posts from `public/social/schedule.json` go out automatically to @noemptychair and the
 No Empty Chair Facebook Page. A Netlify scheduled function checks every 10
 minutes and publishes anything that is due. Supports single images, carousels
 (2 to 10 items), Reels, and Stories on both platforms.

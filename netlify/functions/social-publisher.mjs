@@ -1,7 +1,7 @@
 // Scheduled: every 10 minutes, publish any social posts that are due.
 // Paused unless SOCIAL_PUBLISHER_ENABLED=true. See social/README.md.
 import { getStore } from "@netlify/blobs";
-import schedule from "../../social/schedule.json" with { type: "json" };
+import schedule from "../../public/social/schedule.json" with { type: "json" };
 import { runTick, makeGraph, config as readConfig } from "../lib/social-publisher.mjs";
 
 export default async () => {

@@ -3,10 +3,12 @@
   publish = "dist"
   functions = "netlify/functions"
 
-# Social publisher: bundle with esbuild so social/schedule.json and netlify/lib are baked in.
+# Social publisher: bundle with esbuild so public/social/schedule.json and netlify/lib are baked in.
 [functions."social-publisher"]
   node_bundler = "esbuild"
 [functions."social-admin"]
+  node_bundler = "esbuild"
+[functions."save-schedule"]
   node_bundler = "esbuild"
 
 [build.environment]

@@ -31,3 +31,27 @@ export async function uploadImage(file) {
   }
   return data.secure_url;
 }
+
+// Image OR video, auto-detected by Cloudinary — for social media attachments
+// (Reels/video Stories need video; everything else is a photo). Needs the same
+// unsigned preset to allow the "video" resource type (on by default unless the
+// preset was restricted to images only in the Cloudinary dashboard).
+export async function uploadMedia(file) {
+  if (!cloudinaryConfigured()) {
+    throw new Error(
+      "Cloudinary is not configured. Add PUBLIC_CLOUDINARY_CLOUD_NAME and PUBLIC_CLOUDINARY_UPLOAD_PRESET."
+    );
+  }
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", UPLOAD_PRESET);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+    { method: "POST", body: form }
+  );
+  const data = await res.json();
+  if (!res.ok || !data.secure_url) {
+    throw new Error(data.error?.message || "Upload failed");
+  }
+  return { url: data.secure_url, isVideo: data.resource_type === "video" };
+}
