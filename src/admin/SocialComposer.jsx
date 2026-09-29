@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { uploadImage, uploadMedia, cloudinaryConfigured } from "../lib/cloudinary";
 import { TYPES, PLATFORMS, validatePost } from "../../netlify/lib/social-publisher.mjs";
+import { useHashtags, saveHashtags } from "../hooks/useHashtags";
 
 /* ---------- Eastern-time date/time <-> ISO helpers (mirrors scripts/social-import.mjs) ---------- */
 function tzOffsetMin(utcMs) {
@@ -34,6 +35,16 @@ function isoToEasternParts(iso) {
 function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80); }
 const isVideoUrl = (u) => /\.(mp4|mov)(\?|#|$)/i.test(u);
 const fmt = (iso) => { const t = Date.parse(iso); return Number.isNaN(t) ? "—" : new Date(t).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+function timeAgo(iso) {
+  const ms = Date.now() - Date.parse(iso);
+  if (!Number.isFinite(ms) || ms < 0) return "";
+  const mins = Math.round(ms / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.round(hrs / 24)}d ago`;
+}
+const TYPE_ICON = { image: "🖼️", carousel: "🔲", reel: "🎬", story: "📖" };
 
 const MEDIA_HINT = {
   image: "Exactly 1 photo.",
@@ -117,7 +128,7 @@ function MediaPicker({ media, onChange }) {
 }
 
 /* ---------- the composer modal ---------- */
-function PostModal({ post, onSave, onClose }) {
+function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHashtagSet }) {
   const [p, setP] = useState(post);
   const [showFbCaption, setShowFbCaption] = useState(!!post.caption_facebook);
   const { date, time } = isoToEasternParts(p.publish_at);
@@ -178,28 +189,22 @@ function PostModal({ post, onSave, onClose }) {
             </div>
           </div>
 
-          {p.type === "story" ? (
-            <div className="tip">
-              📌 Stories posted through the API are photo/video only — Instagram and Facebook don't let automation
-              attach polls, quizzes, sliders, countdowns, or music. If this Story needs any of those, turn on
-              <b> "Needs manual posting"</b> below: it'll stay saved here with your caption and media as a
-              reference, but the auto-poster will always skip it. Add the stickers and post it yourself in the app
-              when it's ready.
-            </div>
-          ) : null}
-
-          {p.type === "reel" ? (
-            <div className="tip">
-              🎵 There's no API access to Meta's trending-sound library — the auto-poster can't "attach" a trending
-              audio the way the app does when you browse sounds and tap one. Two ways to actually use one:
-              <br />• <b>Just want the sound playing:</b> add it to the video yourself (in the Instagram/CapCut
-              editor, whatever you use) and upload the finished export here — a baked-in audio track posts
-              automatically like any other Reel, no manual step needed.
-              <br />• <b>Want the official "using sound ___" tag</b> (for that sound's own discovery/trending
-              reach): that credit only happens if you pick the sound inside the app itself, so turn on
-              <b> "Needs manual posting"</b> below and post this one by hand when you're ready.
-            </div>
-          ) : null}
+          <div className="tip">
+            🖐 <b>Not everything Meta lets you do in-app is available through automation</b> — polls/stickers on
+            Stories, the official "using sound ___" credit on Reels, and similar native-only features can't be
+            attached by the API, on any post type. Turn on <b>"Needs manual posting"</b> below whenever this post
+            needs one of those: it stays saved here with your caption and media as a reference, the auto-poster
+            always skips it, and you finish it by hand in the app when you're ready.
+            {p.type === "story" ? (
+              <><br /><br />📌 For this Story: posted through the API it's photo/video only — no polls, quizzes,
+              sliders, countdowns, or music.</>
+            ) : null}
+            {p.type === "reel" ? (
+              <><br /><br />🎵 For this Reel: if you just want a trending song playing (not the official credit),
+              add it to the video yourself before uploading — a baked-in audio track posts automatically, no
+              manual step needed. Only the actual "using sound ___" tag requires picking it in the app.</>
+            ) : null}
+          </div>
 
           <div className="fld">
             <label className="switch manualtoggle">
@@ -212,6 +217,23 @@ function PostModal({ post, onSave, onClose }) {
             <label>Caption</label>
             <textarea value={p.caption || ""} onChange={(e) => set({ caption: e.target.value })} />
             <div className="muted">{(p.caption || "").length} / 2200 characters</div>
+            {hashtagSets?.length ? (
+              <div className="hashtagrow">
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const found = hashtagSets.find((s) => s.name === e.target.value);
+                    if (found) set({ caption: `${p.caption || ""}${p.caption ? "\n\n" : ""}${found.tags}` });
+                  }}
+                >
+                  <option value="" disabled>Insert a saved hashtag set…</option>
+                  {hashtagSets.map((s) => <option key={s.name} value={s.name}>{s.name} ({(s.tags.match(/#/g) || []).length})</option>)}
+                </select>
+                <button type="button" className="mini" onClick={() => onSaveHashtagSet(p.caption || "")}>+ Save this caption's hashtags</button>
+              </div>
+            ) : (
+              <button type="button" className="mini" onClick={() => onSaveHashtagSet(p.caption || "")}>+ Save this caption's hashtags as a reusable set</button>
+            )}
           </div>
 
           {showFbCaption ? (
@@ -239,6 +261,14 @@ function PostModal({ post, onSave, onClose }) {
               ) : null}
             </div>
           ) : null}
+
+          <div className="fld">
+            <label>Campaign (optional)</label>
+            <input type="text" list="campaign-list" placeholder="e.g. Fall Launch" value={p.campaign || ""} onChange={(e) => set({ campaign: e.target.value })} />
+            <datalist id="campaign-list">
+              {(allCampaigns || []).map((c) => <option key={c} value={c} />)}
+            </datalist>
+          </div>
 
           <div className="fld">
             <label>Status</label>
@@ -273,6 +303,44 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
   const [editing, setEditing] = useState(null);
   const [status, setStatus] = useState("");
   const posts = schedule?.posts || [];
+  const { hashtags, setHashtags } = useHashtags();
+  const [live, setLive] = useState(null); // server-side state (permalink/stats) keyed by post id
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadLive = () => {
+    fetch(`/admin/social?format=json&t=${Date.now()}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.posts) setLive(Object.fromEntries(d.posts.map((p) => [p.id, p.state]))); })
+      .catch(() => {});
+  };
+  useEffect(loadLive, []);
+
+  const refreshStats = async () => {
+    setRefreshing(true);
+    try {
+      await fetch("/admin/social", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "refresh-stats" }) });
+      loadLive();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const allCampaigns = [...new Set(posts.map((p) => p.campaign).filter(Boolean))].sort();
+
+  const onSaveHashtagSet = async (captionText) => {
+    const tags = (captionText.match(/#[\p{L}\p{N}_]+/gu) || []).join(" ");
+    if (!tags) { setStatus("That caption doesn't have any hashtags to save."); return; }
+    const name = prompt("Name this hashtag set (e.g. \"Color launch\"):");
+    if (!name) return;
+    const nextSets = [...(hashtags?.sets || []).filter((s) => s.name !== name), { name, tags }];
+    try {
+      await saveHashtags(password, { sets: nextSets });
+      setHashtags({ sets: nextSets });
+      setStatus(`Saved hashtag set "${name}".`);
+    } catch (ex) {
+      setStatus("Error saving hashtag set: " + ex.message);
+    }
+  };
 
   const blankPost = () => ({
     _isNew: true,
@@ -282,6 +350,7 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
     platforms: ["instagram", "facebook"],
     media: [],
     caption: "",
+    campaign: "",
     status: "draft",
     manual_only: false,
   });
@@ -336,6 +405,7 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
       <div className="calhead">
         <button type="button" className="save" onClick={() => setEditing(blankPost())}>+ New post</button>
         <a href="/admin/social" target="_blank" rel="noopener noreferrer" className="mini">Open publisher status ↗</a>
+        <button type="button" className="mini" onClick={refreshStats} disabled={refreshing}>{refreshing ? "Refreshing…" : "↻ Refresh stats"}</button>
         <button type="button" className="save" onClick={save}>Save &amp; Deploy</button>
       </div>
 
@@ -365,10 +435,11 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
       <div className="calgrid">
         {shown.map((post) => {
           const thumb = post.media?.[0];
+          const liveState = live?.[post.id];
           return (
             <div className="calcard" key={post.id}>
               <div className="calthumb">
-                {thumb ? (isVideoUrl(thumb) ? <video src={thumb} muted /> : <img src={thumb} alt="" />) : <div className="calthumb-empty">{post.type === "reel" ? "🎬" : "🖼️"}</div>}
+                {thumb ? (isVideoUrl(thumb) ? <video src={thumb} muted /> : <img src={thumb} alt="" />) : <div className="calthumb-empty">{TYPE_ICON[post.type] || "🖼️"}</div>}
                 <div className="calplatbadges">
                   {(post.platforms || []).includes("instagram") ? <span className="platbadge pb-ig">IG</span> : null}
                   {(post.platforms || []).includes("facebook") ? <span className="platbadge pb-fb">FB</span> : null}
@@ -379,8 +450,24 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
                   <span className="calwhen">{fmt(post.publish_at)}</span>
                   <span className={`pill st-${post.manual_only ? "manual" : (post.status || "draft")}`}>{post.manual_only ? "🖐 manual" : (post.status || "draft")}</span>
                 </div>
-                <div className="caltype">{post.type}</div>
+                <div className="caltype">{TYPE_ICON[post.type] || ""} {post.type}{post.campaign ? <span className="campaignbadge">🏷 {post.campaign}</span> : null}</div>
                 <div className="calcap">{(post.caption || "").slice(0, 90) || <span className="muted">no caption</span>}</div>
+                {(post.platforms || []).map((pl) => {
+                  const st = liveState?.[pl];
+                  if (!st || st.status !== "published") return null;
+                  const s = st.stats;
+                  return (
+                    <div className="tracking" key={pl}>
+                      {s?.permalink || st.permalink ? <a href={s?.permalink || st.permalink} target="_blank" rel="noopener noreferrer">{pl === "instagram" ? "IG" : "FB"} ↗</a> : <span>{pl === "instagram" ? "IG" : "FB"}</span>}
+                      {s?.postedAt ? <span> · posted {timeAgo(s.postedAt)}</span> : null}
+                      {typeof s?.likes === "number" ? <span> · ❤️ {s.likes.toLocaleString()}</span> : null}
+                      {typeof s?.comments === "number" ? <span> · 💬 {s.comments.toLocaleString()}</span> : null}
+                      {typeof s?.reach === "number" ? <span> · 👁 {s.reach.toLocaleString()}</span> : null}
+                      {typeof s?.plays === "number" ? <span> · ▶ {s.plays.toLocaleString()}</span> : null}
+                      {!s ? <span className="muted"> · no stats yet — try Refresh stats</span> : null}
+                    </div>
+                  );
+                })}
                 <div className="caltools">
                   <button type="button" className="mini" onClick={() => setEditing(post)}>Edit</button>
                   <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>
@@ -392,7 +479,16 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
         })}
       </div>
 
-      {editing ? <PostModal post={editing} onSave={upsert} onClose={() => setEditing(null)} /> : null}
+      {editing ? (
+        <PostModal
+          post={editing}
+          onSave={upsert}
+          onClose={() => setEditing(null)}
+          allCampaigns={allCampaigns}
+          hashtagSets={hashtags?.sets}
+          onSaveHashtagSet={onSaveHashtagSet}
+        />
+      ) : null}
     </div>
   );
 }
@@ -426,6 +522,11 @@ export const SOCIAL_CSS = `
 .calrow1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .calwhen{font-weight:600;font-size:14px;}
 .caltype{text-transform:capitalize;font-size:12px;color:#8a7f86;}
+.campaignbadge{margin-left:8px;text-transform:none;color:#a85a76;font-weight:600;}
+.tracking{font-size:11px;color:#5a3f4e;margin-top:2px;}
+.tracking a{color:#a85a76;font-weight:600;text-decoration:none;}
+.hashtagrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.hashtagrow select{width:auto;flex:1;min-width:160px;}
 .calcap{font-size:13px;color:#413645;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .caltools{display:flex;gap:8px;margin-top:6px;}
 .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}

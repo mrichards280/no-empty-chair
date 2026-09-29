@@ -2,10 +2,10 @@
 // Behind the /admin Basic-Auth edge gate, and re-checks ADMIN_PASSWORD here (fails closed).
 //   GET  /admin/social            status page
 //   GET  /admin/social?format=json
-//   POST /admin/social  {action: "verify" | "dry-run" | "run" | "retry", id?, platform?}
+//   POST /admin/social  {action: "verify" | "dry-run" | "run" | "retry" | "refresh-stats", id?, platform?}
 import { getStore } from "@netlify/blobs";
 import schedule from "../../public/social/schedule.json" with { type: "json" };
-import { runTick, makeGraph, config as readConfig, validateSchedule, verifyConnection, mediaUrl } from "../lib/social-publisher.mjs";
+import { runTick, makeGraph, config as readConfig, validateSchedule, verifyConnection, mediaUrl, refreshAllStats } from "../lib/social-publisher.mjs";
 
 export default async (req) => {
   const expected = Netlify.env.get("ADMIN_PASSWORD");
@@ -32,6 +32,7 @@ export default async (req) => {
       await store.setJSON(body.id, cur);
       return json({ ok: true, note: "cleared; it will publish on the next run if still within the late window" });
     }
+    if (body.action === "refresh-stats") return json({ results: await refreshAllStats({ schedule, store, graph }) });
     return json({ error: "unknown action" }, 400);
   }
 
@@ -53,6 +54,16 @@ function authorized(header, expected) {
 const json = (o, s = 200) => new Response(JSON.stringify(o, null, 2), { status: s, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmt = (iso) => new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+const num = (n) => (typeof n === "number" ? n.toLocaleString("en-US") : null);
+function timeAgo(iso) {
+  const ms = Date.now() - Date.parse(iso);
+  if (!Number.isFinite(ms) || ms < 0) return "";
+  const mins = Math.round(ms / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.round(hrs / 24)}d ago`;
+}
 
 function page(d, cfg) {
   const badge = (st, p, id) => {
@@ -60,14 +71,27 @@ function page(d, cfg) {
     const link = st?.permalink ? ` <a href="${esc(st.permalink)}" target="_blank" rel="noopener">view</a>` : "";
     const err = st?.error || st?.lastError ? `<div class="err">${esc(st.error || st.lastError)}</div>` : "";
     const retry = ["failed", "missed"].includes(s) ? ` <button class="mini" data-retry="${esc(id)}" data-platform="${p}">Retry</button>` : "";
-    return `<div><b>${p === "instagram" ? "IG" : "FB"}</b> <span class="s s-${s}">${s}</span>${link}${retry}${err}</div>`;
+    const stats = st?.stats;
+    const statLine = stats
+      ? `<div class="stats">${[
+          stats.postedAt ? `posted ${esc(timeAgo(stats.postedAt))}` : null,
+          num(stats.likes) !== null ? `❤️ ${num(stats.likes)}` : null,
+          num(stats.comments) !== null ? `💬 ${num(stats.comments)}` : null,
+          num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
+          num(stats.plays) !== null ? `▶ ${num(stats.plays)} plays` : null,
+          num(stats.saved) !== null ? `🔖 ${num(stats.saved)}` : null,
+          num(stats.post_impressions) !== null ? `👁 ${num(stats.post_impressions)} impr.` : null,
+          num(stats.post_engaged_users) !== null ? `⚡ ${num(stats.post_engaged_users)} engaged` : null,
+        ].filter(Boolean).join(" · ")}<span class="muted"> (as of ${esc(timeAgo(stats.fetchedAt))})</span></div>`
+      : "";
+    return `<div><b>${p === "instagram" ? "IG" : "FB"}</b> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statLine}</div>`;
   };
   const rows = d.posts.slice().sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at)).map((p) => `
     <tr class="${esc(p.status || "draft")}">
       <td>${esc(fmt(p.publish_at))}</td>
-      <td>${esc(p.type)}<div class="muted">${esc(p.status || "draft")}</div></td>
+      <td>${esc(p.type)}<div class="muted">${esc(p.status || "draft")}</div>${p.campaign ? `<div class="muted">🏷 ${esc(p.campaign)}</div>` : ""}</td>
       <td><a href="${esc(mediaUrl(p.media[0] || "", cfg))}" target="_blank" rel="noopener">${esc(p.id)}</a><div class="muted cap">${esc((p.caption || "").slice(0, 90))}</div></td>
-      <td>${p.manual_only ? `<div class="manual">🖐 Manual — needs stickers/polls added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</td>
+      <td>${p.manual_only ? `<div class="manual">🖐 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</td>
     </tr>`).join("");
   const probs = d.problems.length ? `<div class="warn"><b>Schedule problems (these posts will not go out):</b><ul>${d.problems.map((p) => `<li>${esc(p.id)}: ${esc(p.errors.join("; "))}</li>`).join("")}</ul></div>` : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Social publisher</title>
@@ -89,12 +113,13 @@ tr.draft td,tr.paused td{opacity:.55}
 .s-published{background:#dff3e6;color:#1d6b3a}.s-failed,.s-missed{background:#f6e3e3;color:#8c2f2f}.s-processing{background:#fff1d6;color:#7a5200}
 .err{color:#8c2f2f;font-size:12px;max-width:340px}.warn{background:#fff1d6;border-radius:12px;padding:10px 14px;margin:12px 0}
 .manual{color:#7a5200;font-size:12px;max-width:340px}
+.stats{font-size:11px;color:#5a3f4e;margin-top:2px}
 pre{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto;max-height:340px;font-size:12px;white-space:pre-wrap}
 </style></head><body><div class="wrap">
 <h1>Social publisher</h1>
 <div>Auto-posting is <span class="pill ${d.enabled ? "on" : "off"}">${d.enabled ? "ON" : "PAUSED"}</span>
 <span class="muted"> · checks every 10 minutes · last run ${d.lastRun ? esc(fmt(d.lastRun.at)) + (d.lastRun.skipped ? " (" + esc(d.lastRun.skipped) + ")" : "") : "never"} · times shown in Eastern</span></div>
-<div class="bar"><button data-act="verify">Check connection</button><button data-act="dry-run">Dry run</button><button class="primary" data-act="run">Run now</button></div>
+<div class="bar"><button data-act="verify">Check connection</button><button data-act="dry-run">Dry run</button><button class="primary" data-act="run">Run now</button><button data-act="refresh-stats">Refresh stats</button></div>
 ${probs}
 <div class="tablewrap"><table><thead><tr><th>When</th><th>Type</th><th>Post</th><th>Status</th></tr></thead><tbody>${rows || `<tr><td colspan="4">No posts in public/social/schedule.json yet.</td></tr>`}</tbody></table></div>
 <pre id="out" hidden></pre>
@@ -103,7 +128,7 @@ const out=document.getElementById('out');
 async function go(body){out.hidden=false;out.textContent='Working...';
  const r=await fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
  out.textContent=JSON.stringify(await r.json(),null,2);}
-document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>go({action:b.dataset.act}));
+document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{await go({action:b.dataset.act});if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
 document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600)});
 </script></div></body></html>`;
 }
