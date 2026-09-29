@@ -216,6 +216,15 @@ export default function Admin() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [dirty]);
 
+  // The live-site Arrange tool only activates for someone who has actually
+  // logged in here (the "second gate"), not just anyone who reached /admin.
+  useEffect(() => {
+    try {
+      if (authed) localStorage.setItem("nec-admin-edit", "1");
+      else localStorage.removeItem("nec-admin-edit");
+    } catch {}
+  }, [authed]);
+
   const login = async (e) => {
     e.preventDefault();
     setAuthErr("");
@@ -285,6 +294,23 @@ export default function Admin() {
               <button type="button" className="mini" onClick={signOut}>Sign out</button>
             </div>
           </div>
+
+          {tab === "content" ? (
+          <div className="launchers">
+            <div className="arrange-launch">
+              <b>🎨 Arrange the live site</b>
+              <a href="/?edit" className="launchbtn primary">Homepage</a>
+              <a href="/teardown?edit" className="launchbtn">Teardown page</a>
+              <span className="muted">Drag pieces where you want, then hit <b>Copy layout</b> and send it to me to bake it in.</span>
+            </div>
+            <div className="arrange-launch">
+              <b>📅 Social posting</b>
+              <a href="/admin/social" className="launchbtn primary">Open publisher status</a>
+              <span className="muted">Check what's scheduled, run a dry run, or post something now.</span>
+            </div>
+          </div>
+          ) : null}
+
           {tab === "content" && status ? <div className="statusbar">{status}</div> : null}
 
           {tab === "social" ? (
@@ -364,6 +390,13 @@ const ADMIN_CSS = `
 .tabbtn{background:none;border:1px solid transparent;padding:8px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
 .tabbtn.active{background:#efe8f2;color:#8a4560;border-color:#e2d6ea;}
 .statusbar{background:#efe8f2;color:#8a4560;padding:10px 24px;font-size:14px;}
+.launchers{max-width:1040px;margin:18px auto 0;padding:0 20px;display:grid;gap:12px;}
+.arrange-launch{background:#f4efea;border:1px solid #e4ddd2;border-radius:14px;padding:14px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.arrange-launch b{color:#413645;}
+.arrange-launch .muted{color:#8a8779;font-size:13px;}
+.launchbtn{text-decoration:none;padding:8px 16px;border-radius:100px;font-weight:600;font-size:14px;}
+.launchbtn.primary{background:#413645;color:#fff;}
+.launchbtn:not(.primary){background:#fff;color:#413645;border:1px solid #d8d1c4;padding:7px 14px;}
 .dirtydot{color:#a85a76;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .contentlayout{max-width:1040px;margin:24px auto;padding:0 20px;display:flex;align-items:flex-start;gap:22px;}
 .sectionnav{width:220px;flex-shrink:0;position:sticky;top:80px;display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 100px);overflow-y:auto;}
