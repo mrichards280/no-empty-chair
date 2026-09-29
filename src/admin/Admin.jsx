@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useContent, verifyPassword, saveContent } from "../hooks/useContent";
+import { useSchedule, saveSchedule } from "../hooks/useSchedule";
 import { uploadImage, cloudinaryConfigured } from "../lib/cloudinary";
+import SocialCalendar, { SOCIAL_CSS } from "./SocialComposer";
 
 /* ---------- immutable helpers ---------- */
 function clone(v) {
@@ -12,6 +14,21 @@ function isImageKey(key) {
 function looksLong(key, val) {
   return typeof val === "string" && (val.length > 60 || /desc|intro|sub|paragraph|note|bio|tagline|body/i.test(key));
 }
+const ACRONYMS = new Set(["cta", "ig", "faq", "url", "id", "seo"]);
+function prettyLabel(key) {
+  const words = String(key)
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  return words.map((w) => (ACRONYMS.has(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
+}
+const SECTION_ICONS = {
+  brand: "🏷️", hero: "🎯", strip: "📣", gap: "🔀", packages: "💼", consults: "🗓️",
+  alacarte: "🍽️", proof: "⭐", work: "🖼️", founder: "👤", process: "🔁",
+  faq: "❓", demos: "🎨", contact: "✉️", footer: "📄", radar: "📡",
+};
 
 /* ---------- field renderers ---------- */
 function ImageField({ label, value, onChange }) {
@@ -33,7 +50,7 @@ function ImageField({ label, value, onChange }) {
   };
   return (
     <div className="fld">
-      <label>{label}</label>
+      <label>{prettyLabel(label)}</label>
       {value ? <img src={value} alt="" className="thumb" /> : null}
       <input type="text" value={value || ""} placeholder="Image URL" onChange={(e) => onChange(e.target.value)} />
       {cloudinaryConfigured() ? (
@@ -59,7 +76,7 @@ function StringList({ label, list, onChange }) {
   const del = (i) => onChange(list.filter((_, j) => j !== i));
   return (
     <div className="fld">
-      <label>{label}</label>
+      <label>{prettyLabel(label)}</label>
       {(list || []).map((item, i) => (
         <div className="listrow" key={i}>
           <input type="text" value={item} onChange={(e) => set(i, e.target.value)} />
@@ -75,7 +92,7 @@ function Value({ keyName, value, onChange }) {
   if (typeof value === "boolean") {
     return (
       <div className="fld">
-        <label>{keyName}</label>
+        <label>{prettyLabel(keyName)}</label>
         <label className="switch">
           <input type="checkbox" checked={value} onChange={(e) => onChange(e.target.checked)} /> {value ? "Yes" : "No"}
         </label>
@@ -87,13 +104,13 @@ function Value({ keyName, value, onChange }) {
     if (looksLong(keyName, value))
       return (
         <div className="fld">
-          <label>{keyName}</label>
+          <label>{prettyLabel(keyName)}</label>
           <textarea value={value} onChange={(e) => onChange(e.target.value)} />
         </div>
       );
     return (
       <div className="fld">
-        <label>{keyName}</label>
+        <label>{prettyLabel(keyName)}</label>
         <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />
       </div>
     );
@@ -125,7 +142,7 @@ function Value({ keyName, value, onChange }) {
     };
     return (
       <div className="fld">
-        <label>{keyName}</label>
+        <label>{prettyLabel(keyName)}</label>
         {value.map((item, i) => (
           <div className="objcard" key={i}>
             <div className="objtools">
@@ -160,11 +177,29 @@ function Value({ keyName, value, onChange }) {
 /* ---------- main admin ---------- */
 export default function Admin() {
   const { content, setContent, loading } = useContent();
+  const { schedule, setSchedule, loading: schedLoading } = useSchedule();
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
   const [authErr, setAuthErr] = useState("");
   const [status, setStatus] = useState("");
-  const [open, setOpen] = useState({});
+  const [activeSection, setActiveSection] = useState(null);
+  const [sectionQuery, setSectionQuery] = useState("");
+  const [tab, setTab] = useState("content");
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
+
+  useEffect(() => {
+    if (content && !activeSection) setActiveSection(Object.keys(content)[0]);
+    if (content && savedSnapshot === null) setSavedSnapshot(JSON.stringify(content));
+  }, [content]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const dirty = savedSnapshot !== null && content && JSON.stringify(content) !== savedSnapshot;
+
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
 
   const login = async (e) => {
     e.preventDefault();
@@ -178,6 +213,7 @@ export default function Admin() {
     setStatus("Saving & deploying…");
     try {
       await saveContent(password, content);
+      setSavedSnapshot(JSON.stringify(content));
       setStatus("Saved. Your site will redeploy in about a minute.");
     } catch (ex) {
       setStatus("Error: " + ex.message);
@@ -185,6 +221,8 @@ export default function Admin() {
   };
 
   const setSection = (key, val) => setContent({ ...content, [key]: val });
+  const sectionKeys = content ? Object.keys(content) : [];
+  const visibleKeys = sectionKeys.filter((k) => prettyLabel(k).toLowerCase().includes(sectionQuery.toLowerCase()));
 
   return (
     <div className="admin">
@@ -201,38 +239,72 @@ export default function Admin() {
             {authErr ? <div className="err" role="status" aria-live="polite">{authErr}</div> : null}
           </form>
         </div>
-      ) : loading || !content ? (
-        <div className="loading">Loading content…</div>
       ) : (
         <div className="editor">
           <div className="topbar">
             <div className="logo">No Empty <span>Chair</span> · Editor</div>
+            <div className="tabs">
+              <button type="button" className={`tabbtn${tab === "content" ? " active" : ""}`} onClick={() => setTab("content")}>Site content</button>
+              <button type="button" className={`tabbtn${tab === "social" ? " active" : ""}`} onClick={() => setTab("social")}>Social calendar</button>
+            </div>
             <div className="topactions">
+              {tab === "content" && dirty ? <span className="dirtydot" title="Unsaved changes">● Unsaved</span> : null}
               <a href="/" target="_blank" rel="noopener noreferrer" className="mini">View site</a>
-              <button className="save" onClick={save}>Save &amp; Deploy</button>
+              {tab === "content" ? <button className="save" onClick={save} disabled={!dirty}>Save &amp; Deploy</button> : null}
             </div>
           </div>
-          {status ? <div className="statusbar">{status}</div> : null}
-          <div className="sections">
-            {Object.keys(content).map((key) => (
-              <div className="section" key={key}>
-                <button type="button" className="sectionhead" onClick={() => setOpen({ ...open, [key]: !open[key] })}>
-                  <span>{key}</span>
-                  <span>{open[key] ? "–" : "+"}</span>
+          {tab === "content" && status ? <div className="statusbar">{status}</div> : null}
+
+          {tab === "social" ? (
+            schedLoading || !schedule ? (
+              <div className="loading">Loading social calendar…</div>
+            ) : (
+              <SocialCalendar schedule={schedule} setSchedule={setSchedule} onSave={() => saveSchedule(password, schedule)} />
+            )
+          ) : loading || !content ? (
+            <div className="loading">Loading content…</div>
+          ) : (
+          <div className="contentlayout">
+            <nav className="sectionnav">
+              <input
+                type="text"
+                className="navsearch"
+                placeholder="Find a section…"
+                value={sectionQuery}
+                onChange={(e) => setSectionQuery(e.target.value)}
+              />
+              {visibleKeys.map((key) => (
+                <button
+                  type="button"
+                  key={key}
+                  className={`navitem${activeSection === key ? " active" : ""}`}
+                  onClick={() => setActiveSection(key)}
+                >
+                  <span className="navicon">{SECTION_ICONS[key] || "📄"}</span>
+                  {prettyLabel(key)}
                 </button>
-                {open[key] ? (
-                  <div className="sectionbody">
-                    <Value keyName={key} value={content[key]} onChange={(v) => setSection(key, v)} />
+              ))}
+              {visibleKeys.length === 0 ? <div className="muted navempty">No sections match "{sectionQuery}"</div> : null}
+            </nav>
+            <div className="sectionmain">
+              {activeSection && content[activeSection] !== undefined ? (
+                <>
+                  <div className="sectionheading">
+                    <span className="navicon">{SECTION_ICONS[activeSection] || "📄"}</span>
+                    {prettyLabel(activeSection)}
                   </div>
-                ) : null}
+                  <Value keyName={activeSection} value={content[activeSection]} onChange={(v) => setSection(activeSection, v)} />
+                </>
+              ) : null}
+              <div className="footersave">
+                <button className="save" onClick={save} disabled={!dirty}>Save &amp; Deploy</button>
               </div>
-            ))}
+            </div>
           </div>
-          <div className="footersave">
-            <button className="save" onClick={save}>Save &amp; Deploy</button>
-          </div>
+          )}
         </div>
       )}
+      <style>{SOCIAL_CSS}</style>
     </div>
   );
 }
@@ -250,15 +322,26 @@ const ADMIN_CSS = `
 .admin input,.admin textarea{width:100%;padding:11px 13px;border:1px solid #e6ddec;border-radius:10px;font-family:inherit;font-size:14px;background:#fffdfb;color:#413645;}
 .admin textarea{min-height:80px;resize:vertical;}
 .save{background:#a85a76;color:#fff;border:none;padding:12px 22px;border-radius:100px;font-weight:600;font-size:14px;cursor:pointer;}
+.save:disabled{opacity:.45;cursor:not-allowed;}
 .save:hover{background:#8a4560;}
 .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(244,239,234,.9);backdrop-filter:blur(12px);border-bottom:1px solid #e6ddec;}
 .topbar .logo{font-size:18px;}
 .topactions{display:flex;gap:12px;align-items:center;}
+.tabs{display:flex;gap:6px;}
+.tabbtn{background:none;border:1px solid transparent;padding:8px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.tabbtn.active{background:#efe8f2;color:#8a4560;border-color:#e2d6ea;}
 .statusbar{background:#efe8f2;color:#8a4560;padding:10px 24px;font-size:14px;}
-.sections{max-width:820px;margin:24px auto;padding:0 20px;display:grid;gap:12px;}
-.section{border:1px solid #e6ddec;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.6);}
-.sectionhead{width:100%;display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:none;border:none;font-family:'Cinzel',serif;font-size:17px;color:#413645;cursor:pointer;text-transform:capitalize;}
-.sectionbody{padding:8px 20px 20px;}
+.dirtydot{color:#a85a76;font-size:12px;font-weight:700;letter-spacing:.03em;}
+.contentlayout{max-width:1040px;margin:24px auto;padding:0 20px;display:flex;align-items:flex-start;gap:22px;}
+.sectionnav{width:220px;flex-shrink:0;position:sticky;top:80px;display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 100px);overflow-y:auto;}
+.navsearch{margin-bottom:8px;}
+.navitem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;color:#6e6172;cursor:pointer;}
+.navitem:hover{background:rgba(255,255,255,.6);}
+.navitem.active{background:#fff;border-color:#e6ddec;color:#413645;box-shadow:0 2px 8px rgba(65,54,69,.08);}
+.navicon{font-size:15px;}
+.navempty{padding:8px 12px;}
+.sectionmain{flex:1;min-width:0;background:rgba(255,255,255,.6);border:1px solid #e6ddec;border-radius:16px;padding:22px 26px 26px;}
+.sectionheading{display:flex;align-items:center;gap:10px;font-family:'Cinzel',serif;font-size:19px;color:#413645;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid #e6ddec;}
 .fld{margin:14px 0;}
 .fld>label{display:block;font-size:12px;letter-spacing:.5px;text-transform:capitalize;color:#6e6172;margin-bottom:5px;font-weight:600;}
 .switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;}
@@ -274,5 +357,12 @@ const ADMIN_CSS = `
 .objnest{padding-left:6px;border-left:2px solid #e6ddec;}
 .thumb{max-width:120px;border-radius:10px;margin-bottom:8px;display:block;}
 .uprow{display:flex;gap:10px;align-items:center;margin-top:6px;font-size:13px;}
-.footersave{max-width:820px;margin:0 auto 60px;padding:0 20px;text-align:right;}
+.footersave{margin-top:24px;padding-top:18px;border-top:1px solid #e6ddec;text-align:right;}
+@media (max-width:768px){
+  .contentlayout{flex-direction:column;padding:0 var(--gutter,16px);}
+  .sectionnav{position:static;width:100%;flex-direction:row;flex-wrap:wrap;max-height:none;overflow-y:visible;}
+  .navsearch{width:100%;flex-basis:100%;}
+  .navitem{width:auto;}
+  .sectionmain{padding:18px 18px 22px;width:100%;}
+}
 `;
