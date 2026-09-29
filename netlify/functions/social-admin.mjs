@@ -107,10 +107,27 @@ function page(d, cfg) {
         </div>
         <div class="ptype">${TYPE_ICON[p.type] || ""} ${esc(p.type)}${p.campaign ? ` <span class="campaign">🏷 ${esc(p.campaign)}</span>` : ""}</div>
         <div class="pcap">${esc((p.caption || "").slice(0, 100)) || `<span class="muted">no caption</span>`}</div>
+        <div class="prow2"><button class="mini" data-preview="${esc(p.id)}">👁 Preview</button></div>
         <div class="pplatforms">${p.manual_only ? `<div class="manual">🖐 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
     </div>`;
   }).join("");
+
+  // Data for the client-side preview modal: full media list resolved to absolute URLs,
+  // since the modal has no server round-trip. "</" is escaped as a JSON solidus escape
+  // so a caption containing the literal text "</script>" can't break out of the tag.
+  const previewData = JSON.stringify(
+    sorted.map((p) => ({
+      id: p.id,
+      type: p.type,
+      platforms: p.platforms,
+      manual_only: !!p.manual_only,
+      publish_at: p.publish_at,
+      caption: p.caption || "",
+      caption_facebook: p.caption_facebook ?? p.caption ?? "",
+      media: (p.media || []).map((m) => mediaUrl(m, cfg)),
+    }))
+  ).replace(/<\//g, "<\\/");
 
   const empty = `
     <div class="emptystate">
@@ -175,6 +192,41 @@ button.primary:hover{background:#54465a}
 .checkrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
 .checkrow:last-child{border-bottom:none}
 .checkrow.bad b{color:#8c2f2f}
+.prow2{margin-top:2px}
+.modalbg{position:fixed;inset:0;background:rgba(40,32,42,.55);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
+.modalbox{background:#fff;border-radius:20px;max-width:420px;width:100%;padding:18px;position:relative;box-shadow:0 20px 60px rgba(40,32,42,.35)}
+.modalclose{position:absolute;top:10px;right:10px;border:none;background:#f1ebf3;color:var(--plum);width:30px;height:30px;border-radius:100px;cursor:pointer;font-size:14px;line-height:1}
+.modaltabs{display:flex;gap:8px;margin:0 0 14px;padding-right:34px}
+.modaltab{border:1px solid var(--line);background:#fff;color:#8a7f86;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer}
+.modaltab.active{background:var(--plum);color:#fff;border-color:var(--plum)}
+.modalmeta{font-size:11px;color:#8a7f86;margin:-8px 0 12px;text-align:center}
+.igmock,.fbmock{border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;font-family:-apple-system,system-ui,sans-serif;color:#262626}
+.igmock-head,.fbmock-head{display:flex;align-items:center;gap:9px;padding:10px 12px}
+.igmock-avatar,.fbmock-avatar,.storymock-avatar,.reelmock-avatar{width:32px;height:32px;border-radius:100px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.fbmock-avatar{background:#1877f2}
+.igmock-head b,.fbmock-head b{font-size:13px}
+.igmock-sub,.fbmock-sub{font-size:11px;color:#8e8e8e}
+.igmock-media,.fbmock-media{width:100%;aspect-ratio:4/5;background:#efe8f2;overflow-x:auto;display:flex;scroll-snap-type:x mandatory}
+.igmock-media img,.igmock-media video,.fbmock-media img,.fbmock-media video{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:start}
+.igmock-dots{text-align:center;font-size:10px;color:#8e8e8e;padding:6px 0 0}
+.igmock-icons{padding:10px 12px 2px;font-size:19px;letter-spacing:10px}
+.igmock-cap{padding:6px 12px 14px;font-size:13px;line-height:1.4}
+.igmock-cap b{margin-right:5px}
+.igmock-cap .more{color:#8e8e8e;cursor:pointer;font-weight:600}
+.fbmock-msg{padding:0 12px 10px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+.fbmock-icons{display:flex;gap:16px;padding:9px 12px;border-top:1px solid #eee;font-size:12px;color:#65676b;font-weight:600}
+.storymock,.reelmock{display:flex;justify-content:center}
+.storymock-frame,.reelmock-frame{position:relative;width:220px;aspect-ratio:9/16;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.storymock-frame img,.storymock-frame video,.reelmock-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.storymock-bar{position:absolute;top:8px;left:8px;right:8px;height:3px;background:rgba(255,255,255,.35);border-radius:3px}
+.storymock-bar::after{content:"";display:block;width:60%;height:100%;background:#fff;border-radius:3px}
+.storymock-head{position:absolute;top:16px;left:10px;right:10px;display:flex;align-items:center;gap:6px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-size:11px}
+.storymock-head b{font-size:12px}
+.storymock-sticker{position:absolute;left:10px;right:10px;bottom:14px;background:rgba(255,255,255,.96);border-radius:12px;padding:10px 12px;font-size:10.5px;line-height:1.5;color:var(--plum);white-space:pre-wrap;max-height:55%;overflow:auto}
+.storymock-sticker .tag{display:inline-block;background:var(--rose);color:#fff;font-weight:700;font-size:9px;padding:1px 8px;border-radius:100px;margin-bottom:5px}
+.reelmock-side{position:absolute;right:8px;bottom:70px;display:flex;flex-direction:column;gap:14px;color:#fff;font-size:17px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.reelmock-bottom{position:absolute;left:10px;right:40px;bottom:14px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-size:11px;line-height:1.4}
+.reelmock-bottom b{display:block;margin-bottom:3px;font-size:12px}
 </style></head><body><div class="wrap">
 <a class="backlink" href="/admin">← Back to Admin</a>
 <div class="pageheader">
@@ -191,6 +243,13 @@ button.primary:hover{background:#54465a}
 ${probs}
 ${sorted.length ? `<div class="pgrid">${cards}</div>` : empty}
 <div id="out" class="outbox" hidden></div>
+<div id="previewModal" class="modalbg" hidden><div class="modalbox">
+  <button class="modalclose" id="previewClose">✕</button>
+  <div id="previewTabs"></div>
+  <div id="previewMeta" class="modalmeta"></div>
+  <div id="previewBody"></div>
+</div></div>
+<script type="application/json" id="postsData">${previewData}</script>
 <script>
 const out=document.getElementById('out');
 function escHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -208,5 +267,72 @@ async function go(body){out.hidden=false;out.innerHTML='Working…';
  return data;}
 document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{await go({action:b.dataset.act});if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
 document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600)});
+
+// ---- preview modal ----
+const POSTS=JSON.parse(document.getElementById('postsData').textContent);
+const modal=document.getElementById('previewModal'), tabsEl=document.getElementById('previewTabs'), metaEl=document.getElementById('previewMeta'), bodyEl=document.getElementById('previewBody');
+const isVid=m=>/\\.(mp4|mov)(\\?|#|$)/i.test(m);
+const fmtModal=iso=>{try{return new Date(iso).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}catch{return iso;}};
+function mediaTag(url,cls){return isVid(url)?'<video src="'+url+'" '+(cls==='reelmock'?'controls':'muted loop autoplay playsinline')+'></video>':'<img src="'+url+'" alt="">';}
+function igCard(post){
+  const media=post.media.map(m=>mediaTag(m,'igmock')).join('');
+  const dots=post.media.length>1?'<div class="igmock-dots">'+post.media.map((_,i)=>i===0?'●':'○').join(' ')+'</div>':'';
+  const full=escHtml(post.caption), short=escHtml(post.caption.slice(0,140));
+  const cap=post.caption.length>140
+    ? '<span class="capshort">'+short+'… <span class="more" data-expand="1">more</span></span><span class="capfull" hidden>'+full+'</span>'
+    : full;
+  return '<div class="igmock"><div class="igmock-head"><div class="igmock-avatar">N</div><div><b>noemptychair</b><div class="igmock-sub">'+escHtml(post.type)+'</div></div></div>'
+    +'<div class="igmock-media">'+media+'</div>'+dots
+    +'<div class="igmock-icons">♡ 💬 ➤</div>'
+    +'<div class="igmock-cap"><b>noemptychair</b>'+cap+'</div></div>';
+}
+function fbCard(post){
+  const media=post.media.map(m=>mediaTag(m,'fbmock')).join('');
+  return '<div class="fbmock"><div class="fbmock-head"><div class="fbmock-avatar">N</div><div><b>No Empty Chair</b><div class="fbmock-sub">Just now · 🌐</div></div></div>'
+    +'<div class="fbmock-msg">'+escHtml(post.caption_facebook)+'</div>'
+    +'<div class="fbmock-media">'+media+'</div>'
+    +'<div class="fbmock-icons"><span>👍 Like</span><span>💬 Comment</span><span>↗ Share</span></div></div>';
+}
+function storyCard(post){
+  return '<div class="storymock"><div class="storymock-frame">'
+    +mediaTag(post.media[0],'storymock')
+    +'<div class="storymock-bar"></div>'
+    +'<div class="storymock-head"><div class="storymock-avatar" style="width:22px;height:22px;font-size:10px">N</div><b>noemptychair</b></div>'
+    +'<div class="storymock-sticker"><span class="tag">🖐 add sticker in-app</span>'+escHtml(post.caption)+'</div>'
+    +'</div></div>';
+}
+function reelCard(post,caption){
+  return '<div class="reelmock"><div class="reelmock-frame">'
+    +mediaTag(post.media[0],'reelmock')
+    +'<div class="reelmock-side"><div>♡</div><div>💬</div><div>➤</div><div>⋯</div></div>'
+    +'<div class="reelmock-bottom"><b>@noemptychair</b>'+escHtml(caption)+'</div>'
+    +'</div></div>';
+}
+function renderPlatform(post,platform){
+  if(post.type==='story')return storyCard(post);
+  if(post.type==='reel')return reelCard(post,platform==='facebook'?post.caption_facebook:post.caption);
+  return platform==='facebook'?fbCard(post):igCard(post);
+}
+function openPreview(id){
+  const post=POSTS.find(p=>p.id===id); if(!post)return;
+  metaEl.textContent=fmtModal(post.publish_at)+' · '+post.type+(post.manual_only?' · manual':'');
+  const plats=post.manual_only?['instagram']:post.platforms;
+  let active=plats[0];
+  function draw(){
+    tabsEl.innerHTML=plats.length>1?'<div class="modaltabs">'+plats.map(pl=>'<button class="modaltab'+(pl===active?' active':'')+'" data-tab="'+pl+'">'+(pl==='instagram'?'Instagram':'Facebook')+'</button>').join('')+'</div>':'';
+    bodyEl.innerHTML=renderPlatform(post,active);
+    tabsEl.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{active=b.dataset.tab;draw();});
+    bodyEl.querySelectorAll('[data-expand]').forEach(b=>b.onclick=()=>{
+      const wrap=b.closest('.igmock-cap');
+      wrap.querySelector('.capshort').hidden=true;
+      wrap.querySelector('.capfull').hidden=false;
+    });
+  }
+  draw();
+  modal.hidden=false;
+}
+document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>openPreview(b.dataset.preview));
+document.getElementById('previewClose').onclick=()=>{modal.hidden=true;};
+modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});
 </script></div></body></html>`;
 }
