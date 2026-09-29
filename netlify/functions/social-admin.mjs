@@ -108,7 +108,7 @@ function page(d, cfg) {
         <div class="ptype">${TYPE_ICON[p.type] || ""} ${esc(p.type)}${p.campaign ? ` <span class="campaign">🏷 ${esc(p.campaign)}</span>` : ""}</div>
         <div class="pcap">${esc((p.caption || "").slice(0, 100)) || `<span class="muted">no caption</span>`}</div>
         <div class="prow2"><button class="mini" data-preview="${esc(p.id)}">👁 Preview</button></div>
-        <div class="pplatforms">${p.manual_only ? `<div class="manual">🖐 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
+        <div class="pplatforms">${p.manual_only ? `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
     </div>`;
   }).join("");
@@ -291,14 +291,14 @@ function fbCard(post){
   return '<div class="fbmock"><div class="fbmock-head"><div class="fbmock-avatar">N</div><div><b>No Empty Chair</b><div class="fbmock-sub">Just now · 🌐</div></div></div>'
     +'<div class="fbmock-msg">'+escHtml(post.caption_facebook)+'</div>'
     +'<div class="fbmock-media">'+media+'</div>'
-    +'<div class="fbmock-icons"><span>👍 Like</span><span>💬 Comment</span><span>↗ Share</span></div></div>';
+    +'<div class="fbmock-icons"><span>👍🏾 Like</span><span>💬 Comment</span><span>↗ Share</span></div></div>';
 }
 function storyCard(post){
   return '<div class="storymock"><div class="storymock-frame">'
     +mediaTag(post.media[0],'storymock')
     +'<div class="storymock-bar"></div>'
     +'<div class="storymock-head"><div class="storymock-avatar" style="width:22px;height:22px;font-size:10px">N</div><b>noemptychair</b></div>'
-    +'<div class="storymock-sticker"><span class="tag">🖐 add sticker in-app</span>'+escHtml(post.caption)+'</div>'
+    +'<div class="storymock-sticker"><span class="tag">🖐🏾 add sticker in-app</span>'+escHtml(post.caption)+'</div>'
     +'</div></div>';
 }
 function reelCard(post,caption){

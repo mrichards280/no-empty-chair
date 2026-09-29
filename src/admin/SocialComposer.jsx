@@ -46,6 +46,48 @@ function timeAgo(iso) {
 }
 const TYPE_ICON = { image: "🖼️", carousel: "🔲", reel: "🎬", story: "📖" };
 
+/* ---------- undo/redo history (up to 10 steps back) ---------- */
+function useHistoryState(initial, limit = 10) {
+  const [state, setState] = useState({ hist: [initial], idx: 0 });
+  const value = state.hist[state.idx];
+  const set = (patch) => setState(({ hist, idx }) => {
+    const cur = hist[idx];
+    const next = typeof patch === "function" ? patch(cur) : { ...cur, ...patch };
+    let newHist = [...hist.slice(0, idx + 1), next];
+    if (newHist.length > limit + 1) newHist = newHist.slice(newHist.length - (limit + 1));
+    return { hist: newHist, idx: newHist.length - 1 };
+  });
+  const undo = () => setState(({ hist, idx }) => ({ hist, idx: Math.max(0, idx - 1) }));
+  const redo = () => setState(({ hist, idx }) => ({ hist, idx: Math.min(hist.length - 1, idx + 1) }));
+  return { value, set, undo, redo, canUndo: state.idx > 0, canRedo: state.idx < state.hist.length - 1 };
+}
+
+/* ---------- small copy-to-clipboard button, for any field ---------- */
+function CopyBtn({ value, label }) {
+  const [copied, setCopied] = useState(false);
+  const text = typeof value === "string" ? value : Array.isArray(value) ? value.join("\n") : String(value ?? "");
+  return (
+    <button
+      type="button"
+      className="copybtn"
+      title={`Copy ${label || "value"}`}
+      aria-label={`Copy ${label || "value"}`}
+      disabled={!text}
+      onClick={async () => {
+        try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1100); } catch {}
+      }}
+    >{copied ? "✓" : "⧉"}</button>
+  );
+}
+function FldHead({ children, value, label }) {
+  return (
+    <div className="fldhead">
+      <label>{children}</label>
+      <CopyBtn value={value} label={label} />
+    </div>
+  );
+}
+
 const MEDIA_HINT = {
   image: "Exactly 1 photo.",
   carousel: "2 to 10 items (Facebook can't include video if it's one of the platforms).",
@@ -129,34 +171,63 @@ function MediaPicker({ media, onChange }) {
 
 /* ---------- the composer modal ---------- */
 function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHashtagSet }) {
-  const [p, setP] = useState(post);
+  const { value: p, set, undo, redo, canUndo, canRedo } = useHistoryState(post, 10);
   const [showFbCaption, setShowFbCaption] = useState(!!post.caption_facebook);
+  const [maximized, setMaximized] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const { date, time } = isoToEasternParts(p.publish_at);
-  const set = (patch) => setP({ ...p, ...patch });
 
   const errors = validatePost(p, {});
 
+  useEffect(() => {
+    const onKey = (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      e.shiftKey ? redo() : undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo]);
+
+  if (minimized) {
+    return (
+      <button type="button" className="minipill" onClick={() => setMinimized(false)}>
+        <span className="traffic"><span className="tl tl-yellow" /></span>
+        {post._isNew ? "New post" : `Edit · ${post.id}`} — click to reopen
+      </button>
+    );
+  }
+
   return (
     <div className="modalveil" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal">
+      <div className={`modal${maximized ? " maximized" : ""}`}>
         <div className="modalhead">
+          <div className="traffic">
+            <button type="button" className="tl tl-red" title="Close" aria-label="Close" onClick={onClose}>✕</button>
+            <button type="button" className="tl tl-yellow" title="Minimize" aria-label="Minimize" onClick={() => setMinimized(true)}>−</button>
+            <button type="button" className="tl tl-green" title={maximized ? "Restore" : "Maximize"} aria-label="Maximize" onClick={() => setMaximized((m) => !m)}>{maximized ? "⤡" : "+"}</button>
+          </div>
           <b>{post._isNew ? "New post" : `Edit · ${post.id}`}</b>
-          <button type="button" className="mini" onClick={onClose} aria-label="Close">✕</button>
+          <div className="historybtns">
+            <button type="button" className="mini" disabled={!canUndo} onClick={undo} title="Undo (⌘Z)">↶ Undo</button>
+            <button type="button" className="mini" disabled={!canRedo} onClick={redo} title="Redo (⌘⇧Z)">↷ Redo</button>
+          </div>
         </div>
 
         <div className="modalbody">
           <div className="fld">
-            <label>Post ID</label>
+            <FldHead value={p.id} label="Post ID">Post ID</FldHead>
             <input type="text" value={p.id} onChange={(e) => set({ id: slug(e.target.value) })} />
           </div>
 
           <div className="grid2">
             <div className="fld">
-              <label>Date (Eastern)</label>
+              <FldHead value={date} label="date">Date (Eastern)</FldHead>
               <input type="date" value={date} onChange={(e) => set({ publish_at: easternISO(e.target.value, time || "12:00") })} />
             </div>
             <div className="fld">
-              <label>Time (Eastern)</label>
+              <FldHead value={time} label="time">Time (Eastern)</FldHead>
               <input type="time" value={time} onChange={(e) => set({ publish_at: easternISO(date || new Date().toISOString().slice(0, 10), e.target.value) })} />
             </div>
           </div>
@@ -190,7 +261,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
           </div>
 
           <div className="tip">
-            🖐 <b>Not everything Meta lets you do in-app is available through automation</b> — polls/stickers on
+            🖐🏾 <b>Not everything Meta lets you do in-app is available through automation</b> — polls/stickers on
             Stories, the official "using sound ___" credit on Reels, and similar native-only features can't be
             attached by the API, on any post type. Turn on <b>"Needs manual posting"</b> below whenever this post
             needs one of those: it stays saved here with your caption and media as a reference, the auto-poster
@@ -214,7 +285,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
           </div>
 
           <div className="fld">
-            <label>Caption</label>
+            <FldHead value={p.caption} label="caption">Caption</FldHead>
             <textarea value={p.caption || ""} onChange={(e) => set({ caption: e.target.value })} />
             <div className="muted">{(p.caption || "").length} / 2200 characters</div>
             {hashtagSets?.length ? (
@@ -238,7 +309,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
 
           {showFbCaption ? (
             <div className="fld">
-              <label>Facebook caption (different from the one above)</label>
+              <FldHead value={p.caption_facebook} label="Facebook caption">Facebook caption (different from the one above)</FldHead>
               <textarea value={p.caption_facebook || ""} onChange={(e) => set({ caption_facebook: e.target.value })} />
             </div>
           ) : (
@@ -263,7 +334,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
           ) : null}
 
           <div className="fld">
-            <label>Campaign (optional)</label>
+            <FldHead value={p.campaign} label="campaign">Campaign (optional)</FldHead>
             <input type="text" list="campaign-list" placeholder="e.g. Fall Launch" value={p.campaign || ""} onChange={(e) => set({ campaign: e.target.value })} />
             <datalist id="campaign-list">
               {(allCampaigns || []).map((c) => <option key={c} value={c} />)}
@@ -448,7 +519,7 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
               <div className="calbody">
                 <div className="calrow1">
                   <span className="calwhen">{fmt(post.publish_at)}</span>
-                  <span className={`pill st-${post.manual_only ? "manual" : (post.status || "draft")}`}>{post.manual_only ? "🖐 manual" : (post.status || "draft")}</span>
+                  <span className={`pill st-${post.manual_only ? "manual" : (post.status || "draft")}`}>{post.manual_only ? "🖐🏾 manual" : (post.status || "draft")}</span>
                 </div>
                 <div className="caltype">{TYPE_ICON[post.type] || ""} {post.type}{post.campaign ? <span className="campaignbadge">🏷 {post.campaign}</span> : null}</div>
                 <div className="calcap">{(post.caption || "").slice(0, 90) || <span className="muted">no caption</span>}</div>
@@ -534,19 +605,46 @@ export const SOCIAL_CSS = `
 .st-draft{background:#eee;color:#666;}
 .st-paused{background:#fff1d6;color:#7a5200;}
 .st-manual{background:#fdecc8;color:#7a5200;}
-.modalveil{position:fixed;inset:0;background:rgba(65,54,69,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
-.modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
-.modalhead{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #e6ddec;font-family:'Cinzel',serif;}
-.modalbody{padding:16px 20px;overflow-y:auto;}
-.modalfoot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid #e6ddec;}
+.modalveil{position:fixed;inset:0;background:rgba(40,32,42,.4);backdrop-filter:blur(6px) saturate(140%);-webkit-backdrop-filter:blur(6px) saturate(140%);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal{background:rgba(255,255,255,.72);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.6);border-radius:18px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 70px rgba(40,32,42,.35),inset 0 1px 0 rgba(255,255,255,.7);transition:max-width .18s ease,max-height .18s ease;}
+.modal.maximized{max-width:96vw;max-height:96vh;}
+.modalhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(230,221,236,.8);font-family:'Cinzel',serif;background:rgba(255,255,255,.4);}
+.modalhead b{flex:1;text-align:center;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.traffic{display:flex;gap:8px;align-items:center;}
+.tl{width:13px;height:13px;border-radius:100%;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;color:transparent;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12);}
+.tl:hover{color:rgba(70,30,10,.65);}
+.tl-red{background:#ff5f57;}
+.tl-yellow{background:#febc2e;}
+.tl-green{background:#28c840;}
+.historybtns{display:flex;gap:6px;}
+.minipill{position:fixed;right:22px;bottom:22px;z-index:100;display:flex;align-items:center;gap:8px;background:rgba(65,54,69,.92);color:#fff;border:none;border-radius:100px;padding:10px 16px 10px 12px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 10px 30px rgba(40,32,42,.35);backdrop-filter:blur(10px);}
+.minipill .traffic{pointer-events:none;}
+.minipill .tl{box-shadow:none;}
+.modalbody{padding:18px 20px;overflow-y:auto;}
+.modalfoot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid rgba(230,221,236,.8);background:rgba(255,255,255,.4);}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .platrow{display:flex;gap:16px;}
 .manualtoggle{font-size:13px;}
-.tip{background:#efe8f2;color:#5a3f4e;border-radius:12px;padding:10px 14px;font-size:13px;margin:10px 0;line-height:1.5;}
+.modal .tip{background:rgba(239,232,242,.8);color:#5a3f4e;border-radius:12px;padding:12px 14px;font-size:13px;margin:14px 0;line-height:1.5;}
+.modal .warn{background:rgba(253,236,200,.85);color:#7a5200;border-radius:12px;padding:12px 14px;margin:14px 0;font-size:13px;line-height:1.5;}
+.modal .warn ul{margin:6px 0 0;padding-left:18px;}
+.modal .err{color:#8c2f2f;font-size:12px;margin-top:6px;}
+.modal .muted{color:#8a7f86;font-size:12px;margin-top:5px;}
+.modal .fld{margin:0 0 16px;display:flex;flex-direction:column;gap:6px;}
+.modal .fld:last-child{margin-bottom:0;}
+.modal .fld>label{font-size:12px;font-weight:700;color:#5a3f4e;letter-spacing:.02em;text-transform:none;}
+.fldhead{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.fldhead label{flex:1;margin-bottom:0!important;}
+.copybtn{border:none;background:rgba(65,54,69,.08);color:#6e6172;width:22px;height:22px;flex-shrink:0;border-radius:7px;cursor:pointer;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;}
+.copybtn:hover:not(:disabled){background:rgba(65,54,69,.16);}
+.copybtn:disabled{opacity:.35;cursor:default;}
+.modal .fld input[type=text],.modal .fld input[type=date],.modal .fld input[type=time],.modal .fld select,.modal .fld textarea{width:100%;border:1px solid #e6ddec;border-radius:10px;padding:9px 11px;font:inherit;font-size:13px;background:rgba(255,255,255,.75);color:#413645;}
+.modal .fld input:focus,.modal .fld select:focus,.modal .fld textarea:focus{outline:2px solid rgba(168,90,118,.35);outline-offset:1px;}
+.modal .fld textarea{min-height:110px;resize:vertical;line-height:1.5;}
 .medialist{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
 .mediaitem{position:relative;width:84px;}
 .mediaitem img,.mediaitem video{width:84px;height:84px;object-fit:cover;border-radius:10px;display:block;}
 .mediatools{display:flex;gap:2px;justify-content:center;margin-top:3px;}
 .addurl{margin-top:8px;}
-.mediahint{margin-top:-4px;margin-bottom:10px;}
+.mediahint{margin-top:-6px;margin-bottom:14px;}
 `;
