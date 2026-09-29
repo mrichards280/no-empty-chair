@@ -534,7 +534,7 @@ function renderVisits(){
   const today=ymd(new Date());
   const up=mine.filter(a=>a.date>=today && a.status!=='Cancelled' && a.status!=='Declined');
   const past=mine.filter(a=>a.date<today || a.status==='Cancelled' || a.status==='Declined');
-  let h=`<div class="eyebrow">My visits</div><h1 class="big">Hey${up[0]?', '+(up[0].name.split(' ')[0]):''} <span class="ser">👋</span></h1>
+  let h=`<div class="eyebrow">My visits</div><h1 class="big">Hey${up[0]?', '+(up[0].name.split(' ')[0]):''} <span class="ser">👋🏾</span></h1>
     <p class="sub">${lastPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3')} · <a href="#" onclick="visitsUnlocked=false;go('visits');return false" style="color:var(--clay);font-weight:600">switch number</a></p>`;
   if(!mine.length){h+=`<div class="empty">No visits yet on this number.<br>Head to <b>Book</b> to grab a slot.</div>`;}
   if(up.length){h+=`<div class="fieldlbl">Upcoming</div>`+up.map(a=>visitCard(a,true)).join('');}
@@ -572,7 +572,7 @@ function renderStudio(){
   const el=document.getElementById('s-studio');
   const tabs=['rules','services','photos','requests','today'];
   const tabName={rules:'Booking rules',services:'Services',photos:'Portfolio',requests:'Requests',today:"The book"};
-  let h=`<div class="stnote">👋 This is the <b>owner side</b>. Change anything here, then tap <b>Book</b> — the client only ever sees openings your rules allow.</div>
+  let h=`<div class="stnote">👋🏾 This is the <b>owner side</b>. Change anything here, then tap <b>Book</b> — the client only ever sees openings your rules allow.</div>
     <div class="sttabs">${tabs.map(t=>`<button class="sttab ${stTab===t?'on':''}" onclick="stTab='${t}';renderStudio()">${tabName[t]}${t==='requests'?reqCountLabel():''}</button>`).join('')}</div>`;
   if(stTab==='rules') h+=studioRules();
   if(stTab==='services') h+=studioServices();
