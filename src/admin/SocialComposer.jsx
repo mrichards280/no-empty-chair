@@ -350,6 +350,14 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
             </select>
           </div>
 
+          <div className="fld">
+            <label className="switch evergreentoggle">
+              <input type="checkbox" checked={!!p.evergreen} onChange={(e) => set({ evergreen: e.target.checked })} />
+              🌲 Evergreen — not tied to this date, safe to duplicate into future months
+            </label>
+            {p.evergreen ? <div className="muted">Reminder: swap in a fresh caption each time you reuse it, so it doesn't repeat.</div> : null}
+          </div>
+
           {errors.length ? (
             <div className="warn">
               <b>Fix before this can be added:</b>
@@ -460,10 +468,12 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
     ready: posts.filter((p) => (p.status || "draft") === "ready" && !p.manual_only).length,
     draft: posts.filter((p) => (p.status || "draft") !== "ready" && !p.manual_only).length,
     manual: posts.filter((p) => p.manual_only).length,
+    evergreen: posts.filter((p) => p.evergreen).length,
   };
   const shown = posts
     .filter((p) => {
       if (filter === "all") return true;
+      if (filter === "evergreen") return !!p.evergreen;
       if (filter === "manual") return !!p.manual_only;
       if (p.manual_only) return false;
       return (p.status || "draft") === filter || (filter === "draft" && (p.status || "draft") === "paused");
@@ -488,7 +498,7 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
       </div>
 
       <div className="calfilters">
-        {[["all", "All"], ["ready", "Ready"], ["draft", "Draft"], ["manual", "Manual"]].map(([k, label]) => (
+        {[["all", "All"], ["ready", "Ready"], ["draft", "Draft"], ["manual", "Manual"], ["evergreen", "🌲 Evergreen"]].map(([k, label]) => (
           <button type="button" key={k} className={`filterchip${filter === k ? " active" : ""}`} onClick={() => setFilter(k)}>
             {label} <span className="filtercount">{counts[k]}</span>
           </button>
@@ -521,7 +531,7 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
                   <span className="calwhen">{fmt(post.publish_at)}</span>
                   <span className={`pill st-${post.manual_only ? "manual" : (post.status || "draft")}`}>{post.manual_only ? "🖐🏾 manual" : (post.status || "draft")}</span>
                 </div>
-                <div className="caltype">{TYPE_ICON[post.type] || ""} {post.type}{post.campaign ? <span className="campaignbadge">🏷 {post.campaign}</span> : null}</div>
+                <div className="caltype">{TYPE_ICON[post.type] || ""} {post.type}{post.evergreen ? <span className="evergreenbadge">🌲 evergreen</span> : null}{post.campaign ? <span className="campaignbadge">🏷 {post.campaign}</span> : null}</div>
                 <div className="calcap">{(post.caption || "").slice(0, 90) || <span className="muted">no caption</span>}</div>
                 {(post.platforms || []).map((pl) => {
                   const st = liveState?.[pl];
@@ -594,6 +604,8 @@ export const SOCIAL_CSS = `
 .calwhen{font-weight:600;font-size:14px;}
 .caltype{text-transform:capitalize;font-size:12px;color:#8a7f86;}
 .campaignbadge{margin-left:8px;text-transform:none;color:#a85a76;font-weight:600;}
+.evergreenbadge{margin-left:8px;text-transform:none;color:#1d6b3a;font-weight:600;}
+.evergreentoggle{font-size:13px;}
 .tracking{font-size:11px;color:#5a3f4e;margin-top:2px;}
 .tracking a{color:#a85a76;font-weight:600;text-decoration:none;}
 .hashtagrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}

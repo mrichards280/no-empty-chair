@@ -13,7 +13,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649042/no-empty-chair/social/oct-2026/f01.jpg"
       ],
       "caption": "You spent years perfecting the craft. Your website got one weekend and a free template.\n\nHere's the thing nobody tells you: a new client sees your site before they see your work. If it's slow, broken, or still has \"Lorem ipsum\" in the footer, they don't think \"she's busy.\" They think \"sketchy.\"\n\nYour talent is not the problem. The front door is.\n\nStart with the $200 teardown. Link in bio.\n\n#atlantasalon #salonmarketing #beautybusiness #salonowner #atlantahairstylist",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r01",
@@ -27,7 +28,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649075/no-empty-chair/social/oct-2026/reel-r01.mp4"
       ],
       "caption": "Mother-in-law energy, but make it helpful. Every profile here is a mockup, but you've seen all of them. Want yours rated for real? That's the teardown. Link in bio.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s01",
@@ -41,7 +44,8 @@
       ],
       "caption": "Fri · Oct 2 · POLL\nQUICK QUESTION\nWhen did you last update your website?\nTHIS YEAR\nWHAT WEBSITE?\nNext frame: share the results with \"I knew it.\" and a link sticker to the teardown.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-e01",
@@ -55,7 +59,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649033/no-empty-chair/social/oct-2026/e01.jpg"
       ],
       "caption": "Hi. I'm Makayla, the founder of No Empty Chair.\n\nI spent years in TV news making short videos people actually stop scrolling for. Two Emmy nominations, a Murrow Award, and a lot of 4 a.m. edits later, I noticed something: the most talented people I knew (my stylist, my braider, my barber) had the worst online front doors.\n\nSo I built a studio for them. Branding, websites and short-form content made to fill chairs, not rack up likes.\n\nIf your work is a ten and your calendar isn't, we should talk. Every project starts with the $200 teardown.\n\n#noemptychair #atlantabeauty #salonmarketing #womeninbusiness #atlantaentrepreneur",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-s02",
@@ -69,7 +74,8 @@
       ],
       "caption": "Sun · Oct 4 · QUESTION BOX\nSUNDAY QUESTION\nWhat's the one question clients DM you the most?\nTELL ME\nAnswer 3 to 5 during the week as stories with \"that belongs on your website.\" Easy content, warm leads.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-f02",
@@ -83,7 +89,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649042/no-empty-chair/social/oct-2026/f02.jpg"
       ],
       "caption": "Nine thousand people watch you. Three of them paid you this week.\n\nThat's not a following problem. That's a front door problem. Somewhere between \"love this!!\" and \"booked,\" people are getting lost: no prices, a dead link, a DM that never got answered.\n\nViews are nice. Bookings pay rent. Let's build the part that pays.\n\nThe $200 teardown is a short video showing the three fixes that turn the followers you already have into bookings. Link in bio.\n\n#beautybusiness #salonmarketing #instagramforbusiness #atlbraider #atlnails",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r02",
@@ -97,7 +104,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649077/no-empty-chair/social/oct-2026/reel-r02.mp4"
       ],
       "caption": "Views are a vibe. Bookings are a business. If your follower count and your calendar don't match, the problem is what happens after they tap your profile.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s03",
@@ -111,7 +120,8 @@
       ],
       "caption": "Wed · Oct 7 · SLIDER\nTHE HANDS PROBLEM\nHow much of your week is spent on things that aren't the actual service?\nBARELYALL OF IT\nPrimes Thursday's carousel (F03). Share results Thursday morning.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-f03",
@@ -129,7 +139,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649045/no-empty-chair/social/oct-2026/f03-5.jpg"
       ],
       "caption": "Quick question: if you broke your wrist tomorrow, how long until the money stops?\n\nIf the answer is \"immediately,\" you don't have a business yet. You have a very skilled job with a ring light.\n\nThat's not a shame thing. It's a setup thing. When your page shows the prices, answers the questions, and sends people straight to book, your hands can stay on the hair.\n\nSave this. Then send it to the friend who answered \"how much?\" 40 times today.\n\nStart with the $200 teardown. Link in bio.\n\n#salonowner #beautybusiness #businesssystems #atlantasalon #salonmarketing",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r04",
@@ -143,7 +154,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649087/no-empty-chair/social/oct-2026/reel-r04.mp4"
       ],
       "caption": "Not trying to scare you. Okay, a little. Your talent deserves a business that doesn't depend on you being in the chair 60 hours a week.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s04",
@@ -157,7 +170,8 @@
       ],
       "caption": "Fri · Oct 9 · THIS OR THAT\nYOU ONLY GET ONE\n100K followers, or a booked-out month?\nFOLLOWERS\nBOOKINGS\nFollow-up frame: \"Then post like it.\" Primes F05.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-e02",
@@ -173,7 +187,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649036/no-empty-chair/social/oct-2026/e02-3.jpg"
       ],
       "caption": "Every \"you available?\" DM is a sign, and it's not that clients are annoying.\n\nIt means your availability, prices and policies are hiding. So people ask. Then they ghost. Then you post a rant about time-wasters.\n\nA good booking page answers three things before anyone messages you: what you do, what it costs, and when you're free. One tap to book. No back-and-forth.\n\nYour DMs should be for regulars saying thank you, not strangers asking for your calendar.\n\n#salonowner #bookingsystem #braiderlife #atlantahairstylist #beautypreneur",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-f04",
@@ -187,7 +202,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649046/no-empty-chair/social/oct-2026/f04.jpg"
       ],
       "caption": "\"I'm booked for three months\" hits different when you haven't had a Saturday off since 2022.\n\nHere's the thing: a waitlist is your clients telling you you're underpriced. But raising rates is scary when your page still looks like a $60 shop.\n\nPremium work needs a premium front door. When the brand looks the part, the new price doesn't need explaining.\n\nTell me in the comments: when did you last raise your prices?\n\n#salonlife #raiseyourrates #beautybusiness #stylistlife #salonowner",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r03",
@@ -201,7 +217,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649085/no-empty-chair/social/oct-2026/reel-r03.mp4"
       ],
       "caption": "I'm sweet to people. I am not sweet to websites. Which line hit a little too close? Be honest.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s05",
@@ -215,7 +233,8 @@
       ],
       "caption": "Wed · Oct 14 · QUIZ\nPOP QUIZ\nWhich one is an actual booking system?\nA · My DMs\nB · My Notes app\nC · A page that takes deposits\nD · My cousin\nCorrect answer: C. Reshare results with \"If you picked D, we need to talk.\"",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-f05",
@@ -233,7 +252,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649048/no-empty-chair/social/oct-2026/f05-5.jpg"
       ],
       "caption": "I make short-form video for a living (2x Emmy-nominated), so hear me: content matters. But somewhere along the way, a lot of us started performing for the algorithm instead of building for the client.\n\nYour next client doesn't care about your morning routine. She cares whether you can do her lash fill by Friday, what it costs, and where to click.\n\nBe both if you want. Just make sure the business half actually has a booking button.\n\nWhich column are you in right now? Be honest in the comments.\n\n#lashtech #beautyinfluencer #beautybusiness #contentcreator #salonmarketing",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r05",
@@ -247,7 +267,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649090/no-empty-chair/social/oct-2026/reel-r05.mp4"
       ],
       "caption": "The brand deal is a bonus. The client who rebooks every six weeks is the business. Make your page for her.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s06",
@@ -261,7 +283,8 @@
       ],
       "caption": "Fri · Oct 16 · LINK STICKER\nWHAT YOU ACTUALLY GET\nAn honest read of your page. On video. No sugar.\nA short video walking through your page and the three fixes that will book you more, plus a priority list. $200, and it credits toward any package.\nNOEMPTYCHAIR.CO/TEARDOWN\nMid-month conversion push. Save to the Book highlight.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-e03",
@@ -276,7 +299,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649038/no-empty-chair/social/oct-2026/e03-2.jpg"
       ],
       "caption": "You've seen the post. Maybe you've made the post. Four paragraphs of policies in a screenshot, all caps, three colors.\n\nHere's the truth: nobody reads it. Not because clients are rude, but because a caption is the wrong place for a contract.\n\nDeposits, lateness, add-ons, cancellations: all of it belongs inside your booking flow, with a checkbox. Agreed to before they pay. Enforced without you arguing in the comments.\n\nProtect your time with systems, not paragraphs.\n\n#salonpolicies #bookingpolicy #braider #lashtech #salonowner",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-f06",
@@ -290,7 +314,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649049/no-empty-chair/social/oct-2026/f06.jpg"
       ],
       "caption": "Be honest, how many of these are running your calendar right now?\n\nNo judgment. Most of the best artists I know started exactly here. But every booking that lives in your head is a booking you can lose, double up, or forget to confirm.\n\nA real booking page (Square, StyleSeat, Booksy, whatever you use), built into a site that looks like your work, takes deposits and books clients while you're mid-install.\n\nTag the friend with 14 links in her Linktree.\n\n#bookingsystem #salonowner #atlbraider #beautybusiness #salonmarketing",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r06",
@@ -304,7 +329,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649092/no-empty-chair/social/oct-2026/reel-r06.mp4"
       ],
       "caption": "Nobody reads your whole bio. They scan it, feel something, and decide. Make sure what they feel is \"I need to book her.\"",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s07",
@@ -318,7 +345,8 @@
       ],
       "caption": "Wed · Oct 21 · POLL\nTHE HANDS PROBLEM\nCould you take two weeks off without losing money?\nYES, I'M BUILT\nLOL. NO.\nPrimes Thursday's \"Your hands are not a retirement plan\" (F07).",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-f07",
@@ -332,7 +360,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649050/no-empty-chair/social/oct-2026/f07.jpg"
       ],
       "caption": "Wrists, backs, knees. Ask any braider over 35 what 10 years behind the chair costs.\n\nThe goal was never to do every head yourself forever. The goal is a brand strong enough to book an assistant, sell a class, fill a second chair, or take a month off without the calendar going quiet.\n\nThat starts with how you show up online. A brand that only works when you're in the photo can't grow past you.\n\nSave this. Your future wrists will thank you.\n\n#salonowner #atlbraider #beautybusiness #scaleyourbusiness #stylistlife",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r07",
@@ -346,7 +375,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649094/no-empty-chair/social/oct-2026/reel-r07.mp4"
       ],
       "caption": "Count how many jobs you did today that weren't the actual service. The first one I'd take off your plate: answering the same five questions in your DMs.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s08",
@@ -360,7 +391,8 @@
       ],
       "caption": "Fri · Oct 23 · RESHARE BAIT\nRESHARE IF\nYou've answered \"how much?\" forty times today.\nAnd every single one of them left you on read.\nNo sticker. Built to be reshared into other pros' stories.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-e04",
@@ -375,7 +407,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649039/no-empty-chair/social/oct-2026/e04-2.jpg"
       ],
       "caption": "\"Can you do it for less?\" isn't only about the client. It's about what your page told them before they asked.\n\nBlurry flyer, no prices listed, a booking link that's a Google Form? That reads as negotiable.\n\nClean branding, clear prices, real reviews and a smooth checkout read as \"this is her rate.\" People don't haggle with a business that looks like one.\n\nYour price is your price. Make your brand say it for you.\n\n#knowyourworth #salonpricing #lashtech #atlantalashes #beautybusiness",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-e05",
@@ -389,7 +422,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649040/no-empty-chair/social/oct-2026/e05.jpg"
       ],
       "caption": "People ask why a TV producer is making content for salons.\n\nSimple. Short-form is my whole career. I've spent years figuring out what makes someone stop, watch and act in under three seconds, for millions of viewers.\n\nYour clients are scrolling the same feed. The difference between a view and a booking is the hook, the pacing and one clear next step.\n\nThat's what I bring to your page. Not trends. Strategy.\n\n#shortformvideo #reelsstrategy #salonmarketing #atlantacreative #contentcreator",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-f08",
@@ -407,7 +441,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649054/no-empty-chair/social/oct-2026/f08-5.jpg"
       ],
       "caption": "This is a made-up profile, but I promise you've seen it. Maybe you've been it.\n\nThe work is beautiful. The profile is a wall of rules, a hidden price list, and a grid that looks like a parking lot sign. A new client lands here and feels scolded before she's even booked.\n\nThree small fixes. Same talent. A completely different first impression.\n\nWant this for your page? The $200 teardown is a short video of the three highest-impact fixes for your page, plus a priority list. It credits toward any package. Link in bio.\n\n#nailtech #atlnails #instagramtips #salonmarketing #beautybusiness",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     },
     {
       "id": "2026-10-r08",
@@ -421,7 +456,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649096/no-empty-chair/social/oct-2026/reel-r08.mp4"
       ],
       "caption": "Demo concept, real lesson. Your clients decide if you're worth the price before they ever see you in person. Make the site say it for you.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": true
     },
     {
       "id": "2026-10-s09",
@@ -435,7 +472,8 @@
       ],
       "caption": "Wed · Oct 28 · SLIDER\nHALLOWEEN WEEK\nGo tap your own link in bio. How scary was it?\nWORKS FINEHAUNTED\nPrimes F09 and the Halloween reel.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": false
     },
     {
       "id": "2026-10-f09",
@@ -449,7 +487,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649054/no-empty-chair/social/oct-2026/f09.jpg"
       ],
       "caption": "Booking shouldn't feel like walking into a haunted house. I've clicked booking links that led to a 404, a closed Square account, and one very confused Wix page that just said \"Welcome to my site!\"\n\nYour clients are not brave. If the link doesn't work, they don't try harder. They go to the next person.\n\nCheck your link in bio right now. Tap it like a stranger would. If it scares you, you know where to find me.\n\n$200 teardown. Link in bio (it works, I checked).\n\n#halloween #salonmarketing #beautybusiness #linkinbio #atlantasalon",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": false
     },
     {
       "id": "2026-10-r09",
@@ -463,7 +502,9 @@
         "https://res.cloudinary.com/djrmz717j/video/upload/v1790649098/no-empty-chair/social/oct-2026/reel-r09.mp4"
       ],
       "caption": "Happy Halloween to everyone except broken booking links. Drop your scariest website moment in the comments. I'll go first.",
-      "status": "draft"
+      "status": "draft",
+      "manual_only": true,
+      "evergreen": false
     },
     {
       "id": "2026-10-s10",
@@ -477,7 +518,8 @@
       ],
       "caption": "Fri · Oct 30 · LINK STICKER\nNEW MONTH, NEW FRONT DOOR\nWalk into November with a page that books you.\nStart with the $200 teardown. It credits toward any package.\nNOEMPTYCHAIR.CO/TEARDOWN\nMonth-end close. Save to the Book highlight.",
       "status": "draft",
-      "manual_only": true
+      "manual_only": true,
+      "evergreen": false
     },
     {
       "id": "2026-10-e06",
@@ -491,7 +533,8 @@
         "https://res.cloudinary.com/djrmz717j/image/upload/v1790649041/no-empty-chair/social/oct-2026/e06.jpg"
       ],
       "caption": "The teardown is my favorite thing I offer, because it's the fastest way to stop guessing.\n\nYou send me your Instagram, website and booking link. I record a video going through all of it the way a new client would, and tell you what's costing you bookings. No fluff, no sales pitch disguised as feedback.\n\nYou walk away with a prioritized fix list. And if you work with me after, the $200 comes off any package.\n\nLink in bio.\n\n#salonaudit #beautybusiness #salonowner #atlantasalon #braiderbusiness",
-      "status": "draft"
+      "status": "ready",
+      "evergreen": true
     }
   ]
 }

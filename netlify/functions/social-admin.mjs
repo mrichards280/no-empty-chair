@@ -97,8 +97,12 @@ function page(d, cfg) {
     const thumb = media0
       ? (isVid ? `<video src="${src}" muted></video>` : `<img src="${src}" alt="">`)
       : `<div class="pthumb-empty">${TYPE_ICON[p.type] || "🖼️"}</div>`;
+    const fullCap = p.caption || "";
+    const capBlock = p.manual_only
+      ? `<div class="pcap pcap-full">${esc(fullCap) || `<span class="muted">no caption</span>`}</div>`
+      : `<div class="pcap">${esc(fullCap.slice(0, 100)) || `<span class="muted">no caption</span>`}</div>`;
     return `
-    <div class="pcard">
+    <div class="pcard" data-manual="${p.manual_only ? "1" : "0"}" data-status="${esc(p.status || "draft")}">
       <a class="pthumb" href="${src || "#"}" target="_blank" rel="noopener">${thumb}</a>
       <div class="pbody">
         <div class="prow1">
@@ -106,8 +110,12 @@ function page(d, cfg) {
           <span class="pill st-${esc(p.status || "draft")}">${esc(p.status || "draft")}</span>
         </div>
         <div class="ptype">${TYPE_ICON[p.type] || ""} ${esc(p.type)}${p.campaign ? ` <span class="campaign">🏷 ${esc(p.campaign)}</span>` : ""}</div>
-        <div class="pcap">${esc((p.caption || "").slice(0, 100)) || `<span class="muted">no caption</span>`}</div>
-        <div class="prow2"><button class="mini" data-preview="${esc(p.id)}">👁 Preview</button></div>
+        ${capBlock}
+        <div class="prow2">
+          <button class="mini" data-preview="${esc(p.id)}">👁 Preview</button>
+          <button class="mini" data-copycap="${esc(p.id)}">📋 Copy caption</button>
+          ${isVid && media0 ? `<a class="mini" href="${src}" download>⬇ Save video</a>` : ""}
+        </div>
         <div class="pplatforms">${p.manual_only ? `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
     </div>`;
@@ -151,7 +159,7 @@ h1{font-family:'Cinzel',Georgia,serif;font-size:24px;margin:0 0 8px}
 .sub{color:#6e6172;font-size:13px;margin:0}
 .muted{color:#8a7f86;font-size:12px}.cap{max-width:380px}
 .actionbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
-button{font:inherit;font-weight:600;letter-spacing:.02em;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--plum);padding:10px 18px;border-radius:100px;cursor:pointer;box-shadow:0 1px 3px rgba(65,54,69,.06)}
+button,a.mini{font:inherit;font-weight:600;letter-spacing:.02em;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--plum);padding:10px 18px;border-radius:100px;cursor:pointer;box-shadow:0 1px 3px rgba(65,54,69,.06)}
 button:hover{background:#f8f4fb;border-color:#e2d6ea}
 button.primary{background:var(--plum);color:#fff;border-color:var(--plum)}
 button.primary:hover{background:#54465a}
@@ -165,8 +173,15 @@ button.primary:hover{background:#54465a}
 .emptystate p{margin:0;font-size:14px;max-width:420px;margin:0 auto}
 .emptystate a{color:var(--rose);font-weight:600;text-decoration:none}
 .emptystate a:hover{text-decoration:underline}
+.filterbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.filterchip{background:#fff;border:1px solid var(--line);padding:8px 14px;border-radius:100px;font-size:13px;font-weight:700;color:#6e6172;cursor:pointer}
+.filterchip span{opacity:.65;font-weight:400;margin-left:2px}
+.filterchip.active{background:var(--plum);color:#fff;border-color:var(--plum)}
+.filterchip.active span{opacity:.8}
 .pgrid{display:grid;gap:12px}
 .pcard{display:flex;gap:14px;background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 4px 14px rgba(65,54,69,.05)}
+.pcard.filtered-out{display:none}
+.pcard[data-manual="1"]{border-color:#f0d69a;background:rgba(255,249,235,.65)}
 .pthumb{width:76px;height:76px;flex-shrink:0;border-radius:12px;overflow:hidden;background:#efe8f2;display:block}
 .pthumb img,.pthumb video{width:100%;height:100%;object-fit:cover;display:block}
 .pthumb-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px}
@@ -175,6 +190,10 @@ button.primary:hover{background:#54465a}
 .ptype{text-transform:capitalize;font-size:12px;color:#8a7f86}
 .campaign{color:var(--rose);font-weight:600;text-transform:none}
 .pcap{font-size:13px;color:var(--plum)}
+.pcap-full{white-space:pre-wrap;line-height:1.5;background:rgba(255,255,255,.6);border-radius:10px;padding:10px 12px;margin:2px 0}
+.prow2{margin-top:2px;display:flex;flex-wrap:wrap;gap:8px}
+.prow2 .mini{text-decoration:none;display:inline-block}
+.copied{background:#dff3e6!important;color:#1d6b3a!important;border-color:#bfe6cf!important}
 .pplatforms{margin-top:4px;display:flex;flex-direction:column;gap:4px}
 .platrow{font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .platchip{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;color:#fff}
@@ -192,7 +211,6 @@ button.primary:hover{background:#54465a}
 .checkrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
 .checkrow:last-child{border-bottom:none}
 .checkrow.bad b{color:#8c2f2f}
-.prow2{margin-top:2px}
 .modalbg{position:fixed;inset:0;background:rgba(40,32,42,.55);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
 .modalbox{background:#fff;border-radius:20px;max-width:420px;width:100%;padding:18px;position:relative;box-shadow:0 20px 60px rgba(40,32,42,.35)}
 .modalclose{position:absolute;top:10px;right:10px;border:none;background:#f1ebf3;color:var(--plum);width:30px;height:30px;border-radius:100px;cursor:pointer;font-size:14px;line-height:1}
@@ -227,6 +245,17 @@ button.primary:hover{background:#54465a}
 .reelmock-side{position:absolute;right:8px;bottom:70px;display:flex;flex-direction:column;gap:14px;color:#fff;font-size:17px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .reelmock-bottom{position:absolute;left:10px;right:40px;bottom:14px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-size:11px;line-height:1.4}
 .reelmock-bottom b{display:block;margin-bottom:3px;font-size:12px}
+@media (max-width:560px){
+  .wrap{padding:18px 14px 50px}
+  .pageheader{padding:16px 18px}
+  h1{font-size:20px}
+  .actionbar button{flex:1;min-width:0;padding:12px 10px;font-size:12px}
+  .pcard{flex-direction:column}
+  .pthumb{width:100%;height:auto;aspect-ratio:4/5;max-height:280px}
+  .prow2 .mini,.prow2 .mini[href]{flex:1;text-align:center;padding:10px 8px}
+  .filterchip{flex:1;text-align:center}
+  .modalbox{max-width:100%;padding:16px}
+}
 </style></head><body><div class="wrap">
 <a class="backlink" href="/admin">← Back to Admin</a>
 <div class="pageheader">
@@ -241,6 +270,11 @@ button.primary:hover{background:#54465a}
   <button data-act="refresh-stats">↻ Refresh stats</button>
 </div>
 ${probs}
+${sorted.length ? `<div class="filterbar">
+  <button class="filterchip active" data-filter="all">All <span>${sorted.length}</span></button>
+  <button class="filterchip" data-filter="manual">🖐🏾 Needs posting <span>${sorted.filter((p) => p.manual_only).length}</span></button>
+  <button class="filterchip" data-filter="ready">Ready <span>${sorted.filter((p) => (p.status || "draft") === "ready").length}</span></button>
+</div>` : ""}
 ${sorted.length ? `<div class="pgrid">${cards}</div>` : empty}
 <div id="out" class="outbox" hidden></div>
 <div id="previewModal" class="modalbg" hidden><div class="modalbox">
@@ -334,5 +368,29 @@ function openPreview(id){
 document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>openPreview(b.dataset.preview));
 document.getElementById('previewClose').onclick=()=>{modal.hidden=true;};
 modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});
+
+// ---- copy caption (grabs the full caption/instructions straight from POSTS) ----
+document.querySelectorAll('[data-copycap]').forEach(b=>b.onclick=async()=>{
+  const post=POSTS.find(p=>p.id===b.dataset.copycap); if(!post)return;
+  try{
+    await navigator.clipboard.writeText(post.caption||'');
+    const original=b.textContent;
+    b.textContent='✓ Copied';
+    b.classList.add('copied');
+    setTimeout(()=>{b.textContent=original;b.classList.remove('copied');},1400);
+  }catch{}
+});
+
+// ---- filter bar (All / Needs posting / Ready) ----
+const cardsEls=[...document.querySelectorAll('.pcard')];
+document.querySelectorAll('[data-filter]').forEach(chip=>chip.onclick=()=>{
+  document.querySelectorAll('[data-filter]').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  const f=chip.dataset.filter;
+  cardsEls.forEach(card=>{
+    const show=f==='all' || (f==='manual' && card.dataset.manual==='1') || (f==='ready' && card.dataset.status==='ready');
+    card.classList.toggle('filtered-out',!show);
+  });
+});
 </script></div></body></html>`;
 }
