@@ -2,15 +2,23 @@
 // One-time helper: turn a short-lived User token from Graph API Explorer into the
 // never-expiring Page token + IDs the social publisher needs.
 //
+// Easiest: create .env.local (gitignored) in the repo root with:
+//   META_APP_ID=...
+//   META_APP_SECRET=...
+//   META_USER_TOKEN=...
+// then run:  node --env-file=.env.local scripts/meta-token.mjs
+// Delete .env.local when you're done — it holds live secrets.
+//
+// Or inline, no file:
 //   META_APP_ID=... META_APP_SECRET=... node scripts/meta-token.mjs <short-lived-user-token>
 //
 // Prints META_PAGE_ID, META_PAGE_TOKEN, META_IG_USER_ID to paste into Netlify env vars.
-// Nothing is written to disk. Never commit these values (this repo is public).
+// Nothing is written to disk by this script. Never commit these values (this repo is public).
 const V = process.env.META_GRAPH_VERSION || "v25.0";
 const { META_APP_ID: id, META_APP_SECRET: secret } = process.env;
-const short = process.argv[2];
+const short = process.argv[2] || process.env.META_USER_TOKEN;
 if (!id || !secret || !short) {
-  console.error("Usage: META_APP_ID=... META_APP_SECRET=... node scripts/meta-token.mjs <short-lived-user-token>");
+  console.error("Usage: node --env-file=.env.local scripts/meta-token.mjs  (see file header for the .env.local format)");
   process.exit(1);
 }
 const g = async (p, q) => {
