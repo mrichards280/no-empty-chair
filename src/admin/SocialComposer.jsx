@@ -188,6 +188,19 @@ function PostModal({ post, onSave, onClose }) {
             </div>
           ) : null}
 
+          {p.type === "reel" ? (
+            <div className="tip">
+              🎵 There's no API access to Meta's trending-sound library — the auto-poster can't "attach" a trending
+              audio the way the app does when you browse sounds and tap one. Two ways to actually use one:
+              <br />• <b>Just want the sound playing:</b> add it to the video yourself (in the Instagram/CapCut
+              editor, whatever you use) and upload the finished export here — a baked-in audio track posts
+              automatically like any other Reel, no manual step needed.
+              <br />• <b>Want the official "using sound ___" tag</b> (for that sound's own discovery/trending
+              reach): that credit only happens if you pick the sound inside the app itself, so turn on
+              <b> "Needs manual posting"</b> below and post this one by hand when you're ready.
+            </div>
+          ) : null}
+
           <div className="fld">
             <label className="switch manualtoggle">
               <input type="checkbox" checked={!!p.manual_only} onChange={(e) => set({ manual_only: e.target.checked })} />
@@ -301,6 +314,23 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
     }
   };
 
+  const [filter, setFilter] = useState("all");
+  const counts = {
+    all: posts.length,
+    ready: posts.filter((p) => (p.status || "draft") === "ready" && !p.manual_only).length,
+    draft: posts.filter((p) => (p.status || "draft") !== "ready" && !p.manual_only).length,
+    manual: posts.filter((p) => p.manual_only).length,
+  };
+  const shown = posts
+    .filter((p) => {
+      if (filter === "all") return true;
+      if (filter === "manual") return !!p.manual_only;
+      if (p.manual_only) return false;
+      return (p.status || "draft") === filter || (filter === "draft" && (p.status || "draft") === "paused");
+    })
+    .slice()
+    .sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at));
+
   return (
     <div className="social-calendar">
       <div className="calhead">
@@ -308,25 +338,58 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
         <a href="/admin/social" target="_blank" rel="noopener noreferrer" className="mini">Open publisher status ↗</a>
         <button type="button" className="save" onClick={save}>Save &amp; Deploy</button>
       </div>
+
+      <div className="calstats">
+        <div className="statcard"><b>{counts.all}</b><span>Total</span></div>
+        <div className="statcard st-ready"><b>{counts.ready}</b><span>Ready</span></div>
+        <div className="statcard st-draft"><b>{counts.draft}</b><span>Draft</span></div>
+        <div className="statcard st-manual"><b>{counts.manual}</b><span>Manual</span></div>
+      </div>
+
+      <div className="calfilters">
+        {[["all", "All"], ["ready", "Ready"], ["draft", "Draft"], ["manual", "Manual"]].map(([k, label]) => (
+          <button type="button" key={k} className={`filterchip${filter === k ? " active" : ""}`} onClick={() => setFilter(k)}>
+            {label} <span className="filtercount">{counts[k]}</span>
+          </button>
+        ))}
+      </div>
+
       {status ? <div className="statusbar">{status}</div> : null}
 
-      {!posts.length ? <div className="muted">No posts yet — click "+ New post" to add one.</div> : null}
+      {!posts.length ? (
+        <div className="calempty">No posts yet — click "+ New post" to add your first one.</div>
+      ) : !shown.length ? (
+        <div className="calempty">Nothing in "{filter}" right now.</div>
+      ) : null}
 
       <div className="calgrid">
-        {posts.slice().sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at)).map((post) => (
-          <div className="calcard" key={post.id}>
-            <div className="calwhen">{fmt(post.publish_at)}</div>
-            <div className="caltype">{post.type} <span className={`pill st-${post.status || "draft"}`}>{post.status || "draft"}</span></div>
-            <div className="calplat">{(post.platforms || []).join(" + ")}</div>
-            {post.manual_only ? <div className="manualbadge">🖐 manual</div> : null}
-            <div className="calcap">{(post.caption || "").slice(0, 70) || <span className="muted">no caption</span>}</div>
-            <div className="caltools">
-              <button type="button" className="mini" onClick={() => setEditing(post)}>Edit</button>
-              <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>
-              <button type="button" className="mini danger" onClick={() => del(post)}>Delete</button>
+        {shown.map((post) => {
+          const thumb = post.media?.[0];
+          return (
+            <div className="calcard" key={post.id}>
+              <div className="calthumb">
+                {thumb ? (isVideoUrl(thumb) ? <video src={thumb} muted /> : <img src={thumb} alt="" />) : <div className="calthumb-empty">{post.type === "reel" ? "🎬" : "🖼️"}</div>}
+                <div className="calplatbadges">
+                  {(post.platforms || []).includes("instagram") ? <span className="platbadge pb-ig">IG</span> : null}
+                  {(post.platforms || []).includes("facebook") ? <span className="platbadge pb-fb">FB</span> : null}
+                </div>
+              </div>
+              <div className="calbody">
+                <div className="calrow1">
+                  <span className="calwhen">{fmt(post.publish_at)}</span>
+                  <span className={`pill st-${post.manual_only ? "manual" : (post.status || "draft")}`}>{post.manual_only ? "🖐 manual" : (post.status || "draft")}</span>
+                </div>
+                <div className="caltype">{post.type}</div>
+                <div className="calcap">{(post.caption || "").slice(0, 90) || <span className="muted">no caption</span>}</div>
+                <div className="caltools">
+                  <button type="button" className="mini" onClick={() => setEditing(post)}>Edit</button>
+                  <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>
+                  <button type="button" className="mini danger" onClick={() => del(post)}>Delete</button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {editing ? <PostModal post={editing} onSave={upsert} onClose={() => setEditing(null)} /> : null}
@@ -335,20 +398,41 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
 }
 
 export const SOCIAL_CSS = `
-.social-calendar{max-width:900px;margin:24px auto;padding:0 20px;}
-.calhead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.social-calendar{max-width:960px;margin:24px auto;padding:0 20px;}
+.calhead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px;}
+.calstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.statcard{border:1px solid #e6ddec;border-radius:14px;padding:14px 16px;background:rgba(255,255,255,.6);display:flex;flex-direction:column;gap:2px;}
+.statcard b{font-family:'Cinzel',serif;font-size:24px;color:#413645;}
+.statcard span{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#8a7f86;}
+.statcard.st-ready b{color:#1d6b3a;}
+.statcard.st-draft b{color:#6e6172;}
+.statcard.st-manual b{color:#7a5200;}
+.calfilters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filterchip{background:none;border:1px solid #e6ddec;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.filterchip:hover{background:rgba(255,255,255,.6);}
+.filterchip.active{background:#413645;color:#fff;border-color:#413645;}
+.filtercount{opacity:.7;font-weight:400;}
+.calempty{padding:30px 16px;text-align:center;color:#8a7f86;font-size:14px;border:1px dashed #e2d6ea;border-radius:14px;}
 .calgrid{display:grid;gap:10px;}
-.calcard{border:1px solid #e6ddec;border-radius:12px;padding:12px 16px;background:rgba(255,255,255,.6);display:grid;gap:4px;}
+.calcard{border:1px solid #e6ddec;border-radius:14px;padding:12px;background:rgba(255,255,255,.65);display:flex;gap:14px;}
+.calthumb{position:relative;width:72px;height:72px;flex-shrink:0;border-radius:10px;overflow:hidden;background:#efe8f2;}
+.calthumb img,.calthumb video{width:100%;height:100%;object-fit:cover;display:block;}
+.calthumb-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.calplatbadges{position:absolute;bottom:3px;left:3px;display:flex;gap:3px;}
+.platbadge{font-size:9px;font-weight:700;padding:1px 4px;border-radius:4px;color:#fff;letter-spacing:.02em;}
+.pb-ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);}
+.pb-fb{background:#1877f2;}
+.calbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.calrow1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .calwhen{font-weight:600;font-size:14px;}
-.caltype{text-transform:capitalize;font-size:13px;color:#6e6172;display:flex;gap:8px;align-items:center;}
-.calplat{font-size:12px;color:#8a7f86;text-transform:capitalize;}
-.calcap{font-size:13px;color:#413645;}
-.manualbadge{font-size:11px;color:#7a5200;font-weight:600;}
+.caltype{text-transform:capitalize;font-size:12px;color:#8a7f86;}
+.calcap{font-size:13px;color:#413645;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .caltools{display:flex;gap:8px;margin-top:6px;}
-.pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px;font-weight:600;}
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
 .st-ready{background:#dff3e6;color:#1d6b3a;}
 .st-draft{background:#eee;color:#666;}
 .st-paused{background:#fff1d6;color:#7a5200;}
+.st-manual{background:#fdecc8;color:#7a5200;}
 .modalveil{position:fixed;inset:0;background:rgba(65,54,69,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
 .modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
 .modalhead{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #e6ddec;font-family:'Cinzel',serif;}
