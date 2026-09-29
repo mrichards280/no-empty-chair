@@ -72,6 +72,7 @@ export function validatePost(p, cfg = config()) {
   if (!media.length) errs.push("media is empty");
   if (!["ready", "draft", "paused"].includes(p.status || "draft")) errs.push("status must be ready, draft, or paused");
   if (p.manual_only !== undefined && typeof p.manual_only !== "boolean") errs.push("manual_only must be true or false");
+  if (p.campaign !== undefined && typeof p.campaign !== "string") errs.push("campaign must be text");
 
   const imgs = media.filter((m) => !isVideo(m));
   const vids = media.filter(isVideo);
@@ -417,4 +418,89 @@ export async function verifyConnection(graph, cfg = config()) {
     } catch (e) { add("Instagram publishing permission", false, e.message); }
   }
   return out;
+}
+
+// ---------------------------------------------------------------- performance tracking
+
+// Likes/comments/permalink come from the stable media/post object fields.
+// Reach/plays/saves/impressions come from the Insights edges, which are
+// best-effort: accepted metric names vary by media type and get renamed or
+// deprecated across API versions (Meta deprecated a batch of Page Insights
+// metrics in mid-2026), and a Story's insights disappear once it expires
+// after 24h. A failure there is recorded but never blocks the stable counts.
+const IG_INSIGHT_METRICS = {
+  IMAGE: "reach,saved",
+  CAROUSEL_ALBUM: "reach,saved",
+  VIDEO: "reach,saved,plays",
+  REELS: "reach,saved,plays",
+  STORY: "reach",
+};
+
+function readInsightRows(data) {
+  const out = {};
+  for (const row of data || []) out[row.name] = row.values?.[0]?.value ?? row.total_value?.value;
+  return out;
+}
+
+// Pulls current performance numbers for one already-published post/platform.
+// `st` is that platform's saved publish state (has mediaId for Instagram,
+// postId for Facebook).
+export async function fetchStats(graph, platform, st) {
+  if (platform === "instagram" && st.mediaId) {
+    const media = await graph.get(st.mediaId, { fields: "permalink,timestamp,media_product_type,like_count,comments_count" });
+    const out = {
+      permalink: media.permalink,
+      postedAt: media.timestamp,
+      likes: media.like_count,
+      comments: media.comments_count,
+      fetchedAt: new Date().toISOString(),
+    };
+    try {
+      const metric = IG_INSIGHT_METRICS[media.media_product_type] || "reach";
+      Object.assign(out, readInsightRows((await graph.get(`${st.mediaId}/insights`, { metric })).data));
+    } catch (e) { out.insightsError = e.message; }
+    return out;
+  }
+  if (platform === "facebook" && st.postId) {
+    const post = await graph.get(st.postId, { fields: "permalink_url,created_time,likes.summary(true),comments.summary(true)" });
+    const out = {
+      permalink: post.permalink_url,
+      postedAt: post.created_time,
+      likes: post.likes?.summary?.total_count,
+      comments: post.comments?.summary?.total_count,
+      fetchedAt: new Date().toISOString(),
+    };
+    try {
+      Object.assign(out, readInsightRows((await graph.get(`${st.postId}/insights`, { metric: "post_impressions,post_engaged_users" })).data));
+    } catch (e) { out.insightsError = e.message; }
+    return out;
+  }
+  return null;
+}
+
+// Walks every published post/platform in the schedule and refreshes its stats
+// in the blob store in place. Returns a per-post/platform ok/error report.
+export async function refreshAllStats({ schedule, store, graph }) {
+  const { posts } = validateSchedule(schedule);
+  const results = [];
+  for (const post of posts) {
+    const state = (await store.get(post.id, { type: "json" })) || {};
+    let changed = false;
+    for (const platform of post.platforms || []) {
+      const st = state[platform];
+      if (!st || st.status !== "published") continue;
+      try {
+        const stats = await fetchStats(graph, platform, st);
+        if (stats) {
+          state[platform] = { ...st, stats };
+          changed = true;
+          results.push({ id: post.id, platform, ok: true });
+        }
+      } catch (e) {
+        results.push({ id: post.id, platform, ok: false, error: e.message });
+      }
+    }
+    if (changed) await store.setJSON(post.id, state);
+  }
+  return results;
 }

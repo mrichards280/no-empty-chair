@@ -174,18 +174,33 @@ function Value({ keyName, value, onChange }) {
   return null;
 }
 
+const REMEMBER_KEY = "nec-admin-remember";
+
 /* ---------- main admin ---------- */
 export default function Admin() {
   const { content, setContent, loading } = useContent();
   const { schedule, setSchedule, loading: schedLoading } = useSchedule();
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
+  const [checkingRemembered, setCheckingRemembered] = useState(true);
+  const [remember, setRemember] = useState(true);
   const [authErr, setAuthErr] = useState("");
   const [status, setStatus] = useState("");
   const [activeSection, setActiveSection] = useState(null);
   const [sectionQuery, setSectionQuery] = useState("");
   const [tab, setTab] = useState("content");
   const [savedSnapshot, setSavedSnapshot] = useState(null);
+
+  useEffect(() => {
+    let stored;
+    try { stored = localStorage.getItem(REMEMBER_KEY); } catch { stored = null; }
+    if (!stored) { setCheckingRemembered(false); return; }
+    verifyPassword(stored).then((ok) => {
+      if (ok) { setPassword(stored); setAuthed(true); }
+      else { try { localStorage.removeItem(REMEMBER_KEY); } catch {} }
+      setCheckingRemembered(false);
+    });
+  }, []);
 
   useEffect(() => {
     if (content && !activeSection) setActiveSection(Object.keys(content)[0]);
@@ -205,8 +220,19 @@ export default function Admin() {
     e.preventDefault();
     setAuthErr("");
     const ok = await verifyPassword(password);
-    if (ok) setAuthed(true);
-    else setAuthErr("Wrong password, or the save function isn't configured yet.");
+    if (ok) {
+      setAuthed(true);
+      try {
+        if (remember) localStorage.setItem(REMEMBER_KEY, password);
+        else localStorage.removeItem(REMEMBER_KEY);
+      } catch {}
+    } else setAuthErr("Wrong password, or the save function isn't configured yet.");
+  };
+
+  const signOut = () => {
+    try { localStorage.removeItem(REMEMBER_KEY); } catch {}
+    setAuthed(false);
+    setPassword("");
   };
 
   const save = async () => {
@@ -228,13 +254,18 @@ export default function Admin() {
     <div className="admin">
       <style>{ADMIN_CSS}</style>
 
-      {!authed ? (
+      {checkingRemembered ? (
+        <div className="loading">Signing you in…</div>
+      ) : !authed ? (
         <div className="loginwrap">
           <form className="loginbox" onSubmit={login}>
             <div className="logo">No Empty <span>Chair</span> · Admin</div>
             <p className="muted">Sign in to edit your site content.</p>
             <label className="visually-hidden" htmlFor="nec-admin-password">Admin password</label>
             <input id="nec-admin-password" type="password" placeholder="Admin password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <label className="switch rememberrow">
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> Keep me signed in on this device
+            </label>
             <button className="save" type="submit">Sign in</button>
             {authErr ? <div className="err" role="status" aria-live="polite">{authErr}</div> : null}
           </form>
@@ -251,6 +282,7 @@ export default function Admin() {
               {tab === "content" && dirty ? <span className="dirtydot" title="Unsaved changes">● Unsaved</span> : null}
               <a href="/" target="_blank" rel="noopener noreferrer" className="mini">View site</a>
               {tab === "content" ? <button className="save" onClick={save} disabled={!dirty}>Save &amp; Deploy</button> : null}
+              <button type="button" className="mini" onClick={signOut}>Sign out</button>
             </div>
           </div>
           {tab === "content" && status ? <div className="statusbar">{status}</div> : null}
@@ -319,6 +351,7 @@ const ADMIN_CSS = `
 .loginwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
 .loginbox{background:rgba(255,255,255,.7);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.7);border-radius:20px;padding:36px 30px;width:100%;max-width:380px;display:grid;gap:14px;box-shadow:0 20px 60px rgba(65,54,69,.15);}
 .loginbox .logo{font-size:20px;text-align:center;}
+.rememberrow{font-size:13px;color:#6e6172;}
 .admin input,.admin textarea{width:100%;padding:11px 13px;border:1px solid #e6ddec;border-radius:10px;font-family:inherit;font-size:14px;background:#fffdfb;color:#413645;}
 .admin textarea{min-height:80px;resize:vertical;}
 .save{background:#a85a76;color:#fff;border:none;padding:12px 22px;border-radius:100px;font-weight:600;font-size:14px;cursor:pointer;}
