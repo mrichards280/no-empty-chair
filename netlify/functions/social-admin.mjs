@@ -191,6 +191,10 @@ button:hover{background:#f8f4fb;border-color:#e2d6ea}
 button.primary{background:var(--plum);color:#fff;border-color:var(--plum)}
 button.primary:hover{background:#54465a}
 .mini{padding:3px 10px;font-size:11px;box-shadow:none}
+.mini.loading,button.loading{position:relative;color:transparent!important;pointer-events:none}
+.mini.loading::after,button.loading::after{content:"";position:absolute;inset:0;margin:auto;width:12px;height:12px;border:2px solid currentColor;border-color:var(--plum) var(--plum) transparent transparent;border-radius:50%;animation:spin .6s linear infinite;color:var(--plum)}
+button.primary.loading::after{border-color:#fff #fff transparent transparent}
+@keyframes spin{to{transform:rotate(360deg)}}
 .pill{display:inline-block;padding:2px 11px;border-radius:100px;font-size:12px;font-weight:600}
 .on{background:#dff3e6;color:#1d6b3a}.off{background:#f6e3e3;color:#8c2f2f}
 .st-ready{background:#dff3e6;color:#1d6b3a}.st-draft{background:#eee;color:#666}.st-paused{background:#fff1d6;color:#7a5200}
@@ -332,8 +336,8 @@ async function go(body){out.hidden=false;out.innerHTML='Working…';
  const data=await r.json();
  out.innerHTML=render(body.action,data);
  return data;}
-document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{await go({action:b.dataset.act});if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
-document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600)});
+document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');await go({action:b.dataset.act});b.classList.remove('loading');if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
+document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600)});
 
 // ---- preview modal ----
 const POSTS=JSON.parse(document.getElementById('postsData').textContent);
@@ -444,7 +448,7 @@ document.querySelectorAll('[data-markmanual]').forEach(b=>b.onclick=async()=>{
 document.querySelectorAll('[data-postnow]').forEach(b=>b.onclick=async()=>{
   const id=b.dataset.postnow;
   if(!confirm('Post this right now, live, regardless of its scheduled time?'))return;
-  b.disabled=true; b.textContent='Posting…';
+  b.disabled=true; b.classList.add('loading');
   const data=await go({action:'run',id});
   location.reload();
 });
