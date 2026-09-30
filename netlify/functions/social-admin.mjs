@@ -140,7 +140,7 @@ function page(d, cfg) {
         <div class="prow2">
           <button class="mini" data-preview="${esc(p.id)}">👁 Preview</button>
           <button class="mini" data-copycap="${esc(p.id)}">📋 Copy caption</button>
-          ${isVid && media0 ? `<a class="mini" href="${src}" download>⬇ Save video</a>` : ""}
+          ${isVid && media0 ? `<button class="mini" data-savevideo="${src}" data-savename="${esc(p.id)}.mp4">⬇ Save video</button>` : ""}
           ${p.manual_only ? (p.state.manual?.status === "posted"
             ? `<button class="mini" data-markmanual="${esc(p.id)}" data-undo="1">↺ Undo posted</button>`
             : `<button class="mini markdone" data-markmanual="${esc(p.id)}">✓ Mark posted</button>`) : ""}
@@ -447,6 +447,35 @@ document.querySelectorAll('[data-copycap]').forEach(b=>b.onclick=async()=>{
     b.classList.add('copied');
     setTimeout(()=>{b.textContent=original;b.classList.remove('copied');},1400);
   }catch{}
+});
+
+// ---- save video: a plain <a download> silently fails on iOS Safari for
+// cross-origin files (Cloudinary), it just opens/plays the video instead of
+// saving it. Fetch it as a blob and hand it to the native share sheet, which
+// gives a real "Save Video" option on iPhone; desktop falls back to a normal
+// same-origin blob download (blob: URLs aren't subject to that restriction).
+document.querySelectorAll('[data-savevideo]').forEach(b=>b.onclick=async()=>{
+  const url=b.dataset.savevideo, filename=b.dataset.savename||'video.mp4';
+  const original=b.textContent;
+  b.textContent='Preparing…'; b.classList.add('loading');
+  try{
+    const res=await fetch(url);
+    const blob=await res.blob();
+    const file=new File([blob],filename,{type:blob.type||'video/mp4'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:filename});
+    } else {
+      const objUrl=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=objUrl; a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(objUrl),4000);
+    }
+  }catch(err){
+    if(err?.name!=='AbortError') window.open(url,'_blank');
+  }finally{
+    b.textContent=original; b.classList.remove('loading');
+  }
 });
 
 // ---- filter bar (All / Needs posting / Ready) ----
