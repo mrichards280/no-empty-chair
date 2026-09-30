@@ -73,6 +73,7 @@ export function validatePost(p, cfg = config()) {
   if (!["ready", "draft", "paused"].includes(p.status || "draft")) errs.push("status must be ready, draft, or paused");
   if (p.manual_only !== undefined && typeof p.manual_only !== "boolean") errs.push("manual_only must be true or false");
   if (p.campaign !== undefined && typeof p.campaign !== "string") errs.push("campaign must be text");
+  if (p.first_comment !== undefined && typeof p.first_comment !== "string") errs.push("first_comment must be text");
 
   const imgs = media.filter((m) => !isVideo(m));
   const vids = media.filter(isVideo);
@@ -217,11 +218,46 @@ async function igStep(post, st, g, cfg) {
   return st;
 }
 
-async function igPublish(st, g, cfg) {
+// A first comment posted immediately reads as automated; staggering it randomly
+// within this window (after the media is confirmed published) mimics when a
+// real person would circle back and drop a follow-up comment.
+const AUTO_COMMENT_MIN_MS = 10 * 60 * 1000;
+const AUTO_COMMENT_MAX_MS = 40 * 60 * 1000;
+
+async function igPublish(post, st, g, cfg) {
   const r = await g.post(`${cfg.igUserId}/media_publish`, { creation_id: st.container });
   let permalink;
   try { permalink = (await g.get(r.id, { fields: "permalink" })).permalink; } catch { /* nice to have */ }
-  return { ...st, status: "published", phase: "done", mediaId: r.id, permalink };
+  const next = { ...st, status: "published", phase: "done", mediaId: r.id, permalink };
+  if (post.first_comment) {
+    const delay = AUTO_COMMENT_MIN_MS + Math.random() * (AUTO_COMMENT_MAX_MS - AUTO_COMMENT_MIN_MS);
+    next.autoComment = { message: post.first_comment, status: "pending", dueAt: Date.now() + delay };
+  }
+  return next;
+}
+
+// Posts each post's staggered first comment once its due time has passed.
+// Runs alongside the main publish tick; failures are recorded but never retried
+// automatically (a stale "first comment" posted hours late reads as spam).
+export async function postAutoComments({ schedule, store, graph, cfg, now = Date.now() }) {
+  const { posts } = validateSchedule(schedule);
+  const posted = [];
+  for (const post of posts) {
+    const state = (await store.get(post.id, { type: "json" })) || {};
+    const ig = state.instagram;
+    if (!ig?.autoComment || ig.autoComment.status !== "pending") continue;
+    if (now < ig.autoComment.dueAt) continue;
+    try {
+      const r = await graph.post(`${ig.mediaId}/comments`, { message: ig.autoComment.message });
+      state.instagram = { ...ig, autoComment: { ...ig.autoComment, status: "posted", postedAt: new Date(now).toISOString(), commentId: r.id } };
+      posted.push({ id: post.id, ok: true });
+    } catch (err) {
+      state.instagram = { ...ig, autoComment: { ...ig.autoComment, status: "failed", error: err.message } };
+      posted.push({ id: post.id, ok: false, error: err.message });
+    }
+    await store.setJSON(post.id, state);
+  }
+  return { posted };
 }
 
 function tooSlow(st) {
@@ -342,7 +378,7 @@ export async function runTick({ schedule, store, now = Date.now(), graph, cfg = 
             if (next._publishNext) {
               delete next._publishNext;
               await save(post.id, platform, next); // phase=publishing persisted BEFORE the call
-              next = await igPublish(next, graph, cfg);
+              next = await igPublish(post, next, graph, cfg);
             }
           } else {
             next = await fbStep(post, next, graph, cfg);
@@ -496,6 +532,10 @@ export async function fetchStats(graph, platform, st) {
       const metric = IG_INSIGHT_METRICS[media.media_product_type] || "reach";
       Object.assign(out, readInsightRows((await graph.get(`${st.mediaId}/insights`, { metric })).data));
     } catch (e) { out.insightsError = e.message; }
+    try {
+      const c = await graph.get(`${st.mediaId}/comments`, { fields: "username,text,timestamp", limit: 5 });
+      out.recentComments = (c.data || []).map((x) => ({ username: x.username, text: x.text, timestamp: x.timestamp }));
+    } catch { /* comments are a nice-to-have, never block the stable counts */ }
     return out;
   }
   if (platform === "facebook" && st.postId) {
@@ -517,7 +557,7 @@ export async function fetchStats(graph, platform, st) {
 
 // Walks every published post/platform in the schedule and refreshes its stats
 // in the blob store in place. Returns a per-post/platform ok/error report.
-export async function refreshAllStats({ schedule, store, graph }) {
+export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
   const { posts } = validateSchedule(schedule);
   const results = [];
   for (const post of posts) {
@@ -526,6 +566,7 @@ export async function refreshAllStats({ schedule, store, graph }) {
     for (const platform of post.platforms || []) {
       const st = state[platform];
       if (!st || st.status !== "published") continue;
+      if (maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs) continue;
       try {
         const stats = await fetchStats(graph, platform, st);
         if (stats) {

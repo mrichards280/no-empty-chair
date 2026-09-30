@@ -316,6 +316,14 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
             <button type="button" className="mini" onClick={() => setShowFbCaption(true)}>+ Use a different caption for Facebook</button>
           )}
 
+          {!p.manual_only && (p.platforms || []).includes("instagram") ? (
+            <div className="fld">
+              <FldHead value={p.first_comment} label="first comment">First comment (optional)</FldHead>
+              <textarea value={p.first_comment || ""} onChange={(e) => set({ first_comment: e.target.value })} />
+              <div className="muted">Posted automatically on Instagram 10–40 min after this goes live (randomized so it doesn't read as a bot). Manual-only posts don't get this — add it by hand when you post.</div>
+            </div>
+          ) : null}
+
           <MediaPicker media={p.media || []} onChange={(media) => set({ media })} />
           <div className="muted mediahint">{MEDIA_HINT[p.type]}</div>
 

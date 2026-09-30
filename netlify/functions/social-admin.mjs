@@ -98,7 +98,16 @@ function page(d, cfg) {
           num(stats.post_engaged_users) !== null ? `⚡ ${num(stats.post_engaged_users)} engaged` : null,
         ].filter(Boolean).join(" · ")}<span class="muted"> (as of ${esc(timeAgo(stats.fetchedAt))})</span></div>`
       : "";
-    return `<div class="platrow"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statLine}</div>`;
+    const comments = stats?.recentComments?.length
+      ? `<div class="commentlist">${stats.recentComments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}</div>`).join("")}</div>`
+      : "";
+    const ac = p === "instagram" ? st?.autoComment : null;
+    const acLine = ac
+      ? ac.status === "pending" ? `<div class="muted">🕐 first comment queued for ${esc(fmt(new Date(ac.dueAt).toISOString()))}</div>`
+      : ac.status === "posted" ? `<div class="muted">💬 first comment posted ${esc(timeAgo(ac.postedAt))}</div>`
+      : `<div class="err">first comment failed: ${esc(ac.error || "")}</div>`
+      : "";
+    return `<div class="platrow"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statLine}${comments}${acLine}</div>`;
   };
 
   const sorted = d.posts.slice().sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at));
@@ -245,6 +254,9 @@ button.markdone{background:#dff3e6;color:#1d6b3a;border-color:#bfe6cf}
 button.postnow{background:var(--plum);color:#fff;border-color:var(--plum)}
 button.postnow:disabled{opacity:.6}
 .stats{font-size:11px;color:#5a3f4e}
+.commentlist{margin-top:4px;padding-left:10px;border-left:2px solid var(--line)}
+.commentrow{font-size:11px;color:#5a3f4e;line-height:1.5}
+.commentrow b{color:var(--plum)}
 .outbox{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:20px;box-shadow:0 4px 14px rgba(65,54,69,.05)}
 .outbox pre{margin:0;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:340px}
 .checkhead{font-weight:600;margin-bottom:10px}
