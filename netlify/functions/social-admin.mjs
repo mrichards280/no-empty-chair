@@ -105,7 +105,7 @@ function page(d, cfg) {
     const isVid = /\.(mp4|mov)(\?|#|$)/i.test(media0);
     const src = media0 ? esc(mediaUrl(media0, cfg)) : "";
     const thumb = media0
-      ? (isVid ? `<video src="${src}" muted></video>` : `<img src="${src}" alt="">`)
+      ? (isVid ? `<video src="${src}" muted playsinline preload="metadata"></video>` : `<img src="${src}" alt="">`)
       : `<div class="pthumb-empty">${TYPE_ICON[p.type] || "🖼️"}</div>`;
     const fullCap = p.caption || "";
     const capBlock = p.manual_only
@@ -340,7 +340,7 @@ const POSTS=JSON.parse(document.getElementById('postsData').textContent);
 const modal=document.getElementById('previewModal'), tabsEl=document.getElementById('previewTabs'), metaEl=document.getElementById('previewMeta'), bodyEl=document.getElementById('previewBody');
 const isVid=m=>/\\.(mp4|mov)(\\?|#|$)/i.test(m);
 const fmtModal=iso=>{try{return new Date(iso).toLocaleString('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}catch{return iso;}};
-function mediaTag(url,cls){return isVid(url)?'<video src="'+url+'" '+(cls==='reelmock'?'controls':'muted loop autoplay playsinline')+'></video>':'<img src="'+url+'" alt="">';}
+function mediaTag(url,cls){return isVid(url)?'<video src="'+url+'" preload="metadata" '+(cls==='reelmock'?'controls':'muted loop autoplay playsinline')+'></video>':'<img src="'+url+'" alt="">';}
 function igCard(post){
   const media=post.media.map(m=>mediaTag(m,'igmock')).join('');
   const dots=post.media.length>1?'<div class="igmock-dots">'+post.media.map((_,i)=>i===0?'●':'○').join(' ')+'</div>':'';
