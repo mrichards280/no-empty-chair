@@ -1,0 +1,13 @@
+{
+  "name": "No Empty Chair Social",
+  "short_name": "NEC Social",
+  "start_url": "/admin/social",
+  "scope": "/admin/social",
+  "display": "standalone",
+  "background_color": "#faf6f2",
+  "theme_color": "#413645",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicon-48.png", "sizes": "48x48", "type": "image/png" }
+  ]
+}
