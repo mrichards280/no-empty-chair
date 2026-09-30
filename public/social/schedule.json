@@ -2,6 +2,22 @@
   "timezone_note": "publish_at must include an offset. Eastern is -04:00 until Nov 1, 2026, then -05:00.",
   "posts": [
     {
+      "id": "2026-09-30-test-flow",
+      "publish_at": "2026-09-30T14:30:00-04:00",
+      "type": "reel",
+      "platforms": [
+        "instagram",
+        "facebook"
+      ],
+      "media": [
+        "https://res.cloudinary.com/djrmz717j/video/upload/v1790792332/no-empty-chair/social/oct-2026/ad-a01.mp4"
+      ],
+      "caption": "A free template from 2017? For your signature work? Groundbreaking. Dress the front door. Link in bio \u2014 $200 teardown.",
+      "status": "ready",
+      "manual_only": false,
+      "evergreen": true
+    },
+    {
       "id": "2026-10-f01",
       "publish_at": "2026-10-01T11:00:00-04:00",
       "type": "image",
