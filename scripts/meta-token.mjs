@@ -37,9 +37,12 @@ for (const p of pages.data) {
   const exp = dbg.data?.expires_at ? new Date(dbg.data.expires_at * 1000).toISOString() : "never";
   console.log(`\n=== ${p.name} ===`);
   console.log(`Page token expires: ${exp}`);
+  if (exp !== "never") console.log(`⚠️  NOT never-expiring — do not use this one for the live scheduler. Something went wrong in the exchange (check META_APP_ID/META_APP_SECRET are right).`);
   console.log(`Scopes: ${(dbg.data?.scopes || []).join(", ")}`);
   console.log(`Can create content: ${(p.tasks || []).includes("CREATE_CONTENT")}`);
-  console.log(`\nMETA_PAGE_ID=${p.id}`);
+  console.log(`\n↓↓↓ COPY ONLY THESE THREE LINES INTO NETLIFY — nowhere else has the real values ↓↓↓`);
+  console.log(`META_PAGE_ID=${p.id}`);
   console.log(`META_PAGE_TOKEN=${p.access_token}`);
   console.log(p.instagram_business_account ? `META_IG_USER_ID=${p.instagram_business_account.id}   (@${p.instagram_business_account.username})` : "META_IG_USER_ID=  (no Instagram professional account linked to this Page)");
+  console.log(`↑↑↑ NOT from .env.local, NOT from the Explorer's Access Token box — only from these three lines, right here ↑↑↑`);
 }

@@ -32,6 +32,13 @@ export default async (req) => {
       await store.setJSON(body.id, cur);
       return json({ ok: true, note: "cleared; it will publish on the next run if still within the late window" });
     }
+    if (body.action === "mark-manual" && body.id) {
+      const cur = (await store.get(body.id, { type: "json" })) || {};
+      if (body.undo) delete cur.manual;
+      else cur.manual = { status: "posted", postedAt: new Date().toISOString(), ...(body.permalink ? { permalink: body.permalink } : {}) };
+      await store.setJSON(body.id, cur);
+      return json({ ok: true });
+    }
     if (body.action === "refresh-stats") return json({ results: await refreshAllStats({ schedule, store, graph }) });
     return json({ error: "unknown action" }, 400);
   }
@@ -39,7 +46,10 @@ export default async (req) => {
   const { posts, problems } = validateSchedule(schedule);
   const rows = await Promise.all(posts.map(async (p) => ({ ...p, state: (await store.get(p.id, { type: "json" })) || {} })));
   const lastRun = await store.get("_lastRun", { type: "json" });
-  const data = { enabled: cfg.enabled, lastRun, problems, posts: rows };
+  const calToken = Netlify.env.get("CALENDAR_FEED_TOKEN");
+  const site = (Netlify.env.get("URL") || "https://noemptychair.co").replace(/\/$/, "");
+  const calendarUrl = calToken ? `${site}/social/calendar.ics?key=${encodeURIComponent(calToken)}` : null;
+  const data = { enabled: cfg.enabled, lastRun, problems, posts: rows, calendarUrl };
   if (new URL(req.url).searchParams.get("format") === "json") return json(data);
   return new Response(page(data, cfg), { headers: { "Content-Type": "text/html; charset=utf-8", "X-Robots-Tag": "noindex", "Cache-Control": "no-store" } });
 };
@@ -101,8 +111,11 @@ function page(d, cfg) {
     const capBlock = p.manual_only
       ? `<div class="pcap pcap-full">${esc(fullCap) || `<span class="muted">no caption</span>`}</div>`
       : `<div class="pcap">${esc(fullCap.slice(0, 100)) || `<span class="muted">no caption</span>`}</div>`;
+    const allPublished = !p.manual_only && p.platforms.length && p.platforms.every((pl) => p.state[pl]?.status === "published");
+    const canPostNow = !p.manual_only && (p.status || "draft") === "ready" && !allPublished;
+    const needsPosting = p.manual_only && (p.status || "draft") === "ready" && p.state.manual?.status !== "posted";
     return `
-    <div class="pcard" data-manual="${p.manual_only ? "1" : "0"}" data-status="${esc(p.status || "draft")}">
+    <div class="pcard" data-manual="${p.manual_only ? "1" : "0"}" data-needs-posting="${needsPosting ? "1" : "0"}" data-status="${esc(p.status || "draft")}">
       <a class="pthumb" href="${src || "#"}" target="_blank" rel="noopener">${thumb}</a>
       <div class="pbody">
         <div class="prow1">
@@ -115,8 +128,16 @@ function page(d, cfg) {
           <button class="mini" data-preview="${esc(p.id)}">👁 Preview</button>
           <button class="mini" data-copycap="${esc(p.id)}">📋 Copy caption</button>
           ${isVid && media0 ? `<a class="mini" href="${src}" download>⬇ Save video</a>` : ""}
+          ${p.manual_only ? (p.state.manual?.status === "posted"
+            ? `<button class="mini" data-markmanual="${esc(p.id)}" data-undo="1">↺ Undo posted</button>`
+            : `<button class="mini markdone" data-markmanual="${esc(p.id)}">✓ Mark posted</button>`) : ""}
+          ${canPostNow ? `<button class="mini postnow" data-postnow="${esc(p.id)}">▶ Post now</button>` : ""}
         </div>
-        <div class="pplatforms">${p.manual_only ? `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>` : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
+        <div class="pplatforms">${p.manual_only
+          ? (p.state.manual?.status === "posted"
+              ? `<div class="manual posted">✅ Posted ${esc(timeAgo(p.state.manual.postedAt))}${p.state.manual.permalink ? ` · <a href="${esc(p.state.manual.permalink)}" target="_blank" rel="noopener">view ↗</a>` : ` <span class="muted">(no link saved)</span>`}</div>`
+              : `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>`)
+          : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
     </div>`;
   }).join("");
@@ -147,6 +168,12 @@ function page(d, cfg) {
   const probs = d.problems.length ? `<div class="warn"><b>Schedule problems (these posts will not go out):</b><ul>${d.problems.map((p) => `<li>${esc(p.id)}: ${esc(p.errors.join("; "))}</li>`).join("")}</ul></div>` : "";
 
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Social publisher</title>
+<link rel="manifest" href="/social/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEC Social">
+<meta name="theme-color" content="#413645">
 <style>
 :root{--plum:#413645;--rose:#a85a76;--cream:#faf6f2;--line:#e7dfe3}
 *{box-sizing:border-box}
@@ -204,6 +231,11 @@ button.primary:hover{background:#54465a}
 .err{color:#8c2f2f;font-size:12px;max-width:340px}
 .warn{background:#fff1d6;border-radius:14px;padding:14px 18px;margin:0 0 16px;font-size:14px}
 .manual{color:#7a5200;font-size:13px}
+.manual.posted{color:#1d6b3a}
+.manual.posted a{color:#1d6b3a;font-weight:600}
+button.markdone{background:#dff3e6;color:#1d6b3a;border-color:#bfe6cf}
+button.postnow{background:var(--plum);color:#fff;border-color:var(--plum)}
+button.postnow:disabled{opacity:.6}
 .stats{font-size:11px;color:#5a3f4e}
 .outbox{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:20px;box-shadow:0 4px 14px rgba(65,54,69,.05)}
 .outbox pre{margin:0;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:340px}
@@ -262,6 +294,7 @@ button.primary:hover{background:#54465a}
   <h1>📅 Social publisher</h1>
   <p class="sub">Auto-posting is <span class="pill ${d.enabled ? "on" : "off"}">${d.enabled ? "ON" : "PAUSED"}</span>
   · checks every 10 minutes · last run ${d.lastRun ? esc(fmt(d.lastRun.at)) + (d.lastRun.skipped ? " (" + esc(d.lastRun.skipped) + ")" : "") : "never"} · times shown in Eastern</p>
+  ${d.calendarUrl ? `<p class="sub"><a href="${esc(d.calendarUrl)}">📅 Subscribe to the "needs posting" calendar</a> — add it once in your phone's Calendar app for native reminders. Add this page to your home screen (Share → Add to Home Screen) for one-tap access.</p>` : `<p class="sub muted">Calendar reminders aren't set up yet — add a CALENDAR_FEED_TOKEN env var to enable the subscribe link.</p>`}
 </div>
 <div class="actionbar">
   <button data-act="verify">🔌 Check connection</button>
@@ -272,7 +305,7 @@ button.primary:hover{background:#54465a}
 ${probs}
 ${sorted.length ? `<div class="filterbar">
   <button class="filterchip active" data-filter="all">All <span>${sorted.length}</span></button>
-  <button class="filterchip" data-filter="manual">🖐🏾 Needs posting <span>${sorted.filter((p) => p.manual_only).length}</span></button>
+  <button class="filterchip" data-filter="manual">🖐🏾 Needs posting <span>${sorted.filter((p) => p.manual_only && (p.status || "draft") === "ready" && p.state.manual?.status !== "posted").length}</span></button>
   <button class="filterchip" data-filter="ready">Ready <span>${sorted.filter((p) => (p.status || "draft") === "ready").length}</span></button>
 </div>` : ""}
 ${sorted.length ? `<div class="pgrid">${cards}</div>` : empty}
@@ -388,9 +421,32 @@ document.querySelectorAll('[data-filter]').forEach(chip=>chip.onclick=()=>{
   chip.classList.add('active');
   const f=chip.dataset.filter;
   cardsEls.forEach(card=>{
-    const show=f==='all' || (f==='manual' && card.dataset.manual==='1') || (f==='ready' && card.dataset.status==='ready');
+    const show=f==='all' || (f==='manual' && card.dataset.needsPosting==='1') || (f==='ready' && card.dataset.status==='ready');
     card.classList.toggle('filtered-out',!show);
   });
+});
+
+// ---- mark a manual post posted / undo, with an optional real permalink for verifiable tracking ----
+document.querySelectorAll('[data-markmanual]').forEach(b=>b.onclick=async()=>{
+  const id=b.dataset.markmanual;
+  if(b.dataset.undo){
+    if(!confirm('Undo "posted"? It will show as needing posting again.'))return;
+    await go({action:'mark-manual',id,undo:true});
+  } else {
+    const url=prompt('Optional: paste the real Instagram or Facebook post link, so this is verifiable later (leave blank to skip):','');
+    if(url===null)return; // cancelled
+    await go({action:'mark-manual',id,permalink:url.trim()||undefined});
+  }
+  location.reload();
+});
+
+// ---- post now: publish one specific ready post immediately, regardless of its scheduled time ----
+document.querySelectorAll('[data-postnow]').forEach(b=>b.onclick=async()=>{
+  const id=b.dataset.postnow;
+  if(!confirm('Post this right now, live, regardless of its scheduled time?'))return;
+  b.disabled=true; b.textContent='Posting…';
+  const data=await go({action:'run',id});
+  location.reload();
 });
 </script></div></body></html>`;
 }

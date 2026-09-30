@@ -396,6 +396,43 @@ export async function sendNotice(notices, cfg) {
   });
 }
 
+// ---------------------------------------------------------------- manual-post reminders
+
+// Manual posts (Reels/Stories the API can't fully publish — polls, stickers, sound
+// credits) never get touched by runTick. This is the parallel check: once a manual
+// post's scheduled time arrives, email a one-time reminder (never repeats — tracked via
+// state.manualReminder.sentAt) unless it's already been marked posted.
+export async function checkManualReminders({ schedule, store, cfg = config(), now = Date.now() }) {
+  if (!cfg.resendKey) return { sent: false, reason: "no RESEND_API_KEY" };
+  const { posts } = validateSchedule(schedule);
+  const due = [];
+  for (const p of posts) {
+    if (!p.manual_only || (p.status || "draft") !== "ready") continue;
+    if (Date.parse(p.publish_at) > now) continue;
+    const state = (await store.get(p.id, { type: "json" })) || {};
+    if (state.manual?.status === "posted") continue;
+    if (state.manualReminder?.sentAt) continue;
+    due.push({ p, state });
+  }
+  if (!due.length) return { sent: false, reason: "nothing newly due" };
+
+  const lines = due.map(({ p }) => `🖐🏾 ${p.type} — ${(p.caption || "").split("\n")[0].slice(0, 80) || "(no caption)"} — due ${p.publish_at}`);
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${cfg.resendKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: "No Empty Chair Social <onboarding@resend.dev>",
+      to: [cfg.notifyTo],
+      subject: `🖐🏾 ${due.length} post${due.length > 1 ? "s" : ""} to post by hand today`,
+      text: lines.join("\n") + "\n\nGrab the caption/media and mark it posted: https://noemptychair.co/admin/social",
+    }),
+  });
+  for (const { p, state } of due) {
+    await store.setJSON(p.id, { ...state, manualReminder: { sentAt: new Date(now).toISOString() } });
+  }
+  return { sent: true, ids: due.map(({ p }) => p.id) };
+}
+
 // ---------------------------------------------------------------- connection check
 
 export async function verifyConnection(graph, cfg = config()) {

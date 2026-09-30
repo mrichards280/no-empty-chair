@@ -344,10 +344,21 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
           <div className="fld">
             <label>Status</label>
             <select value={p.status || "draft"} onChange={(e) => set({ status: e.target.value })}>
-              <option value="draft">Draft — never posts</option>
-              <option value="ready">Ready — will post at the scheduled time</option>
-              <option value="paused">Paused — was ready, temporarily held</option>
+              {p.manual_only ? (
+                <>
+                  <option value="draft">Draft — not finalized, hidden from reminders and "Needs posting"</option>
+                  <option value="ready">Ready — finalized, will show up as needing posting on its date</option>
+                  <option value="paused">Paused — was ready, temporarily held out of reminders</option>
+                </>
+              ) : (
+                <>
+                  <option value="draft">Draft — never auto-posts</option>
+                  <option value="ready">Ready — will auto-post at the scheduled time</option>
+                  <option value="paused">Paused — was ready, temporarily held</option>
+                </>
+              )}
             </select>
+            {p.manual_only ? <div className="muted">Manual posts never auto-publish regardless of status — this only controls when it shows up as something you need to go post.</div> : null}
           </div>
 
           <div className="fld">
@@ -549,6 +560,16 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
                     </div>
                   );
                 })}
+                {post.manual_only ? (
+                  liveState?.manual?.status === "posted" ? (
+                    <div className="tracking posted">
+                      ✅ Posted {timeAgo(liveState.manual.postedAt)}
+                      {liveState.manual.permalink ? <> · <a href={liveState.manual.permalink} target="_blank" rel="noopener noreferrer">view ↗</a></> : <span className="muted"> (no link saved)</span>}
+                    </div>
+                  ) : (post.status || "draft") === "ready" ? (
+                    <div className="tracking muted">🖐🏾 needs posting by hand</div>
+                  ) : null
+                ) : null}
                 <div className="caltools">
                   <button type="button" className="mini" onClick={() => setEditing(post)}>Edit</button>
                   <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>
@@ -607,6 +628,8 @@ export const SOCIAL_CSS = `
 .evergreenbadge{margin-left:8px;text-transform:none;color:#1d6b3a;font-weight:600;}
 .evergreentoggle{font-size:13px;}
 .tracking{font-size:11px;color:#5a3f4e;margin-top:2px;}
+.tracking.posted{color:#1d6b3a;}
+.tracking.muted{color:#8a7f86;}
 .tracking a{color:#a85a76;font-weight:600;text-decoration:none;}
 .hashtagrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
 .hashtagrow select{width:auto;flex:1;min-width:160px;}
