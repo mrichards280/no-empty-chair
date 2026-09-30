@@ -110,7 +110,9 @@ function page(d, cfg) {
     const fullCap = p.caption || "";
     const capBlock = p.manual_only
       ? `<div class="pcap pcap-full">${esc(fullCap) || `<span class="muted">no caption</span>`}</div>`
-      : `<div class="pcap">${esc(fullCap.slice(0, 100)) || `<span class="muted">no caption</span>`}</div>`;
+      : !fullCap ? `<div class="pcap"><span class="muted">no caption</span></div>`
+      : fullCap.length <= 100 ? `<div class="pcap">${esc(fullCap)}</div>`
+      : `<div class="pcap"><span class="capshort">${esc(fullCap.slice(0, 100))}… <span class="more" data-capexpand="1">more</span></span><span class="capfull" hidden>${esc(fullCap)}</span></div>`;
     const allPublished = !p.manual_only && p.platforms.length && p.platforms.every((pl) => p.state[pl]?.status === "published");
     const canPostNow = !p.manual_only && (p.status || "draft") === "ready" && !allPublished;
     const needsPosting = p.manual_only && (p.status || "draft") === "ready" && p.state.manual?.status !== "posted";
@@ -333,12 +335,19 @@ function render(action,data){
   return '<pre>'+escHtml(JSON.stringify(data,null,2))+'</pre>';
 }
 async function go(body){out.hidden=false;out.innerHTML='Working…';
- const r=await fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
- const data=await r.json();
- out.innerHTML=render(body.action,data);
- return data;}
-document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');await go({action:b.dataset.act});b.classList.remove('loading');if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
-document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600)});
+ try{
+   const r=await fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   let data; try{data=await r.json();}catch{throw new Error('Server returned '+r.status+' '+r.statusText+' (not JSON) — it may have timed out mid-publish. Check again in a minute before retrying.');}
+   if(!r.ok) throw new Error(data?.error || ('Request failed: '+r.status));
+   out.innerHTML=render(body.action,data);
+   return data;
+ }catch(err){
+   out.innerHTML='<div class="checkrow bad">❌ '+escHtml(err.message||String(err))+'</div>';
+   throw err;
+ }
+}
+document.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');try{await go({action:b.dataset.act});}catch{}finally{b.classList.remove('loading');}if(b.dataset.act==='refresh-stats')setTimeout(()=>location.reload(),600);});
+document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{b.classList.add('loading');try{await go({action:'retry',id:b.dataset.retry,platform:b.dataset.platform});setTimeout(()=>location.reload(),600);}catch{b.classList.remove('loading');}});
 
 // ---- preview modal ----
 const POSTS=JSON.parse(document.getElementById('postsData').textContent);
@@ -407,6 +416,13 @@ document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>openPreview
 document.getElementById('previewClose').onclick=()=>{modal.hidden=true;};
 modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});
 
+// ---- expand a truncated caption in the card list ----
+document.querySelectorAll('[data-capexpand]').forEach(b=>b.onclick=()=>{
+  const wrap=b.closest('.pcap');
+  wrap.querySelector('.capshort').hidden=true;
+  wrap.querySelector('.capfull').hidden=false;
+});
+
 // ---- copy caption (grabs the full caption/instructions straight from POSTS) ----
 document.querySelectorAll('[data-copycap]').forEach(b=>b.onclick=async()=>{
   const post=POSTS.find(p=>p.id===b.dataset.copycap); if(!post)return;
@@ -450,8 +466,12 @@ document.querySelectorAll('[data-postnow]').forEach(b=>b.onclick=async()=>{
   const id=b.dataset.postnow;
   if(!confirm('Post this right now, live, regardless of its scheduled time?'))return;
   b.disabled=true; b.classList.add('loading');
-  const data=await go({action:'run',id});
-  location.reload();
+  try{
+    await go({action:'run',id});
+    location.reload();
+  }catch{
+    b.disabled=false; b.classList.remove('loading');
+  }
 });
 </script></div></body></html>`;
 }
