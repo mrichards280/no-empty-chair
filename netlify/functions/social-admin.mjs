@@ -248,6 +248,7 @@ button.postnow:disabled{opacity:.6}
 .checkrow:last-child{border-bottom:none}
 .checkrow.bad b{color:#8c2f2f}
 .modalbg{position:fixed;inset:0;background:rgba(40,32,42,.55);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
+.modalbg[hidden]{display:none}
 .modalbox{background:#fff;border-radius:20px;max-width:420px;width:100%;padding:18px;position:relative;box-shadow:0 20px 60px rgba(40,32,42,.35)}
 .modalclose{position:absolute;top:10px;right:10px;border:none;background:#f1ebf3;color:var(--plum);width:30px;height:30px;border-radius:100px;cursor:pointer;font-size:14px;line-height:1}
 .modaltabs{display:flex;gap:8px;margin:0 0 14px;padding-right:34px}
