@@ -30,7 +30,9 @@ export default async (req) => {
       const cur = (await store.get(body.id, { type: "json" })) || {};
       delete cur[body.platform];
       await store.setJSON(body.id, cur);
-      return json({ ok: true, note: "cleared; it will publish on the next run if still within the late window" });
+      const r = await runTick({ schedule, store, graph, cfg, onlyId: body.id });
+      await store.setJSON("_lastRun", r);
+      return json(r);
     }
     if (body.action === "mark-manual" && body.id) {
       const cur = (await store.get(body.id, { type: "json" })) || {};
