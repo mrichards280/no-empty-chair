@@ -267,17 +267,30 @@ export async function postAutoComments({ schedule, store, graph, cfg, now = Date
 // ---------------------------------------------------------------- manual-post link finder
 
 // Manual posts get published by hand in the Instagram app, so the system never sees the
-// result. This closes that loop: it scans your most recent Instagram media and matches
-// each ready manual post (feed/reel/carousel) by caption, then saves the real permalink +
-// media id, and marks it posted if you hadn't yet. Captions are compared after stripping
-// hashtags/emoji/punctuation, so a tweaked hashtag set or trailing emoji still matches.
-// Media already tied to another post (an auto-published copy with the same caption) is
-// never reused. Stories can't be matched this way: the API only exposes them for 24 hours
-// and without captions.
+// result. This closes that loop by looking for the post on Instagram and saving its real
+// link (plus media id, so likes/comments can be tracked), marking it posted if you forgot.
+//
+// * Feed posts / reels / carousels: matched by caption against your 50 most recent media,
+//   after stripping hashtags, emoji and punctuation, so a tweaked hashtag set still matches.
+//   Media already tied to another post (e.g. an auto-published copy with the same caption)
+//   is never reused.
+// * Stories: Instagram hides story captions, so they're matched by posting time against
+//   your live stories (the API only lists the last 24 hours): the nearest unclaimed story
+//   within a window around the scheduled time wins.
+//
+// Search cadence for a post you've marked posted but that has no link yet: check at the
+// next tick (check 1), 10 minutes later (check 2), then wait 30 minutes (check 3). If that
+// third check still finds nothing it stops and sends a push, so you can paste the link.
+// A post you haven't marked posted yet is searched every tick without counting failures,
+// because it may simply not be posted yet. `force` (the Refresh button) ignores the
+// schedule and never counts a failure.
 const normCaption = (s) => String(s || "").toLowerCase().replace(/#[\p{L}\p{N}_]+/gu, " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim().slice(0, 60);
 const DAY_MS = 24 * 60 * 60 * 1000;
+const LINK_CHECK_TOLERANCE_MS = 90 * 1000; // ticks drift a little; don't skip a check for being 20s early
+const STORY_EARLY_MS = 3 * 60 * 60 * 1000;
+const STORY_LATE_MS = 22 * 60 * 60 * 1000;
 
-export async function matchManualLinks({ schedule, store, graph, cfg, now = Date.now() }) {
+export async function matchManualLinks({ schedule, store, graph, cfg, now = Date.now(), force = false, onlyId } = {}) {
   const { posts } = validateSchedule(schedule);
   const claimed = new Set();
   const cands = [];
@@ -285,37 +298,78 @@ export async function matchManualLinks({ schedule, store, graph, cfg, now = Date
     const state = (await store.get(p.id, { type: "json" })) || {};
     if (state.instagram?.mediaId) claimed.add(state.instagram.mediaId);
     if (state.manual?.mediaId) claimed.add(state.manual.mediaId);
-    if (!p.manual_only || p.type === "story" || !p.platforms?.includes("instagram")) continue;
+    if (onlyId && p.id !== onlyId) continue;
+    if (!p.manual_only || !p.platforms?.includes("instagram")) continue;
     if ((p.status || "draft") !== "ready" || state.manual?.permalink) continue;
     const t = Date.parse(p.publish_at);
-    if (t > now + 3 * DAY_MS || t < now - 21 * DAY_MS) continue;
-    if (!normCaption(p.caption)) continue;
-    cands.push({ p, state, t });
+    if (t > now + (force ? 3 * DAY_MS : 0) || t < now - 21 * DAY_MS) continue;
+    if (p.type !== "story" && !normCaption(p.caption)) continue;
+    const lc = state.linkCheck || {};
+    if (!force && (lc.gaveUp || now < (lc.nextAt || 0) - LINK_CHECK_TOLERANCE_MS)) continue;
+    cands.push({ p, state, t, lc });
   }
-  if (!cands.length) return { matched: [] };
+  if (!cands.length) return { matched: [], checked: 0 };
 
-  const media = (await graph.get(`${cfg.igUserId}/media`, { fields: "id,caption,permalink,timestamp,media_product_type", limit: 50 })).data || [];
-  const matched = [];
-  for (const { p, state, t } of cands.sort((a, b) => a.t - b.t)) {
-    const want = normCaption(p.caption);
-    const hit = media
-      .filter((m) => !claimed.has(m.id) && normCaption(m.caption) === want && Date.parse(m.timestamp) >= t - 2 * DAY_MS)
-      .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp))[0];
-    if (!hit) continue;
-    claimed.add(hit.id);
-    const wasMarked = state.manual?.status === "posted";
-    await store.setJSON(p.id, {
-      ...state,
-      manual: { ...(state.manual || {}), status: "posted", postedAt: state.manual?.postedAt || hit.timestamp, permalink: hit.permalink, mediaId: hit.id, ...(wasMarked ? {} : { autoDetected: true }) },
-    });
-    matched.push({ id: p.id, permalink: hit.permalink, autoMarked: !wasMarked });
-    await pushNotify(cfg, {
-      title: wasMarked ? "🔗 Link saved for your manual post" : "✅ Found your manual post on Instagram",
-      message: `${p.type} · ${shortWhen(p.publish_at)}${wasMarked ? "" : "\nMarked as posted for you."}`,
-      tags: ["link"], priority: 3, click: hit.permalink,
-    });
+  const needFeed = cands.some((c) => c.p.type !== "story");
+  const needStories = cands.some((c) => c.p.type === "story");
+  // An API error (token trouble, rate limit) is not a "failed check": nothing was learned.
+  const media = needFeed ? (await graph.get(`${cfg.igUserId}/media`, { fields: "id,caption,permalink,timestamp,media_product_type", limit: 50 })).data || [] : [];
+  let stories = [];
+  if (needStories) {
+    try { stories = (await graph.get(`${cfg.igUserId}/stories`, { fields: "id,permalink,timestamp,media_type" })).data || []; } catch { stories = null; }
   }
-  return { matched };
+
+  const matched = [];
+  for (const { p, state, t, lc } of cands.sort((a, b) => a.t - b.t)) {
+    let hit;
+    if (p.type === "story") {
+      if (stories === null) continue; // couldn't list stories this time: learned nothing
+      hit = stories
+        .filter((m) => !claimed.has(m.id) && Date.parse(m.timestamp) >= t - STORY_EARLY_MS && Date.parse(m.timestamp) <= t + STORY_LATE_MS)
+        .sort((a, b) => Math.abs(Date.parse(a.timestamp) - t) - Math.abs(Date.parse(b.timestamp) - t))[0];
+    } else {
+      const want = normCaption(p.caption);
+      hit = media
+        .filter((m) => !claimed.has(m.id) && normCaption(m.caption) === want && Date.parse(m.timestamp) >= t - 2 * DAY_MS)
+        .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp))[0];
+    }
+
+    const marked = state.manual?.status === "posted";
+    if (hit) {
+      claimed.add(hit.id);
+      const { linkCheck, ...rest } = state;
+      await store.setJSON(p.id, {
+        ...rest,
+        manual: { ...(state.manual || {}), status: "posted", postedAt: state.manual?.postedAt || hit.timestamp, ...(hit.permalink ? { permalink: hit.permalink } : {}), mediaId: hit.id, ...(marked ? {} : { autoDetected: true }) },
+      });
+      matched.push({ id: p.id, permalink: hit.permalink || null, autoMarked: !marked });
+      await pushNotify(cfg, {
+        title: marked ? "🔗 Link saved for your manual post" : `✅ Found your manual ${p.type} on Instagram`,
+        message: `${p.type} · ${shortWhen(p.publish_at)}${marked ? "" : "\nMarked as posted for you."}${hit.permalink ? "" : "\nInstagram didn't return a link; add it on the status page."}`,
+        tags: ["link"], priority: 3, click: hit.permalink,
+      });
+      continue;
+    }
+
+    if (force) continue; // a manual refresh finding nothing changes nothing
+    if (!marked) { // not posted yet, just keep watching without counting
+      await store.setJSON(p.id, { ...state, linkCheck: { fails: 0, nextAt: now + 10 * 60 * 1000 } });
+      continue;
+    }
+    const fails = (lc.fails || 0) + 1;
+    if (fails >= 3) {
+      await store.setJSON(p.id, { ...state, linkCheck: { fails, gaveUp: true, gaveUpAt: new Date(now).toISOString() } });
+      await pushNotify(cfg, {
+        title: "🔎 Couldn't find the link for a post",
+        message: `${p.type} · ${shortWhen(p.publish_at)}\nIt's marked posted, but I couldn't match it on Instagram after 3 checks. Paste the link on the status page.`,
+        tags: ["mag"], priority: 4,
+      });
+    } else {
+      // after check 1 try again in 10 min; after check 2 wait 30 min for the last try
+      await store.setJSON(p.id, { ...state, linkCheck: { fails, nextAt: now + (fails === 1 ? 10 : 30) * 60 * 1000 } });
+    }
+  }
+  return { matched, checked: cands.length };
 }
 
 function tooSlow(st) {
@@ -691,7 +745,7 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
         results.push({ id: post.id, platform, ok: false, error: e.message });
       }
     }
-    if (state.manual?.mediaId && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs)) {
+    if (state.manual?.mediaId && post.type !== "story" && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs)) {
       try {
         const stats = await fetchStats(graph, "instagram", { mediaId: state.manual.mediaId });
         if (stats) {

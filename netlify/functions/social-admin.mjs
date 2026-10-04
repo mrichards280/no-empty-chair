@@ -48,17 +48,18 @@ export default async (req) => {
       const cur = (await store.get(body.id, { type: "json" })) || {};
       const link = typeof body.permalink === "string" ? body.permalink.trim() : "";
       if (link && !/^https?:\/\//i.test(link)) return json({ error: "That doesn't look like a link. Paste the full https:// post link." }, 400);
-      if (body.undo) delete cur.manual;
+      if (body.undo) { delete cur.manual; delete cur.linkCheck; }
       else cur.manual = {
         ...(cur.manual || {}),
         status: "posted",
         postedAt: cur.manual?.postedAt || new Date().toISOString(),
         ...(link ? { permalink: link } : {}),
       };
+      // Marking posted (re)starts the link search: this is check #1, then 10 min, then 30 min.
+      if (!body.undo && !cur.manual.permalink) cur.linkCheck = { fails: 0, nextAt: 0 };
       await store.setJSON(body.id, cur);
-      // Right after marking posted without a link, try to find it on Instagram now.
       let found = null;
-      if (!body.undo && !cur.manual.permalink) { try { found = (await matchManualLinks({ schedule, store, graph, cfg })).matched.find((m) => m.id === body.id) || null; } catch {} }
+      if (!body.undo && !cur.manual.permalink) { try { found = (await matchManualLinks({ schedule, store, graph, cfg, onlyId: body.id })).matched.find((m) => m.id === body.id) || null; } catch {} }
       return json({ ok: true, linkFound: !!found });
     }
     if (body.action === "test-push") {
@@ -67,7 +68,7 @@ export default async (req) => {
     }
     if (body.action === "refresh-stats") {
       let links = { matched: [] };
-      try { links = await matchManualLinks({ schedule, store, graph, cfg }); } catch (e) { links = { matched: [], error: e.message }; }
+      try { links = await matchManualLinks({ schedule, store, graph, cfg, force: true }); } catch (e) { links = { matched: [], error: e.message }; }
       return json({ results: await refreshAllStats({ schedule, store, graph }), manualLinks: links });
     }
     return json({ error: "unknown action" }, 400);
@@ -217,7 +218,7 @@ function page(d, cfg) {
         </div>
         <div class="pplatforms">${p.manual_only
           ? (p.state.manual?.status === "posted"
-              ? `<div class="manual posted">✅ Posted ${esc(timeAgo(p.state.manual.postedAt))}${p.state.manual.autoDetected ? " <span class=\"muted\">(found on Instagram automatically)</span>" : ""}${p.state.manual.permalink ? ` · <a href="${esc(p.state.manual.permalink)}" target="_blank" rel="noopener">view ↗</a>` : p.type === "story" ? ` <span class="muted">(stories can't be linked automatically; they expire in 24h)</span>` : ` <span class="nolink">⚠ no link yet</span> <span class="muted">(checked automatically every 10 min)</span> <button class="mini" data-addlink="${esc(p.id)}">＋ Add link</button>`}</div>${statsHtml(p.state.manual.stats)}`
+              ? `<div class="manual posted">✅ Posted ${esc(timeAgo(p.state.manual.postedAt))}${p.state.manual.autoDetected ? " <span class=\"muted\">(found on Instagram automatically)</span>" : ""}${p.state.manual.permalink ? ` · <a href="${esc(p.state.manual.permalink)}" target="_blank" rel="noopener">view ↗</a>` : p.state.linkCheck?.gaveUp ? ` <span class="nolink">⚠ couldn't find the link automatically</span> <button class="mini" data-addlink="${esc(p.id)}">＋ Add link</button>` : ` <span class="muted">🔎 looking for the link${p.state.linkCheck?.nextAt ? ` · next check ${esc(fmt(new Date(p.state.linkCheck.nextAt).toISOString()))}` : ""}</span> <button class="mini" data-addlink="${esc(p.id)}">＋ Add link</button>`}</div>${statsHtml(p.state.manual.stats)}`
               : `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>`)
           : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
@@ -522,33 +523,48 @@ document.querySelectorAll('[data-copycap]').forEach(b=>b.onclick=async()=>{
   }catch{}
 });
 
-// ---- save video: a plain <a download> silently fails on iOS Safari for
-// cross-origin files (Cloudinary), it just opens/plays the video instead of
-// saving it. Fetch it as a blob and hand it to the native share sheet, which
-// gives a real "Save Video" option on iPhone; desktop falls back to a normal
-// same-origin blob download (blob: URLs aren't subject to that restriction).
-document.querySelectorAll('[data-savevideo]').forEach(b=>b.onclick=async()=>{
-  const url=b.dataset.savevideo, filename=b.dataset.savename||'video.mp4';
+// ---- save video ----
+// A plain <a download> is ignored for cross-origin files (Cloudinary) in Safari and some
+// Chromium builds, so the video is fetched as a blob first.
+//  * Phones/tablets (Safari, Chrome, Edge mobile): hand the file to the native share sheet,
+//    which has a real "Save Video". Browsers only allow that right after a tap, so if the
+//    download took long enough that the tap expired, the button becomes "Ready - tap to
+//    save" and the second tap (file already cached) opens the sheet.
+//  * Desktop (Edge, Chrome, Firefox, Safari): a normal same-origin blob download to the
+//    Downloads folder; no share dialog.
+const savedFiles=new Map();
+const isTouchDevice=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/i.test(navigator.platform));
+document.querySelectorAll('[data-savevideo]').forEach(b=>{
   const original=b.textContent;
-  b.textContent='Preparing…'; b.classList.add('loading');
-  try{
-    const res=await fetch(url);
-    const blob=await res.blob();
-    const file=new File([blob],filename,{type:blob.type||'video/mp4'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:filename});
-    } else {
-      const objUrl=URL.createObjectURL(blob);
+  b.onclick=async()=>{
+    const url=b.dataset.savevideo, filename=b.dataset.savename||'video.mp4';
+    let file=savedFiles.get(url);
+    try{
+      if(!file){
+        b.textContent='Preparing…'; b.classList.add('loading');
+        const res=await fetch(url);
+        if(!res.ok)throw new Error('download failed');
+        const blob=await res.blob();
+        file=new File([blob],filename,{type:blob.type||'video/mp4'});
+        savedFiles.set(url,file);
+        b.classList.remove('loading');
+      }
+      if(isTouchDevice && navigator.canShare && navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],title:filename}); b.textContent=original; }
+        catch(err){ b.textContent=err&&err.name==='AbortError'?original:'✅ Ready: tap to save'; }
+        return;
+      }
+      const objUrl=URL.createObjectURL(file);
       const a=document.createElement('a');
       a.href=objUrl; a.download=filename;
       document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(objUrl),4000);
+      setTimeout(()=>URL.revokeObjectURL(objUrl),10000);
+      b.textContent=original;
+    }catch(err){
+      b.classList.remove('loading'); b.textContent=original;
+      window.open(url,'_blank');
     }
-  }catch(err){
-    if(err?.name!=='AbortError') window.open(url,'_blank');
-  }finally{
-    b.textContent=original; b.classList.remove('loading');
-  }
+  };
 });
 
 // ---- tabs: each post lives in exactly one (attention / needs posting / scheduled / drafts / published) ----
@@ -601,7 +617,7 @@ document.querySelectorAll('[data-markmanual]').forEach(b=>b.onclick=async()=>{
       if(!confirm('Undo "posted"? It will show as needing posting again.')){b.classList.remove('loading');return;}
       await go({action:'mark-manual',id,undo:true});
     } else {
-      const url=prompt('Paste the post link (Instagram app: ••• → Link). Leave blank and I will look for it on Instagram automatically within 10 minutes.','');
+      const url=prompt('Paste the post or story link (Instagram app: ••• → Copy link). Leave blank and I will look for it on Instagram automatically.','');
       if(url===null){b.classList.remove('loading');return;} // cancelled
       await go({action:'mark-manual',id,permalink:url.trim()||undefined});
     }
