@@ -175,20 +175,29 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
   const [showFbCaption, setShowFbCaption] = useState(!!post.caption_facebook);
   const [maximized, setMaximized] = useState(false);
   const [minimized, setMinimized] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const { date, time } = isoToEasternParts(p.publish_at);
 
   const errors = validatePost(p, {});
+  const changed = JSON.stringify(p) !== JSON.stringify(post);
+  const requestClose = () => { if (changed) setConfirmDiscard(true); else onClose(); };
+  const submit = () => { if (!errors.length) onSave(p); };
 
   useEffect(() => {
     const onKey = (e) => {
       const mod = e.metaKey || e.ctrlKey;
-      if (!mod || e.key.toLowerCase() !== "z") return;
+      if (e.key === "Escape" && !minimized) { requestClose(); return; }
+      if (!mod) return;
+      const k = e.key.toLowerCase();
+      if (k === "s") { e.preventDefault(); e.stopPropagation(); submit(); return; }
+      if (k !== "z") return;
+      if (/^(input|textarea)$/i.test(e.target?.tagName || "")) return; // let fields use their own undo
       e.preventDefault();
       e.shiftKey ? redo() : undo();
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [undo, redo]);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  });
 
   if (minimized) {
     return (
@@ -200,11 +209,11 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
   }
 
   return (
-    <div className="modalveil" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="modalveil" onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose(); }}>
       <div className={`modal${maximized ? " maximized" : ""}`}>
         <div className="modalhead">
           <div className="traffic">
-            <button type="button" className="tl tl-red" title="Close" aria-label="Close" onClick={onClose}>✕</button>
+            <button type="button" className="tl tl-red" title="Close" aria-label="Close" onClick={requestClose}>✕</button>
             <button type="button" className="tl tl-yellow" title="Minimize" aria-label="Minimize" onClick={() => setMinimized(true)}>−</button>
             <button type="button" className="tl tl-green" title={maximized ? "Restore" : "Maximize"} aria-label="Maximize" onClick={() => setMaximized((m) => !m)}>{maximized ? "⤡" : "+"}</button>
           </div>
@@ -260,8 +269,9 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
             </div>
           </div>
 
-          <div className="tip">
-            🖐🏾 <b>Not everything Meta lets you do in-app is available through automation</b> — polls/stickers on
+          <details className="tip">
+            <summary>🖐🏾 What can't be automated? <span className="muted">(when to use "Needs manual posting")</span></summary>
+            <b>Not everything Meta lets you do in-app is available through automation</b> — polls/stickers on
             Stories, the official "using sound ___" credit on Reels, and similar native-only features can't be
             attached by the API, on any post type. Turn on <b>"Needs manual posting"</b> below whenever this post
             needs one of those: it stays saved here with your caption and media as a reference, the auto-poster
@@ -275,7 +285,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
               add it to the video yourself before uploading — a baked-in audio track posts automatically, no
               manual step needed. Only the actual "using sound ___" tag requires picking it in the app.</>
             ) : null}
-          </div>
+          </details>
 
           <div className="fld">
             <label className="switch manualtoggle">
@@ -385,21 +395,41 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
           ) : null}
         </div>
 
-        <div className="modalfoot">
-          <button type="button" className="mini" onClick={onClose}>Cancel</button>
-          <button type="button" className="save" disabled={errors.length > 0} onClick={() => onSave(p)}>
-            {post._isNew ? "Add to calendar" : "Save changes"}
-          </button>
-        </div>
+        {confirmDiscard ? (
+          <div className="modalfoot discardbar" role="alertdialog" aria-label="Discard changes?">
+            <span>Discard what you've changed on this post?</span>
+            <div className="footbtns">
+              <button type="button" className="mini" onClick={() => setConfirmDiscard(false)}>Keep editing</button>
+              <button type="button" className="mini danger" onClick={onClose}>Discard changes</button>
+            </div>
+          </div>
+        ) : (
+          <div className="modalfoot">
+            <span className="footnote">{errors.length ? `${errors.length} thing${errors.length > 1 ? "s" : ""} to fix first` : changed ? "Unsaved edits" : "No changes yet"}</span>
+            <div className="footbtns">
+              <button type="button" className="mini" onClick={requestClose}>Cancel</button>
+              <button type="button" className="save" disabled={errors.length > 0 || (!changed && !post._isNew)} onClick={submit}>
+                {post._isNew ? "Add to calendar" : "Save post"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 /* ---------- the calendar list ---------- */
-export default function SocialCalendar({ schedule, setSchedule, password, onSave }) {
+export default function SocialCalendar({ schedule, setSchedule, password }) {
   const [editing, setEditing] = useState(null);
-  const [status, setStatus] = useState("");
+  const [toast, setToast] = useState(null); // { msg, undo? }
+  const toastTimer = React.useRef(0);
+  const notify = (msg, undo) => {
+    clearTimeout(toastTimer.current);
+    setToast({ msg, undo });
+    toastTimer.current = setTimeout(() => setToast(null), undo ? 8000 : 4000);
+  };
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
   const posts = schedule?.posts || [];
   const { hashtags, setHashtags } = useHashtags();
   const [live, setLive] = useState(null); // server-side state (permalink/stats) keyed by post id
@@ -427,16 +457,16 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
 
   const onSaveHashtagSet = async (captionText) => {
     const tags = (captionText.match(/#[\p{L}\p{N}_]+/gu) || []).join(" ");
-    if (!tags) { setStatus("That caption doesn't have any hashtags to save."); return; }
+    if (!tags) { notify("That caption doesn't have any hashtags to save."); return; }
     const name = prompt("Name this hashtag set (e.g. \"Color launch\"):");
     if (!name) return;
     const nextSets = [...(hashtags?.sets || []).filter((s) => s.name !== name), { name, tags }];
     try {
       await saveHashtags(password, { sets: nextSets });
       setHashtags({ sets: nextSets });
-      setStatus(`Saved hashtag set "${name}".`);
+      notify(`Saved hashtag set "${name}".`);
     } catch (ex) {
-      setStatus("Error saving hashtag set: " + ex.message);
+      notify("Couldn't save the hashtag set: " + ex.message);
     }
   };
 
@@ -461,24 +491,16 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
     const byId = new Map(posts.map((x) => [x.id, x]));
     if (editing && !editing._isNew && editing.id !== clean.id) byId.delete(editing.id);
     byId.set(clean.id, clean);
+    const wasNew = !!editing?._isNew;
     setSchedule({ ...schedule, posts: [...byId.values()].sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at)) });
     setEditing(null);
+    notify(wasNew ? "Post added. Save & Deploy when you're ready to publish it." : "Post updated. Save & Deploy when you're ready.");
   };
 
   const del = (post) => {
-    if (!confirm(`Delete "${post.id}"? This can't be undone once you Save & Deploy.`)) return;
+    const before = schedule;
     setSchedule({ ...schedule, posts: posts.filter((x) => x.id !== post.id) });
-  };
-
-  const save = async () => {
-    setStatus("Saving & deploying…");
-    try {
-      await onSave();
-      setStatus("Saved. The live calendar and the auto-poster will pick it up after redeploy (about a minute).");
-    } catch (ex) {
-      const detail = ex.problems ? " " + ex.problems.map((p) => `${p.id}: ${p.errors.join("; ")}`).join(" | ") : "";
-      setStatus("Error: " + ex.message + detail);
-    }
+    notify(`Deleted "${post.id}".`, () => { setSchedule(before); setToast(null); });
   };
 
   const [filter, setFilter] = useState("all");
@@ -506,14 +528,6 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
         <button type="button" className="save" onClick={() => setEditing(blankPost())}>+ New post</button>
         <a href="/admin/social" target="_blank" rel="noopener noreferrer" className="mini">Open publisher status ↗</a>
         <button type="button" className="mini" onClick={refreshStats} disabled={refreshing}>{refreshing ? "Refreshing…" : "↻ Refresh stats"}</button>
-        <button type="button" className="save" onClick={save}>Save &amp; Deploy</button>
-      </div>
-
-      <div className="calstats">
-        <div className="statcard"><b>{counts.all}</b><span>Total</span></div>
-        <div className="statcard st-ready"><b>{counts.ready}</b><span>Ready</span></div>
-        <div className="statcard st-draft"><b>{counts.draft}</b><span>Draft</span></div>
-        <div className="statcard st-manual"><b>{counts.manual}</b><span>Manual</span></div>
       </div>
 
       <div className="calfilters">
@@ -523,8 +537,6 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
           </button>
         ))}
       </div>
-
-      {status ? <div className="statusbar">{status}</div> : null}
 
       {!posts.length ? (
         <div className="calempty">No posts yet — click "+ New post" to add your first one.</div>
@@ -589,6 +601,13 @@ export default function SocialCalendar({ schedule, setSchedule, password, onSave
         })}
       </div>
 
+      {toast ? (
+        <div className="toast" role="status" aria-live="polite">
+          <span>{toast.msg}</span>
+          {toast.undo ? <button type="button" onClick={toast.undo}>Undo</button> : null}
+        </div>
+      ) : null}
+
       {editing ? (
         <PostModal
           post={editing}
@@ -614,13 +633,13 @@ export const SOCIAL_CSS = `
 .statcard.st-draft b{color:#6e6172;}
 .statcard.st-manual b{color:#7a5200;}
 .calfilters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.filterchip{background:none;border:1px solid #e6ddec;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.filterchip{background:none;border:1px solid #e6ddec;min-height:40px;padding:0 16px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;transition:background .15s,color .15s;}
 .filterchip:hover{background:rgba(255,255,255,.6);}
 .filterchip.active{background:#413645;color:#fff;border-color:#413645;}
 .filtercount{opacity:.7;font-weight:400;}
 .calempty{padding:30px 16px;text-align:center;color:#8a7f86;font-size:14px;border:1px dashed #e2d6ea;border-radius:14px;}
-.calgrid{display:grid;gap:10px;}
-.calcard{border:1px solid #e6ddec;border-radius:14px;padding:12px;background:rgba(255,255,255,.65);display:flex;gap:14px;}
+.calgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;}
+.calcard{min-width:0;border:1px solid #e6ddec;border-radius:14px;padding:12px;background:rgba(255,255,255,.65);display:flex;gap:14px;}
 .calthumb{position:relative;width:72px;height:72px;flex-shrink:0;border-radius:10px;overflow:hidden;background:#efe8f2;}
 .calthumb img,.calthumb video{width:100%;height:100%;object-fit:cover;display:block;}
 .calthumb-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;}
@@ -642,7 +661,9 @@ export const SOCIAL_CSS = `
 .hashtagrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
 .hashtagrow select{width:auto;flex:1;min-width:160px;}
 .calcap{font-size:13px;color:#413645;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.caltools{display:flex;gap:8px;margin-top:6px;}
+.caltools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.calcard{transition:box-shadow .15s,transform .15s;}
+.calcard:hover{box-shadow:0 10px 28px rgba(65,54,69,.1);}
 .pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
 .st-ready{background:#dff3e6;color:#1d6b3a;}
 .st-draft{background:#eee;color:#666;}
@@ -654,8 +675,10 @@ export const SOCIAL_CSS = `
 .modalhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(230,221,236,.8);font-family:'Cinzel',serif;background:rgba(255,255,255,.4);}
 .modalhead b{flex:1;text-align:center;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .traffic{display:flex;gap:8px;align-items:center;}
-.tl{width:13px;height:13px;border-radius:100%;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;color:transparent;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12);}
-.tl:hover{color:rgba(70,30,10,.65);}
+.tl{position:relative;width:14px;height:14px;border-radius:100%;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;color:transparent;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12);}
+.tl::after{content:"";position:absolute;inset:-9px;}
+.tl:hover,.tl:focus-visible{color:rgba(70,30,10,.65);}
+.traffic{gap:12px;}
 .tl-red{background:#ff5f57;}
 .tl-yellow{background:#febc2e;}
 .tl-green{background:#28c840;}
@@ -664,7 +687,27 @@ export const SOCIAL_CSS = `
 .minipill .traffic{pointer-events:none;}
 .minipill .tl{box-shadow:none;}
 .modalbody{padding:18px 20px;overflow-y:auto;}
-.modalfoot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid rgba(230,221,236,.8);background:rgba(255,255,255,.4);}
+.modalfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid rgba(230,221,236,.8);background:rgba(255,255,255,.4);flex-wrap:wrap;}
+.footnote{font-size:12px;color:#8a7f86;}
+.footbtns{display:flex;gap:10px;margin-left:auto;}
+.discardbar{background:rgba(255,241,214,.9);color:#7a5200;font-size:14px;font-weight:600;}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:95;max-width:min(560px,calc(100vw - 24px));display:flex;align-items:center;gap:14px;padding:12px 14px 12px 18px;border-radius:100px;background:rgba(65,54,69,.95);color:#fff;font-size:14px;box-shadow:0 12px 34px rgba(40,32,42,.35);animation:toastIn .2s ease-out;}
+.toast button{font:inherit;font-weight:700;color:#f3c9d3;background:rgba(255,255,255,.12);border:none;min-height:36px;padding:0 16px;border-radius:100px;cursor:pointer;}
+.toast button:hover{background:rgba(255,255,255,.2);}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+.modal :focus-visible,.social-calendar :focus-visible{outline:2px solid #a85a76;outline-offset:2px;}
+@media (max-width:640px){
+  .social-calendar{padding:0 14px;}
+  .calcard{gap:12px;padding:10px;}
+  .calthumb{width:64px;height:64px;}
+  .caltools .mini{flex:1;}
+  .modalveil{padding:0;align-items:stretch;}
+  .modal{max-width:100%;max-height:100vh;border-radius:0;background:rgba(255,253,251,.98);}
+  .grid2{grid-template-columns:1fr;}
+  .footbtns{width:100%;}
+  .footbtns>*{flex:1;}
+  .footnote{width:100%;}
+}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .platrow{display:flex;gap:16px;}
 .manualtoggle{font-size:13px;}
@@ -673,6 +716,12 @@ export const SOCIAL_CSS = `
 .modal .warn ul{margin:6px 0 0;padding-left:18px;}
 .modal .err{color:#8c2f2f;font-size:12px;margin-top:6px;}
 .modal .muted{color:#8a7f86;font-size:12px;margin-top:5px;}
+.modal .tip summary{cursor:pointer;font-weight:700;min-height:28px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.modal .tip summary .muted{margin:0;font-weight:400;}
+.modal .tip[open] summary{margin-bottom:8px;}
+.modal .fld .mini,.modal .fld>.hashtagrow .mini{align-self:flex-start;}
+.modal .switch{min-height:44px;cursor:pointer;line-height:1.35;}
+.modal .switch input{width:20px;height:20px;padding:0;accent-color:#a85a76;flex-shrink:0;}
 .modal .fld{margin:0 0 16px;display:flex;flex-direction:column;gap:6px;}
 .modal .fld:last-child{margin-bottom:0;}
 .modal .fld>label{font-size:12px;font-weight:700;color:#5a3f4e;letter-spacing:.02em;text-transform:none;}

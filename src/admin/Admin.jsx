@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useContent, verifyPassword, saveContent } from "../hooks/useContent";
-import { useSchedule, saveSchedule } from "../hooks/useSchedule";
+import { useSchedule } from "../hooks/useSchedule";
 import { uploadImage, cloudinaryConfigured } from "../lib/cloudinary";
 import SocialCalendar, { SOCIAL_CSS } from "./SocialComposer";
+import SaveBar, { SAVEBAR_CSS } from "./SaveBar";
 
 /* ---------- immutable helpers ---------- */
 function clone(v) {
@@ -179,13 +180,15 @@ const REMEMBER_KEY = "nec-admin-remember";
 /* ---------- main admin ---------- */
 export default function Admin() {
   const { content, setContent, loading } = useContent();
-  const { schedule, setSchedule, loading: schedLoading } = useSchedule();
+  const sched = useSchedule();
+  const { schedule, setSchedule, loading: schedLoading } = sched;
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
   const [checkingRemembered, setCheckingRemembered] = useState(true);
   const [remember, setRemember] = useState(true);
   const [authErr, setAuthErr] = useState("");
-  const [status, setStatus] = useState("");
+  const [contentPhase, setContentPhase] = useState("idle"); // idle | saving | saved | error
+  const [contentMsg, setContentMsg] = useState("");
   const [activeSection, setActiveSection] = useState(null);
   const [sectionQuery, setSectionQuery] = useState("");
   const [tab, setTab] = useState("content");
@@ -245,15 +248,35 @@ export default function Admin() {
   };
 
   const save = async () => {
-    setStatus("Saving & deploying…");
+    setContentPhase("saving");
+    setContentMsg("Saving your changes…");
     try {
       await saveContent(password, content);
       setSavedSnapshot(JSON.stringify(content));
-      setStatus("Saved. Your site will redeploy in about a minute.");
+      setContentPhase("saved");
+      setContentMsg("Your site will redeploy and show it in about a minute.");
     } catch (ex) {
-      setStatus("Error: " + ex.message);
+      setContentPhase("error");
+      setContentMsg(ex.message);
     }
   };
+  const discardContent = () => {
+    if (savedSnapshot) setContent(JSON.parse(savedSnapshot));
+    setContentPhase("idle");
+  };
+
+  // Cmd/Ctrl+S saves whichever tab you're on.
+  useEffect(() => {
+    if (!authed) return;
+    const onKey = (e) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "s") return;
+      e.preventDefault();
+      if (tab === "social") { if (sched.dirty && sched.phase !== "saving") sched.save(password); }
+      else if (dirty && contentPhase !== "saving") save();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setSection = (key, val) => setContent({ ...content, [key]: val });
   const sectionKeys = content ? Object.keys(content) : [];
@@ -288,9 +311,8 @@ export default function Admin() {
               <button type="button" className={`tabbtn${tab === "social" ? " active" : ""}`} onClick={() => setTab("social")}>Social calendar</button>
             </div>
             <div className="topactions">
-              {tab === "content" && dirty ? <span className="dirtydot" title="Unsaved changes">● Unsaved</span> : null}
+              {(tab === "content" ? dirty : sched.dirty) ? <span className="dirtydot" title="Unsaved changes">● Unsaved</span> : null}
               <a href="/" target="_blank" rel="noopener noreferrer" className="mini">View site</a>
-              {tab === "content" ? <button className="save" onClick={save} disabled={!dirty}>Save &amp; Deploy</button> : null}
               <button type="button" className="mini" onClick={signOut}>Sign out</button>
             </div>
           </div>
@@ -311,13 +333,23 @@ export default function Admin() {
           </div>
           ) : null}
 
-          {tab === "content" && status ? <div className="statusbar">{status}</div> : null}
 
           {tab === "social" ? (
             schedLoading || !schedule ? (
               <div className="loading">Loading social calendar…</div>
             ) : (
-              <SocialCalendar schedule={schedule} setSchedule={setSchedule} onSave={() => saveSchedule(password, schedule)} />
+              <>
+                {sched.draft ? (
+                  <div className="draftbanner" role="status">
+                    <span>📝 You have unsaved edits from {new Date(sched.draft.at).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" })} that never got saved.</span>
+                    <span className="draftbtns">
+                      <button type="button" className="mini" onClick={sched.dismissDraft}>Throw away</button>
+                      <button type="button" className="save small" onClick={sched.restoreDraft}>Restore them</button>
+                    </span>
+                  </div>
+                ) : null}
+                <SocialCalendar schedule={schedule} setSchedule={setSchedule} password={password} />
+              </>
             )
           ) : loading || !content ? (
             <div className="loading">Loading content…</div>
@@ -354,15 +386,36 @@ export default function Admin() {
                   <Value keyName={activeSection} value={content[activeSection]} onChange={(v) => setSection(activeSection, v)} />
                 </>
               ) : null}
-              <div className="footersave">
-                <button className="save" onClick={save} disabled={!dirty}>Save &amp; Deploy</button>
-              </div>
             </div>
           </div>
           )}
         </div>
       )}
       <style>{SOCIAL_CSS}</style>
+      <style>{SAVEBAR_CSS}</style>
+      {authed ? (
+        tab === "social" ? (
+          <SaveBar
+            dirty={sched.dirty}
+            summary={[sched.changes.edited && `${sched.changes.edited} edited`, sched.changes.added && `${sched.changes.added} added`, sched.changes.removed && `${sched.changes.removed} removed`].filter(Boolean).join(" · ")}
+            phase={sched.phase}
+            message={sched.message}
+            onSave={() => sched.save(password)}
+            onDiscard={sched.discard}
+            onDismiss={sched.clearNotice}
+            conflict={sched.conflict ? { onMerge: sched.mergeConflict, onTakeTheirs: sched.takeTheirs } : null}
+          />
+        ) : (
+          <SaveBar
+            dirty={dirty}
+            phase={contentPhase}
+            message={contentMsg}
+            onSave={save}
+            onDiscard={discardContent}
+            onDismiss={() => setContentPhase("idle")}
+          />
+        )
+      ) : null}
     </div>
   );
 }
@@ -380,14 +433,16 @@ const ADMIN_CSS = `
 .rememberrow{font-size:13px;color:#6e6172;}
 .admin input,.admin textarea{width:100%;padding:11px 13px;border:1px solid #e6ddec;border-radius:10px;font-family:inherit;font-size:14px;background:#fffdfb;color:#413645;}
 .admin textarea{min-height:80px;resize:vertical;}
-.save{background:#a85a76;color:#fff;border:none;padding:12px 22px;border-radius:100px;font-weight:600;font-size:14px;cursor:pointer;}
-.save:disabled{opacity:.45;cursor:not-allowed;}
+.save{background:#a85a76;color:#fff;border:none;min-height:44px;padding:0 24px;border-radius:100px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 6px 16px rgba(168,90,118,.28);transition:background .15s,transform .1s;}
+.save:active:not(:disabled){transform:scale(.97);}
+.save.small{min-height:40px;padding:0 18px;box-shadow:none;}
+.save:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
 .save:hover{background:#8a4560;}
 .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(244,239,234,.9);backdrop-filter:blur(12px);border-bottom:1px solid #e6ddec;}
 .topbar .logo{font-size:18px;}
-.topactions{display:flex;gap:12px;align-items:center;}
+.topactions{display:flex;gap:10px;align-items:center;}
 .tabs{display:flex;gap:6px;}
-.tabbtn{background:none;border:1px solid transparent;padding:8px 14px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.tabbtn{background:none;border:1px solid transparent;min-height:40px;padding:0 16px;border-radius:100px;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
 .tabbtn.active{background:#efe8f2;color:#8a4560;border-color:#e2d6ea;}
 .statusbar{background:#efe8f2;color:#8a4560;padding:10px 24px;font-size:14px;}
 .launchers{max-width:1040px;margin:18px auto 0;padding:0 20px;display:grid;gap:12px;}
@@ -414,7 +469,9 @@ const ADMIN_CSS = `
 .switch input{width:auto;}
 .listrow{display:flex;gap:8px;margin-bottom:6px;}
 .listrow input{flex:1;}
-.mini{background:#efe8f2;color:#8a4560;border:none;padding:6px 12px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;}
+.mini{background:#efe8f2;color:#8a4560;border:none;min-height:36px;padding:0 14px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:background .15s,transform .1s;}
+.mini:active:not(:disabled){transform:scale(.97);}
+.mini:disabled{opacity:.45;cursor:not-allowed;}
 .mini:hover{background:#e2d6ea;}
 .mini.danger{background:#f6e3e6;color:#b5434f;}
 .objcard{border:1px solid #e6ddec;border-radius:12px;padding:12px 14px;margin-bottom:12px;background:rgba(255,255,255,.5);}
@@ -423,8 +480,13 @@ const ADMIN_CSS = `
 .objnest{padding-left:6px;border-left:2px solid #e6ddec;}
 .thumb{max-width:120px;border-radius:10px;margin-bottom:8px;display:block;}
 .uprow{display:flex;gap:10px;align-items:center;margin-top:6px;font-size:13px;}
-.footersave{margin-top:24px;padding-top:18px;border-top:1px solid #e6ddec;text-align:right;}
+.editor{padding-bottom:120px;}
+.draftbanner{max-width:960px;margin:16px auto 0;padding:12px 16px;border-radius:14px;background:#fff1d6;color:#7a5200;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;width:calc(100% - 40px);}
+.draftbtns{display:flex;gap:8px;margin-left:auto;}
 @media (max-width:768px){
+  .topbar{flex-wrap:wrap;gap:10px;padding:12px 14px;}
+  .topbar .tabs{order:3;width:100%}
+  .topbar .tabbtn{flex:1}
   .contentlayout{flex-direction:column;padding:0 var(--gutter,16px);}
   .sectionnav{position:static;width:100%;flex-direction:row;flex-wrap:wrap;max-height:none;overflow-y:visible;}
   .navsearch{width:100%;flex-basis:100%;}

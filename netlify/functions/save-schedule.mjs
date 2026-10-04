@@ -4,8 +4,12 @@
 // so it never ships to the browser, and the admin composer reuses the same
 // login as the content editor (no second password).
 //
-// Body: { password, schedule }              -> validates + saves
+// Body: { password, schedule, baseHash? }   -> validates + saves
 //       { password, schedule, verifyOnly: true } -> validate only, no write
+//
+// baseHash is the SHA-256 of the schedule the editor loaded (or last saved). If the
+// copy in GitHub has moved on since (another device, another tab), the save is refused
+// with a 409 and the current schedule, so the editor can merge instead of overwriting.
 import crypto from "node:crypto";
 import { validateSchedule } from "../lib/social-publisher.mjs";
 
@@ -32,7 +36,7 @@ export default async (req) => {
 
   let body;
   try { body = await req.json(); } catch { return json(400, { error: "Bad JSON" }); }
-  const { password, schedule, verifyOnly } = body;
+  const { password, schedule, verifyOnly, baseHash } = body;
 
   const ADMIN_PASSWORD = Netlify.env.get("ADMIN_PASSWORD");
   if (!ADMIN_PASSWORD) return json(500, { error: "ADMIN_PASSWORD is not set on the server." });
@@ -62,8 +66,20 @@ export default async (req) => {
   try {
     let sha;
     const getRes = await fetch(`${apiUrl}?ref=${branch}`, { headers });
-    if (getRes.ok) sha = (await getRes.json()).sha;
-    else if (getRes.status !== 404) {
+    if (getRes.ok) {
+      const cur = await getRes.json();
+      sha = cur.sha;
+      if (baseHash && cur.content) {
+        let current = null;
+        try { current = JSON.parse(Buffer.from(cur.content, "base64").toString("utf8")); } catch { /* unreadable: skip the check */ }
+        if (current) {
+          const currentHash = hashOf(current);
+          if (currentHash !== baseHash) {
+            return json(409, { error: "conflict", currentSchedule: current, currentHash });
+          }
+        }
+      }
+    } else if (getRes.status !== 404) {
       const t = await getRes.text();
       return json(502, { error: `GitHub read failed (${getRes.status}): ${t.slice(0, 200)}` });
     }
@@ -78,11 +94,15 @@ export default async (req) => {
       const t = await putRes.text();
       return json(502, { error: `GitHub write failed (${putRes.status}): ${t.slice(0, 200)}` });
     }
-    return json(200, { ok: true });
+    return json(200, { ok: true, hash: hashOf(schedule) });
   } catch (e) {
     return json(500, { error: e.message });
   }
 };
+
+function hashOf(obj) {
+  return crypto.createHash("sha256").update(JSON.stringify(obj)).digest("hex");
+}
 
 function json(status, obj) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
