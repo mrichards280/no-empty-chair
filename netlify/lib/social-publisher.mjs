@@ -121,6 +121,9 @@ const TRANSIENT_CODES = new Set([1, 2, 4, 17, 32, 341, 368, 613, 9004, 9007, 220
 
 export function makeGraph(cfg, fetchImpl = globalThis.fetch) {
   const base = `https://graph.facebook.com/${cfg.version}`;
+  // Meta reports how much of its rate-limit budget this app has used on every response.
+  const usage = { calls: 0, app: null, buc: null };
+  const readHeader = (res, name) => { try { return JSON.parse(res.headers.get(name)); } catch { return null; } };
   async function call(method, path, params = {}) {
     const qs = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) {
@@ -134,6 +137,11 @@ export function makeGraph(cfg, fetchImpl = globalThis.fetch) {
     });
     let data;
     try { data = await res.json(); } catch { data = {}; }
+    usage.calls++;
+    if (res.headers?.get) {
+      usage.app = readHeader(res, "x-app-usage") || usage.app;
+      usage.buc = readHeader(res, "x-business-use-case-usage") || usage.buc;
+    }
     if (!res.ok || data.error) {
       const e = data.error || {};
       const code = e.code, sub = e.error_subcode;
@@ -159,6 +167,7 @@ export function makeGraph(cfg, fetchImpl = globalThis.fetch) {
     get: (p, q) => call("GET", p, q),
     post: (p, q) => call("POST", p, q),
     rupload,
+    usage: () => usage,
   };
 }
 
@@ -557,6 +566,9 @@ const shortWhen = (iso) => {
 // Turns one tick's notices into phone pushes (grouped per post so IG+FB is one buzz)
 // and emails the failures. Notice shape: { id, platform, status, error?, link?, type?, publish_at? }.
 export async function sendNotice(notices, cfg) {
+  // Facebook is a nice-to-have here (its video posting is blocked on Meta's side), so a
+  // Facebook failure stays visible on the status page but never buzzes the phone or inbox.
+  notices = notices.filter((n) => !(n.platform === "facebook" && (n.status === "failed" || n.status === "missed")));
   if (!notices.length) return;
 
   const groups = new Map();
@@ -657,6 +669,15 @@ export async function verifyConnection(graph, cfg = config()) {
       add("Instagram publishing quota", true, `${d.quota_usage ?? 0} of ${d.config?.quota_total ?? "?"} used in last 24h`);
     } catch (e) { add("Instagram publishing permission", false, e.message); }
   }
+  const u = graph.usage?.();
+  if (u?.app) {
+    const worst = Math.max(u.app.call_count || 0, u.app.total_cputime || 0, u.app.total_time || 0);
+    add("Meta API budget (app, hourly)", worst < 80, `${u.app.call_count ?? 0}% of calls · ${u.app.total_cputime ?? 0}% CPU · ${u.app.total_time ?? 0}% time used`);
+  }
+  if (u?.buc) {
+    const first = Object.values(u.buc).flat()[0];
+    if (first) add("Meta API budget (account)", (first.call_count || 0) < 80, `${first.call_count ?? 0}% of calls used${first.estimated_time_to_regain_access ? ` · blocked for ${first.estimated_time_to_regain_access} min` : ""}`);
+  }
   return out;
 }
 
@@ -668,12 +689,14 @@ export async function verifyConnection(graph, cfg = config()) {
 // deprecated across API versions (Meta deprecated a batch of Page Insights
 // metrics in mid-2026), and a Story's insights disappear once it expires
 // after 24h. A failure there is recorded but never blocks the stable counts.
-const IG_INSIGHT_METRICS = {
-  IMAGE: "reach,saved",
-  CAROUSEL_ALBUM: "reach,saved",
-  VIDEO: "reach,saved,plays",
-  REELS: "reach,saved,plays",
-  STORY: "reach",
+// Metric bundles, richest first. Each Instagram media type accepts a different set and Meta
+// renames or retires metrics between API versions, so a bundle that errors with "invalid
+// metric" (code 100) just falls through to the next, smaller one. Normally the first works,
+// so the usual cost is still one insights call per post.
+const IG_METRIC_TIERS = {
+  REELS: ["reach,saved,shares,views,total_interactions,ig_reels_avg_watch_time", "reach,saved,shares,views", "reach,saved,shares", "reach"],
+  STORY: ["reach,replies,shares,total_interactions", "reach"],
+  FEED: ["reach,saved,shares,views,total_interactions,profile_visits,follows", "reach,saved,shares,views", "reach,saved,shares", "reach"],
 };
 
 function readInsightRows(data) {
@@ -695,31 +718,58 @@ export async function fetchStats(graph, platform, st) {
       comments: media.comments_count,
       fetchedAt: new Date().toISOString(),
     };
-    try {
-      const metric = IG_INSIGHT_METRICS[media.media_product_type] || "reach";
-      Object.assign(out, readInsightRows((await graph.get(`${st.mediaId}/insights`, { metric })).data));
-    } catch (e) { out.insightsError = e.message; }
-    try {
-      const c = await graph.get(`${st.mediaId}/comments`, { fields: "username,text,timestamp", limit: 5 });
-      out.recentComments = (c.data || []).map((x) => ({ username: x.username, text: x.text, timestamp: x.timestamp }));
-    } catch { /* comments are a nice-to-have, never block the stable counts */ }
+    const kind = media.media_product_type === "REELS" ? "REELS" : media.media_product_type === "STORY" ? "STORY" : "FEED";
+    const tiers = IG_METRIC_TIERS[kind];
+    for (let i = Math.min(st.stats?.metricTier ?? 0, tiers.length - 1); i < tiers.length; i++) { // resume at the bundle that worked last time
+      const metric = tiers[i];
+      try {
+        Object.assign(out, readInsightRows((await graph.get(`${st.mediaId}/insights`, { metric })).data));
+        delete out.insightsError;
+        out.metricTier = i;
+        break;
+      } catch (e) {
+        out.insightsError = e.message;
+        if (e.code !== 100 && !/metric/i.test(e.message || "")) break; // rate limit / outage: don't hammer, try next time
+      }
+    }
+    if (kind !== "STORY") {
+      try {
+        const c = await graph.get(`${st.mediaId}/comments`, { fields: "username,text,timestamp,like_count", limit: 25 });
+        out.recentComments = (c.data || []).map((x) => ({ username: x.username, text: String(x.text || "").slice(0, 400), timestamp: x.timestamp, likes: x.like_count }));
+      } catch { /* comments are a nice-to-have, never block the stable counts */ }
+    }
     return out;
   }
   if (platform === "facebook" && st.postId) {
-    const post = await graph.get(st.postId, { fields: "permalink_url,created_time,likes.summary(true),comments.summary(true)" });
-    const out = {
+    // One call. Facebook is secondary here and its Page Insights metrics keep being retired.
+    const post = await graph.get(st.postId, { fields: "permalink_url,created_time,reactions.summary(true),comments.summary(true),shares" });
+    return {
       permalink: post.permalink_url,
       postedAt: post.created_time,
-      likes: post.likes?.summary?.total_count,
+      likes: post.reactions?.summary?.total_count,
       comments: post.comments?.summary?.total_count,
+      shares: post.shares?.count ?? 0,
       fetchedAt: new Date().toISOString(),
     };
-    try {
-      Object.assign(out, readInsightRows((await graph.get(`${st.postId}/insights`, { metric: "post_impressions,post_engaged_users" })).data));
-    } catch (e) { out.insightsError = e.message; }
-    return out;
   }
   return null;
+}
+
+// Keeps a small time series next to the latest numbers, so growth can be shown and the
+// refresh cadence can be judged from real data. At most one point per hour, and only when
+// something actually moved.
+const HISTORY_KEYS = ["likes", "comments", "shares", "saved", "reach", "views"];
+export function withHistory(prev, next) {
+  const hist = Array.isArray(prev?.history) ? prev.history.slice() : [];
+  const snap = { at: next.fetchedAt };
+  for (const k of HISTORY_KEYS) snap[k] = k === "views" ? (next.views ?? next.plays) : next[k];
+  const last = hist[hist.length - 1];
+  const moved = !last || HISTORY_KEYS.some((k) => last[k] !== snap[k]);
+  const gap = last ? Date.parse(next.fetchedAt) - Date.parse(last.at) : Infinity;
+  if (moved && gap >= 60 * 60 * 1000) hist.push(snap);
+  const merged = { ...next, history: hist.slice(-60) };
+  if (!merged.recentComments && prev?.recentComments) merged.recentComments = prev.recentComments; // keep the last good list if this fetch missed it
+  return merged;
 }
 
 // Walks every published post/platform in the schedule and refreshes its stats
@@ -737,7 +787,7 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
       try {
         const stats = await fetchStats(graph, platform, st);
         if (stats) {
-          state[platform] = { ...st, stats };
+          state[platform] = { ...st, stats: withHistory(st.stats, stats) };
           changed = true;
           results.push({ id: post.id, platform, ok: true });
         }
@@ -747,9 +797,9 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
     }
     if (state.manual?.mediaId && post.type !== "story" && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs)) {
       try {
-        const stats = await fetchStats(graph, "instagram", { mediaId: state.manual.mediaId });
+        const stats = await fetchStats(graph, "instagram", { mediaId: state.manual.mediaId, stats: state.manual.stats });
         if (stats) {
-          state.manual = { ...state.manual, stats };
+          state.manual = { ...state.manual, stats: withHistory(state.manual.stats, stats) };
           changed = true;
           results.push({ id: post.id, platform: "manual", ok: true });
         }

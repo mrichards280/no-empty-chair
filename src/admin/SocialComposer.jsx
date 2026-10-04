@@ -419,6 +419,102 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
   );
 }
 
+/* ---------- month calendar (Eastern time) ---------- */
+const CAL_CAT = { attention: "Needs attention", needs: "Needs posting", scheduled: "Scheduled", draft: "Draft", published: "Published" };
+function calCat(p, st) {
+  if (p.manual_only) {
+    if (st?.manual?.status === "posted") return "published";
+  } else {
+    const core = (p.platforms || []).filter((x) => x !== "facebook"); // Facebook never needs attention
+    const watch = core.length ? core : p.platforms || [];
+    const ss = watch.filter((x) => !st?.[x]?.dismissed).map((x) => st?.[x]?.status);
+    if (ss.some((x) => x === "failed" || x === "missed")) return "attention";
+    if (ss.length && ss.every((x) => x === "published")) return "published";
+  }
+  if ((p.status || "draft") !== "ready") return "draft";
+  return p.manual_only ? "needs" : "scheduled";
+}
+const timeShort = (iso) => {
+  const t = Date.parse(iso);
+  return Number.isNaN(t) ? "" : new Date(t).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }).replace(":00", "").replace(" AM", "a").replace(" PM", "p");
+};
+const timeLong = (iso) => { const t = Date.parse(iso); return Number.isNaN(t) ? "" : new Date(t).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }); };
+
+function MonthCalendar({ posts, live, onEdit, onDuplicate, onNew }) {
+  const todayKey = isoToEasternParts(new Date().toISOString()).date;
+  const [ym, setYm] = useState(() => { const [y, m] = todayKey.split("-").map(Number); return [y, m - 1]; });
+  const [sel, setSel] = useState(todayKey);
+  const [y, m] = ym;
+  const pad = (n) => String(n).padStart(2, "0");
+  const prefix = `${y}-${pad(m + 1)}-`;
+  const byDay = {};
+  for (const p of posts) { const k = isoToEasternParts(p.publish_at).date; if (k) (byDay[k] = byDay[k] || []).push(p); }
+  for (const k of Object.keys(byDay)) byDay[k].sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at));
+  const lead = new Date(Date.UTC(y, m, 1)).getUTCDay();
+  const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  const title = new Date(Date.UTC(y, m, 1)).toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  const total = Array.from({ length: days }, (_, i) => (byDay[prefix + pad(i + 1)] || []).length).reduce((a, b) => a + b, 0);
+  const go = (delta) => {
+    const n = m + delta;
+    const next = [y + Math.floor(n / 12), ((n % 12) + 12) % 12];
+    setYm(next);
+    setSel(`${next[0]}-${pad(next[1] + 1)}-01`);
+  };
+  const today = () => { const [ty, tm] = todayKey.split("-").map(Number); setYm([ty, tm - 1]); setSel(todayKey); };
+  const selected = sel.startsWith(prefix) ? sel : `${prefix}01`;
+  const list = byDay[selected] || [];
+  const selLabel = new Date(selected + "T12:00:00Z").toLocaleString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+
+  return (
+    <div className="mc">
+      <div className="mc-head">
+        <button type="button" className="mini" onClick={() => go(-1)} aria-label="Previous month">‹</button>
+        <h3>{title}</h3>
+        <button type="button" className="mini" onClick={() => go(1)} aria-label="Next month">›</button>
+        <button type="button" className="mini" onClick={today}>Today</button>
+        <span className="muted mc-count">{total} post{total === 1 ? "" : "s"} this month</span>
+      </div>
+      <div className="mc-dow">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <span key={d}>{d}</span>)}</div>
+      <div className="mc-grid">
+        {Array.from({ length: lead }, (_, i) => <span key={"b" + i} className="mc-cell blank" />)}
+        {Array.from({ length: days }, (_, i) => {
+          const d = i + 1, key = prefix + pad(d), items = byDay[key] || [];
+          return (
+            <button type="button" key={key} className={`mc-cell${key === todayKey ? " today" : ""}${key === selected ? " sel" : ""}`} onClick={() => setSel(key)} aria-label={`${title.split(" ")[0]} ${d}, ${items.length} post${items.length === 1 ? "" : "s"}`}>
+              <span className="mc-n">{d}</span>
+              <span className="mc-pills">
+                {items.slice(0, 3).map((p) => <i key={p.id} className={`mc-pill c-${calCat(p, live?.[p.id])}`}><b>{TYPE_ICON[p.type]} {timeShort(p.publish_at)}</b></i>)}
+                {items.length > 3 ? <i className="mc-more">+{items.length - 3}</i> : null}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mc-legend">{["needs", "scheduled", "published", "draft", "attention"].map((c) => <span key={c}><i className={`mc-dot c-${c}`} />{CAL_CAT[c]}</span>)}</div>
+      <div className="mc-agenda">
+        <div className="mc-agendahead"><h4>{selLabel}</h4><button type="button" className="save small" onClick={() => onNew(selected)}>+ New post on this day</button></div>
+        {list.length ? list.map((p) => {
+          const cat = calCat(p, live?.[p.id]);
+          const thumb = p.media?.[0];
+          return (
+            <div className="mc-row" key={p.id}>
+              <div className="mc-thumb">{thumb && !isVideoUrl(thumb) ? <img src={thumb} alt="" /> : <span>{TYPE_ICON[p.type] || "🖼️"}</span>}</div>
+              <div className="mc-info">
+                <div><b>{timeLong(p.publish_at)}</b> · {TYPE_ICON[p.type]} {p.type} <span className={`mc-tag c-${cat}`}>{CAL_CAT[cat]}</span></div>
+                <div className="mc-cap">{(p.caption || "").slice(0, 100) || <span className="muted">no caption</span>}</div>
+              </div>
+              <div className="mc-btns">
+                <button type="button" className="mini" onClick={() => onEdit(p)}>Edit</button>
+                <button type="button" className="mini" onClick={() => onDuplicate(p)}>Duplicate</button>
+              </div>
+            </div>
+          );
+        }) : <div className="mc-none">Nothing scheduled this day.</div>}
+      </div>
+    </div>
+  );
+}
+
 /* ---------- the calendar list ---------- */
 export default function SocialCalendar({ schedule, setSchedule, password }) {
   const [editing, setEditing] = useState(null);
@@ -503,6 +599,8 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
     notify(`Deleted "${post.id}".`, () => { setSchedule(before); setToast(null); });
   };
 
+  const [view, setViewState] = useState(() => { try { return localStorage.getItem("necSocialView") === "calendar" ? "calendar" : "list"; } catch { return "list"; } });
+  const setView = (v) => { setViewState(v); try { localStorage.setItem("necSocialView", v); } catch {} };
   const [filter, setFilter] = useState("all");
   const counts = {
     all: posts.length,
@@ -526,11 +624,25 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
     <div className="social-calendar">
       <div className="calhead">
         <button type="button" className="save" onClick={() => setEditing(blankPost())}>+ New post</button>
+        <div className="viewtoggle" role="tablist" aria-label="View">
+          <button type="button" role="tab" aria-selected={view === "list"} className={view === "list" ? "active" : ""} onClick={() => setView("list")}>☰ List</button>
+          <button type="button" role="tab" aria-selected={view === "calendar"} className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>🗓 Calendar</button>
+        </div>
         <a href="/admin/social" target="_blank" rel="noopener noreferrer" className="mini">Open publisher status ↗</a>
         <button type="button" className="mini" onClick={refreshStats} disabled={refreshing}>{refreshing ? "Refreshing…" : "↻ Refresh stats"}</button>
       </div>
 
-      <div className="calfilters">
+      {view === "calendar" ? (
+        <MonthCalendar
+          posts={posts}
+          live={live}
+          onEdit={(p) => setEditing(p)}
+          onDuplicate={(p) => setEditing({ ...p, id: slug(p.id + "-copy"), _isNew: true })}
+          onNew={(date) => setEditing({ ...blankPost(), publish_at: easternISO(date, "11:00") })}
+        />
+      ) : null}
+
+      <div className="calfilters" hidden={view === "calendar"}>
         {[["all", "All"], ["ready", "Ready"], ["draft", "Draft"], ["manual", "Manual"], ["evergreen", "🌲 Evergreen"]].map(([k, label]) => (
           <button type="button" key={k} className={`filterchip${filter === k ? " active" : ""}`} onClick={() => setFilter(k)}>
             {label} <span className="filtercount">{counts[k]}</span>
@@ -538,13 +650,13 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
         ))}
       </div>
 
-      {!posts.length ? (
+      {view === "calendar" ? null : !posts.length ? (
         <div className="calempty">No posts yet — click "+ New post" to add your first one.</div>
       ) : !shown.length ? (
         <div className="calempty">Nothing in "{filter}" right now.</div>
       ) : null}
 
-      <div className="calgrid">
+      <div className="calgrid" hidden={view === "calendar"}>
         {shown.map((post) => {
           const thumb = post.media?.[0];
           const liveState = live?.[post.id];
@@ -575,7 +687,9 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
                       {typeof s?.likes === "number" ? <span> · ❤️ {s.likes.toLocaleString()}</span> : null}
                       {typeof s?.comments === "number" ? <span> · 💬 {s.comments.toLocaleString()}</span> : null}
                       {typeof s?.reach === "number" ? <span> · 👁 {s.reach.toLocaleString()}</span> : null}
-                      {typeof s?.plays === "number" ? <span> · ▶ {s.plays.toLocaleString()}</span> : null}
+                      {typeof (s?.views ?? s?.plays) === "number" ? <span> · ▶ {(s.views ?? s.plays).toLocaleString()}</span> : null}
+                      {typeof s?.shares === "number" ? <span> · ↗ {s.shares.toLocaleString()}</span> : null}
+                      {typeof s?.saved === "number" ? <span> · 🔖 {s.saved.toLocaleString()}</span> : null}
                       {!s ? <span className="muted"> · no stats yet — try Refresh stats</span> : null}
                     </div>
                   );
@@ -623,6 +737,53 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
 }
 
 export const SOCIAL_CSS = `
+.viewtoggle{display:inline-flex;border:1px solid #e6ddec;border-radius:100px;background:rgba(255,255,255,.7);padding:3px;gap:2px;}
+.viewtoggle button{border:none;background:none;min-height:38px;padding:0 16px;border-radius:100px;font:inherit;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
+.viewtoggle button.active{background:#413645;color:#fff;}
+.social-calendar [hidden]{display:none!important;}
+.mc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.mc-head h3{margin:0 6px;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:22px;min-width:150px;text-align:center;}
+.mc-count{margin-left:auto;}
+.mc-dow,.mc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.mc-dow span{text-align:center;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a7f86;padding:4px 0;}
+.mc-cell{font:inherit;color:#413645;text-align:left;min-height:92px;padding:6px;border-radius:14px;border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.62);cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0;transition:background .15s;}
+.mc-cell.blank{background:transparent;border-color:transparent;cursor:default;}
+.mc-cell:not(.blank):hover{background:#fff;}
+.mc-cell.today .mc-n{background:#a85a76;color:#fff;}
+.mc-cell.sel{border-color:#a85a76;box-shadow:0 0 0 2px rgba(168,90,118,.25);}
+.mc-n{font-size:12.5px;font-weight:600;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
+.mc-pills{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.mc-pill{font-style:normal;border-radius:8px;padding:2px 6px;font-size:11px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.mc-pill b{font-weight:600;}
+.mc-more{font-style:normal;font-size:11px;color:#8a7f86;padding-left:4px;}
+.c-needs{background:#fdecc8;color:#7a5200;}.c-scheduled{background:#ece3f4;color:#5a3f7a;}.c-published{background:#dff3e6;color:#1d6b3a;}.c-draft{background:#eee;color:#666;}.c-attention{background:#f6e3e3;color:#8c2f2f;}
+.mc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:12px 2px;font-size:12px;color:#6e6172;}
+.mc-legend span{display:inline-flex;align-items:center;gap:6px;}
+.mc-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.mc-dot.c-needs{background:#e2a93a;}.mc-dot.c-scheduled{background:#8a63b3;}.mc-dot.c-published{background:#2f9a58;}.mc-dot.c-draft{background:#b5b0b3;}.mc-dot.c-attention{background:#d24c4c;}
+.mc-agenda{background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:14px 16px;box-shadow:0 8px 26px rgba(65,54,69,.07);}
+.mc-agendahead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.mc-agenda h4{margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:19px;}
+.mc-none{color:#8a7f86;font-size:14px;padding:10px 0;}
+.mc-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #e6ddec;flex-wrap:wrap;}
+.mc-thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;background:#efe8f2;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
+.mc-thumb img{width:100%;height:100%;object-fit:cover;}
+.mc-info{flex:1;min-width:150px;font-size:13.5px;}
+.mc-cap{color:#6e6172;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px;}
+.mc-tag{display:inline-block;border-radius:100px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:4px;}
+.mc-btns{display:flex;gap:8px;}
+@media (max-width:640px){
+  .mc-cell{min-height:58px;padding:5px;align-items:center;}
+  .mc-pills{flex-direction:row;flex-wrap:wrap;justify-content:center;}
+  .mc-pill{width:9px;height:9px;padding:0;border-radius:50%;}
+  .mc-pill b{display:none;}
+  .mc-pill.c-needs{background:#e2a93a;}.mc-pill.c-scheduled{background:#8a63b3;}.mc-pill.c-published{background:#2f9a58;}.mc-pill.c-draft{background:#b5b0b3;}.mc-pill.c-attention{background:#d24c4c;}
+  .mc-more{display:none;}
+  .mc-head h3{min-width:0;flex:1;font-size:19px;}
+  .mc-count{width:100%;margin:0;}
+  .mc-btns{width:100%;}.mc-btns .mini{flex:1;}
+}
+
 .social-calendar{max-width:960px;margin:24px auto;padding:0 20px;}
 .calhead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px;}
 .calstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}

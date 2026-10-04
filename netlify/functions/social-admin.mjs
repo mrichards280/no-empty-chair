@@ -116,7 +116,8 @@ function statsHtml(stats) {
     num(stats.likes) !== null ? `❤️ ${num(stats.likes)}` : null,
     num(stats.comments) !== null ? `💬 ${num(stats.comments)}` : null,
     num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
-    num(stats.plays) !== null ? `▶ ${num(stats.plays)} plays` : null,
+    num(stats.views ?? stats.plays) !== null ? `▶ ${num(stats.views ?? stats.plays)} views` : null,
+    num(stats.shares) !== null ? `↗ ${num(stats.shares)} shares` : null,
     num(stats.saved) !== null ? `🔖 ${num(stats.saved)}` : null,
     num(stats.post_impressions) !== null ? `👁 ${num(stats.post_impressions)} impr.` : null,
     num(stats.post_engaged_users) !== null ? `⚡ ${num(stats.post_engaged_users)} engaged` : null,
@@ -128,7 +129,7 @@ function statsHtml(stats) {
 }
 
 // Which tab a post lives in. A post sits in exactly one:
-//   attention = a platform failed/missed (needs a human)    published = all done
+//   attention = Instagram failed/missed (needs a human)     published = all done
 //   needs     = manual post still to be posted by hand      scheduled = auto-publishes on its own
 //   draft     = draft or paused (won't go out until it's set to ready)
 function catOf(p) {
@@ -137,7 +138,10 @@ function catOf(p) {
   if (p.manual_only) {
     if (st.manual?.status === "posted") return "published";
   } else {
-    const live = plats.filter((pl) => !st[pl]?.dismissed);
+    // Facebook never needs attention: a failure still shows on the card, but the post is
+    // judged by its Instagram result (Facebook only counts if it's the sole platform).
+    const core = plats.filter((pl) => pl !== "facebook");
+    const live = (core.length ? core : plats).filter((pl) => !st[pl]?.dismissed);
     const ss = live.map((pl) => st[pl]?.status);
     if (ss.some((x) => x === "failed" || x === "missed")) return "attention";
     if (live.length && ss.every((x) => x === "published")) return "published";
@@ -147,12 +151,108 @@ function catOf(p) {
   return p.manual_only ? "needs" : "scheduled";
 }
 
+// ---- Stats tab ------------------------------------------------------------------------
+const STAT_METRICS = [["likes", "❤️", "Likes"], ["comments", "💬", "Comments"], ["shares", "↗", "Shares"], ["saved", "🔖", "Saves"], ["reach", "👁", "Reach"], ["views", "▶", "Views"]];
+const metricVal = (s, k) => (k === "views" ? (s.views ?? s.plays) : s[k]);
+const isNum = (n) => typeof n === "number" && Number.isFinite(n);
+
+// One row per post/platform that has numbers saved.
+function statRows(posts) {
+  const rows = [];
+  for (const p of posts) {
+    const st = p.state || {};
+    if (p.manual_only) { if (st.manual?.stats) rows.push({ p, pl: "instagram", s: st.manual.stats, link: st.manual.permalink }); continue; }
+    for (const pl of p.platforms || []) if (st[pl]?.status === "published" && st[pl].stats) rows.push({ p, pl, s: st[pl].stats, link: st[pl].permalink || st[pl].stats.permalink });
+  }
+  return rows.sort((a, b) => Date.parse(b.s.postedAt || b.p.publish_at) - Date.parse(a.s.postedAt || a.p.publish_at));
+}
+
+function sparkline(hist, key) {
+  const pts = (hist || []).map((h) => h[key]).filter(isNum);
+  if (pts.length < 3) return "";
+  const w = 84, h = 24, max = Math.max(...pts), min = Math.min(...pts), span = max - min || 1;
+  const xy = pts.map((v, i) => `${((i / (pts.length - 1)) * w).toFixed(1)},${(h - 2 - ((v - min) / span) * (h - 4)).toFixed(1)}`).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline points="${xy}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+// "+3 likes · +1 comment" since about a day ago (or since tracking began).
+function growthLine(s) {
+  const hist = s.history || [];
+  if (hist.length < 2) return "";
+  const cutoff = Date.now() - 24 * 3600e3;
+  const base = [...hist].reverse().find((h) => Date.parse(h.at) <= cutoff) || hist[0];
+  const parts = [["likes", "like"], ["comments", "comment"], ["shares", "share"], ["saved", "save"]]
+    .map(([k, w]) => { const d = (metricVal(s, k) ?? 0) - (base[k] ?? 0); return isNum(metricVal(s, k)) && isNum(base[k]) && d > 0 ? `+${d.toLocaleString("en-US")} ${w}${d === 1 ? "" : "s"}` : null; })
+    .filter(Boolean);
+  if (!parts.length) return "";
+  return `<div class="growth">▲ ${parts.join(" · ")} <span class="muted">since ${Date.parse(base.at) <= cutoff ? "yesterday" : esc(timeAgo(base.at)) || "earlier"}</span></div>`;
+}
+
+function statsView(posts, cfg) {
+  const rows = statRows(posts);
+  if (!rows.length) {
+    return `<section id="statsView" hidden><div class="emptystate"><div class="emptyicon">📊</div><h3>No stats yet</h3><p>Numbers show up here once a post is live. Tap Refresh stats to pull the latest.</p><p style="margin-top:14px"><button class="btn primary rose" data-act="refresh-stats">↻ Refresh stats</button></p></div></section>`;
+  }
+  const ig = rows.filter((r) => r.pl === "instagram"), fb = rows.filter((r) => r.pl === "facebook");
+  const sum = (arr, k) => arr.reduce((t, r) => t + (Number(metricVal(r.s, k)) || 0), 0);
+  const eng = (r) => ["likes", "comments", "shares", "saved"].reduce((t, k) => t + (Number(metricVal(r.s, k)) || 0), 0);
+  const best = ig.slice().sort((a, b) => eng(b) - eng(a))[0];
+  const newest = rows.reduce((m, r) => Math.max(m, Date.parse(r.s.fetchedAt) || 0), 0);
+  const tiles = STAT_METRICS.map(([k, ic, label]) => `<div class="tile"><span>${ic}</span><b>${(sum(ig, k)).toLocaleString("en-US")}</b><i>${label}</i></div>`).join("");
+  const fbLine = fb.length ? `<p class="sub">Facebook, across ${fb.length} post${fb.length === 1 ? "" : "s"}: ❤️ ${sum(fb, "likes").toLocaleString("en-US")} · 💬 ${sum(fb, "comments").toLocaleString("en-US")} · ↗ ${sum(fb, "shares").toLocaleString("en-US")}</p>` : "";
+  const cards = rows.map((r) => {
+    const { p, pl, s } = r;
+    const m0 = p.media?.[0] || "";
+    const thumb = m0 && !/\.(mp4|mov)(\?|#|$)/i.test(m0) ? `<img src="${esc(mediaUrl(m0, cfg))}" alt="">` : `<div class="pthumb-empty">${TYPE_ICON[p.type] || "🖼️"}</div>`;
+    const grid = STAT_METRICS.map(([k, ic, label]) => { const v = metricVal(s, k); return `<div class="m${isNum(v) ? "" : " na"}"><span>${ic} ${label}</span><b>${isNum(v) ? v.toLocaleString("en-US") : "—"}</b></div>`; }).join("");
+    const extras = [
+      isNum(s.total_interactions) ? `${s.total_interactions.toLocaleString("en-US")} interactions` : null,
+      isNum(s.profile_visits) ? `${s.profile_visits.toLocaleString("en-US")} profile visits` : null,
+      isNum(s.follows) ? `${s.follows.toLocaleString("en-US")} new follows` : null,
+      isNum(s.replies) ? `${s.replies.toLocaleString("en-US")} replies` : null,
+      isNum(s.ig_reels_avg_watch_time) ? `${(s.ig_reels_avg_watch_time / 1000).toFixed(1)}s avg watch` : null,
+    ].filter(Boolean).join(" · ");
+    const comments = (s.recentComments || []);
+    const total = isNum(s.comments) ? s.comments : comments.length;
+    const commentBlock = total || comments.length
+      ? `<details class="scomments"><summary>💬 ${total.toLocaleString("en-US")} comment${total === 1 ? "" : "s"}${comments.length && comments.length < total ? ` · showing latest ${comments.length}` : ""}</summary>${comments.length ? comments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}${c.timestamp ? ` <span class="muted">· ${esc(timeAgo(c.timestamp))}</span>` : ""}${isNum(c.likes) && c.likes ? ` <span class="muted">· ❤️ ${c.likes}</span>` : ""}</div>`).join("") : `<div class="muted">The comment text isn't available yet. Tap Refresh stats.</div>`}</details>`
+      : "";
+    const unavailable = s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach and saves unavailable: ${esc(String(s.insightsError).slice(0, 120))}</div>` : "";
+    return `<article class="srow" data-ts="${Date.parse(s.postedAt || p.publish_at) || 0}" data-likes="${Number(s.likes) || 0}" data-comments="${Number(s.comments) || 0}" data-shares="${Number(s.shares) || 0}" data-reach="${Number(s.reach) || 0}">
+      <div class="pthumb">${thumb}</div>
+      <div class="sbody">
+        <div class="prow1"><b>${esc(fmt(s.postedAt || p.publish_at))}</b><span class="platchip pc-${pl}">${pl === "instagram" ? "IG" : "FB"}</span></div>
+        <div class="ptype">${TYPE_ICON[p.type] || ""} ${esc(p.type)}${p.campaign ? ` <span class="campaign">🏷 ${esc(p.campaign)}</span>` : ""}${r.link ? ` · <a href="${esc(r.link)}" target="_blank" rel="noopener">view ↗</a>` : ""}</div>
+        <div class="pcap">${esc((p.caption || "").slice(0, 110))}${(p.caption || "").length > 110 ? "…" : ""}</div>
+        <div class="mgrid">${grid}</div>
+        ${growthLine(s)}
+        <div class="sline">${extras ? `<span>${esc(extras)}</span>` : ""}${sparkline(s.history, "likes") ? `<span class="sparkwrap" title="Likes over time">${sparkline(s.history, "likes")}<i>likes over time</i></span>` : ""}<span class="muted">updated ${esc(timeAgo(s.fetchedAt) || "just now")}</span></div>
+        ${unavailable}
+        ${commentBlock}
+      </div>
+    </article>`;
+  }).join("");
+  return `<section id="statsView" hidden aria-label="Post statistics">
+    <div class="tiles">${tiles}</div>
+    <p class="sub">Instagram totals across ${ig.length} post${ig.length === 1 ? "" : "s"} · reach adds up per post, so the same person can be counted twice${best ? ` · best so far: <a href="${esc(best.link || "#")}" target="_blank" rel="noopener">${esc(fmt(best.s.postedAt || best.p.publish_at))} ${esc(best.p.type)}</a> (${eng(best).toLocaleString("en-US")} likes, comments, shares and saves)` : ""}</p>
+    ${fbLine}
+    <div class="statbar"><label class="sub" for="statSort">Sort by</label>
+      <select id="statSort"><option value="ts">Newest</option><option value="likes">Most likes</option><option value="comments">Most comments</option><option value="shares">Most shares</option><option value="reach">Most reach</option></select>
+      <span class="muted">Last pulled ${esc(newest ? timeAgo(new Date(newest).toISOString()) || "just now" : "never")}</span>
+      <button class="btn sm" data-act="refresh-stats">↻ Refresh</button></div>
+    <div class="slist">${cards}</div>
+  </section>`;
+}
+
+
 function page(d, cfg) {
   const badge = (st, p, id) => {
     const s = st?.status || "scheduled";
     const link = st?.permalink ? ` <a href="${esc(st.permalink)}" target="_blank" rel="noopener">view ↗</a>` : "";
     const err = st?.error || st?.lastError ? `<div class="err">${esc(st.error || st.lastError)}</div>` : "";
-    const retry = ["failed", "missed"].includes(s)
+    const retry = ["failed", "missed"].includes(s) && p === "facebook"
+      ? ` <button class="btn sm quiet" data-retry="${esc(id)}" data-platform="${p}">Retry</button>`
+      : ["failed", "missed"].includes(s)
       ? ` <button class="btn sm primary" data-retry="${esc(id)}" data-platform="${p}">Retry</button>` + (st?.dismissed
           ? ` <span class="muted">dismissed</span> <button class="btn sm quiet" data-dismiss="${esc(id)}" data-platform="${p}" data-undo="1">Undo</button>`
           : ` <button class="btn sm quiet" data-dismiss="${esc(id)}" data-platform="${p}">Dismiss</button>`)
@@ -164,7 +264,7 @@ function page(d, cfg) {
       : ac.status === "posted" ? `<div class="muted">💬 first comment posted ${esc(timeAgo(ac.postedAt))}</div>`
       : `<div class="err">first comment failed: ${esc(ac.error || "")}</div>`
       : "";
-    return `<div class="platrow"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statsBlock}${acLine}</div>`;
+    return `<div class="platrow${p === "facebook" && ["failed", "missed"].includes(s) ? " quietfail" : ""}"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statsBlock}${acLine}</div>`;
   };
 
   const sorted = d.posts.slice().sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at));
@@ -174,10 +274,13 @@ function page(d, cfg) {
     ...(counts.attention ? [{ key: "attention", label: "⚠️ Needs attention" }] : []),
     { key: "needs", label: "🖐🏾 Needs posting" },
     { key: "scheduled", label: "🗓 Scheduled" },
-    { key: "draft", label: "📝 Drafts & paused" },
+    { key: "draft", label: "📝 Drafts" },
     { key: "published", label: "✅ Published" },
     { key: "all", label: "All" },
+    { key: "calendar", label: "🗓 Calendar" },
+    { key: "stats", label: "📊 Stats" },
   ];
+  const statCount = statRows(sorted).length;
   const defaultTab = counts.attention ? "attention" : counts.needs ? "needs" : counts.scheduled ? "scheduled" : "all";
   const cards = sorted.map((p) => {
     const media0 = p.media?.[0] || "";
@@ -233,6 +336,8 @@ function page(d, cfg) {
       type: p.type,
       platforms: p.platforms,
       manual_only: !!p.manual_only,
+      cat: catOf(p),
+      status: p.status || "draft",
       publish_at: p.publish_at,
       caption: p.caption || "",
       caption_facebook: p.caption_facebook ?? p.caption ?? "",
@@ -441,6 +546,84 @@ details.moretools>summary::-webkit-details-marker{display:none}
 .reelmock-side{position:absolute;right:8px;bottom:70px;display:flex;flex-direction:column;gap:14px;color:#fff;font-size:17px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .reelmock-bottom{position:absolute;left:10px;right:40px;bottom:14px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-size:11px;line-height:1.4}
 .reelmock-bottom b{display:block;margin-bottom:3px;font-size:12px}
+
+[hidden]{display:none!important}
+.platrow.quietfail .err{background:transparent;color:var(--muted);padding:0 0 0 2px;font-size:12px}
+.platrow.quietfail .s-failed,.platrow.quietfail .s-missed{background:#f1ecee;color:#8a6f76}
+.pcard.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%,40%{box-shadow:0 0 0 4px rgba(168,90,118,.55)}100%{box-shadow:0 8px 26px rgba(65,54,69,.07)}}
+
+/* stats */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px;margin:0 0 10px}
+.tile{background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.85);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:1px;box-shadow:0 6px 20px rgba(65,54,69,.06)}
+.tile span{font-size:15px}
+.tile b{font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:24px;color:var(--plum);line-height:1.2}
+.tile i{font-style:normal;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.statbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.statbar select{min-height:40px;border:1px solid var(--line);border-radius:100px;background:var(--white);padding:0 14px;font:inherit;font-size:13px;color:var(--plum)}
+.statbar .btn{margin-left:auto}
+.slist{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.srow{display:flex;gap:14px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:14px;box-shadow:0 8px 26px rgba(65,54,69,.07)}
+.sbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:6px;margin:4px 0 2px}
+.m{background:rgba(244,239,234,.7);border-radius:12px;padding:7px 10px}
+.m span{display:block;font-size:11px;color:var(--muted)}
+.m b{font-size:17px;color:var(--plum)}
+.m.na b{color:#c3b9c0}
+.growth{font-size:12.5px;font-weight:600;color:var(--ok)}
+.sline{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:12px;color:var(--plum-soft)}
+.sparkwrap{display:inline-flex;align-items:center;gap:6px;color:var(--rose)}
+.sparkwrap i{font-style:normal;font-size:11px;color:var(--muted)}
+.scomments{margin-top:2px;border-top:1px solid var(--line);padding-top:6px}
+.scomments summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--rose-deep);min-height:36px;display:flex;align-items:center}
+.scomments .commentrow{padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.scomments .commentrow:last-child{border-bottom:none}
+
+/* calendar */
+.cal-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.cal-head h3{margin:0 6px;font-size:22px;min-width:150px;text-align:center}
+.cal-count{margin-left:auto}
+.cal-dow,.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-dow span{text-align:center;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:4px 0}
+.cal-cell{font:inherit;color:var(--plum);text-align:left;min-height:92px;padding:6px;border-radius:14px;border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.62);cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0;transition:background .15s,border-color .15s}
+.cal-cell.blank{background:transparent;border-color:transparent;cursor:default}
+.cal-cell:not(.blank):hover{background:#fff}
+.cal-cell.today .cal-n{background:var(--rose);color:#fff}
+.cal-cell.sel{border-color:var(--rose);box-shadow:0 0 0 2px rgba(168,90,118,.25)}
+.cal-n{font-size:12.5px;font-weight:600;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.cal-pills{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal-pill{font-style:normal;border-radius:8px;padding:2px 6px;font-size:11px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.cal-pill b{font-weight:600}
+.cal-more{font-style:normal;font-size:11px;color:var(--muted);padding-left:4px}
+.c-needs{background:#fdecc8;color:#7a5200}.c-scheduled{background:#ece3f4;color:#5a3f7a}.c-published{background:var(--ok-bg);color:var(--ok)}.c-draft{background:#eee;color:#666}.c-attention{background:var(--bad-bg);color:var(--bad)}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:12px 2px;font-size:12px;color:var(--plum-soft)}
+.cal-legend span{display:inline-flex;align-items:center;gap:6px}
+.cal-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cal-dot.c-needs{background:#e2a93a}.cal-dot.c-scheduled{background:#8a63b3}.cal-dot.c-published{background:#2f9a58}.cal-dot.c-draft{background:#b5b0b3}.cal-dot.c-attention{background:#d24c4c}
+.cal-agenda{background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:14px 16px;box-shadow:0 8px 26px rgba(65,54,69,.07)}
+.cal-agenda h4{margin:0 0 8px;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:19px}
+.cal-none{color:var(--muted);font-size:14px;padding:10px 0}
+.cal-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.cal-row:first-of-type{border-top:none}
+.cal-thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;background:#efe8f2;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.cal-thumb img{width:100%;height:100%;object-fit:cover}
+.cal-info{flex:1;min-width:150px;font-size:13.5px}
+.cal-cap{color:var(--plum-soft);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
+.cal-tag{display:inline-block;border-radius:100px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:4px}
+.cal-btns{display:flex;gap:8px}
+@media (max-width:640px){
+  .cal-cell{min-height:58px;padding:5px;align-items:center}
+  .cal-pills{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:3px}
+  .cal-pill{width:9px;height:9px;padding:0;border-radius:50%}
+  .cal-pill b{display:none}
+  .cal-pill.c-needs{background:#e2a93a}.cal-pill.c-scheduled{background:#8a63b3}.cal-pill.c-published{background:#2f9a58}.cal-pill.c-draft{background:#b5b0b3}.cal-pill.c-attention{background:#d24c4c}
+  .cal-more{display:none}
+  .cal-head h3{min-width:0;flex:1;font-size:19px}
+  .cal-count{width:100%;margin:0}
+  .cal-btns{width:100%}.cal-btns .btn{flex:1}
+  .srow{flex-direction:column}
+  .srow .pthumb{width:72px;height:72px}
+}
 @media (max-width:560px){
   .wrap{padding:14px 14px 90px}
   h1{font-size:26px}
@@ -490,10 +673,11 @@ details.moretools>summary::-webkit-details-marker{display:none}
 ${probs}
 <div id="view">
 ${sorted.length ? `<nav class="tabsbar" aria-label="Post categories"><div class="tabs" role="tablist">
-  ${tabDefs.map((t) => `<button class="tab${t.key === "attention" ? " attn" : ""}${t.key === defaultTab ? " active" : ""}" role="tab" aria-selected="${t.key === defaultTab}" data-filter="${t.key}">${t.label} <em>${t.key === "all" ? sorted.length : (counts[t.key] || 0)}</em></button>`).join("")}
+  ${tabDefs.map((t) => `<button class="tab${t.key === "attention" ? " attn" : ""}${t.key === defaultTab ? " active" : ""}" role="tab" aria-selected="${t.key === defaultTab}" data-filter="${t.key}">${t.label} ${t.key === "calendar" ? "" : `<em>${t.key === "all" ? sorted.length : t.key === "stats" ? statCount : (counts[t.key] || 0)}</em>`}</button>`).join("")}
 </div></nav>
 <div class="emptystate tabempty" id="tabEmpty" hidden><div class="emptyicon">🎉</div><h3>All clear</h3><p>Nothing in this tab right now.</p></div>` : ""}
 ${sorted.length ? `<div class="pgrid" id="grid">${cards}</div>` : empty}
+${sorted.length ? `<section id="calView" hidden aria-label="Calendar"></section>${statsView(sorted, cfg)}` : ""}
 </div>
 <div id="previewModal" class="modalbg" hidden><div class="modalbox">
   <button class="modalclose" id="previewClose" aria-label="Close preview">✕</button>
@@ -624,14 +808,93 @@ function applyTab(f){
   if(!f||!cs.some(function(c){return c.dataset.filter===f;})){var a=cs.filter(function(c){return c.classList.contains('active');})[0];f=(a||cs[0]).dataset.filter;}
   current=f;
   cs.forEach(function(c){var on=c.dataset.filter===f;c.classList.toggle('active',on);c.setAttribute('aria-selected',on?'true':'false');});
+  var act=cs.filter(function(c){return c.dataset.filter===f;})[0], strip=act&&act.parentNode;
+  if(strip)strip.scrollLeft=Math.max(0,act.offsetLeft-(strip.clientWidth-act.offsetWidth)/2);
+  var special=f==='calendar'||f==='stats';
   var cards=$$('.pcard'),shown=0;
-  cards.forEach(function(card){var show=f==='all'||card.dataset.cat===f;card.classList.toggle('filtered-out',!show);if(show)shown++;});
+  cards.forEach(function(card){var show=!special&&(f==='all'||card.dataset.cat===f);card.classList.toggle('filtered-out',!show);if(show)shown++;});
   var grid=$('.pgrid');
-  // Published reads newest-first; everything else soonest-first.
-  if(grid)cards.slice().sort(function(a,b){return f==='published'?b.dataset.ts-a.dataset.ts:a.dataset.ts-b.dataset.ts;}).forEach(function(c){grid.appendChild(c);});
-  var empty=$('#tabEmpty'); if(empty)empty.hidden=shown>0;
+  if(grid){grid.hidden=special;
+    // Published reads newest-first; everything else soonest-first.
+    cards.slice().sort(function(a,b){return f==='published'?b.dataset.ts-a.dataset.ts:a.dataset.ts-b.dataset.ts;}).forEach(function(c){grid.appendChild(c);});}
+  var cv=$('#calView'),sv=$('#statsView');
+  if(cv)cv.hidden=f!=='calendar';
+  if(sv)sv.hidden=f!=='stats';
+  if(f==='calendar')renderCalendar();
+  if(f==='stats')sortStats(statSortVal);
+  var empty=$('#tabEmpty'); if(empty)empty.hidden=special||shown>0;
   try{localStorage.setItem(TAB_KEY,f);}catch(e){}
 }
+
+// ---- calendar (month grid, Eastern time) ----
+var CAT_LABEL={attention:'Needs attention',needs:'Needs posting',scheduled:'Scheduled',draft:'Draft',published:'Published'};
+var TYPE_ICON={image:'🖼️',carousel:'🔲',reel:'🎬',story:'📖'};
+var etDay=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'});
+var etTime=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
+var calYM=null, calSel=null;
+function dayKey(ms){return etDay.format(new Date(ms));}
+function pad2(n){return (n<10?'0':'')+n;}
+function timeShort(iso){return etTime.format(new Date(Date.parse(iso))).replace(':00','').replace(' AM','a').replace(' PM','p');}
+function calByDay(){
+  var by={};
+  POSTS.forEach(function(p){var k=dayKey(Date.parse(p.publish_at));(by[k]=by[k]||[]).push(p);});
+  Object.keys(by).forEach(function(k){by[k].sort(function(a,b){return Date.parse(a.publish_at)-Date.parse(b.publish_at);});});
+  return by;
+}
+function renderCalendar(){
+  var root=$('#calView'); if(!root)return;
+  var today=dayKey(Date.now());
+  if(!calYM){var t=today.split('-');calYM=[+t[0],+t[1]-1];}
+  var y=calYM[0],m=calYM[1], by=calByDay();
+  var lead=new Date(Date.UTC(y,m,1)).getUTCDay(), days=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+  var title=new Date(Date.UTC(y,m,1)).toLocaleString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
+  var prefix=y+'-'+pad2(m+1)+'-';
+  if(!calSel||calSel.indexOf(prefix)!==0){
+    if(today.indexOf(prefix)===0)calSel=today;
+    else{var firstWith=Object.keys(by).filter(function(k){return k.indexOf(prefix)===0;}).sort()[0];calSel=firstWith||prefix+'01';}
+  }
+  var cells='', total=0, i;
+  for(i=0;i<lead;i++)cells+='<span class="cal-cell blank"></span>';
+  for(var d=1;d<=days;d++){
+    var key=prefix+pad2(d), list=by[key]||[]; total+=list.length;
+    var pills=list.slice(0,3).map(function(p){return '<i class="cal-pill c-'+p.cat+'"><b>'+TYPE_ICON[p.type]+' '+timeShort(p.publish_at)+'</b></i>';}).join('')+(list.length>3?'<i class="cal-more">+'+(list.length-3)+'</i>':'');
+    cells+='<button type="button" class="cal-cell'+(key===today?' today':'')+(key===calSel?' sel':'')+(list.length?' has':'')+'" data-calday="'+key+'" aria-label="'+title.split(' ')[0]+' '+d+', '+list.length+' post'+(list.length===1?'':'s')+'"><span class="cal-n">'+d+'</span><span class="cal-pills">'+pills+'</span></button>';
+  }
+  var dow=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(function(x){return '<span>'+x+'</span>';}).join('');
+  var legend=['needs','scheduled','published','draft','attention'].map(function(c){return '<span><i class="cal-dot c-'+c+'"></i>'+CAT_LABEL[c]+'</span>';}).join('');
+  var selList=by[calSel]||[];
+  var selDate=new Date(calSel+'T12:00:00Z').toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',timeZone:'UTC'});
+  var agenda=selList.length?selList.map(function(p){
+    var m0=p.media[0], thumb=m0&&!isVid(m0)?'<img src="'+escHtml(m0)+'" alt="">':'<span>'+(TYPE_ICON[p.type]||'')+'</span>';
+    return '<div class="cal-row"><div class="cal-thumb">'+thumb+'</div><div class="cal-info"><div><b>'+etTime.format(new Date(Date.parse(p.publish_at)))+'</b> · '+(TYPE_ICON[p.type]||'')+' '+escHtml(p.type)+' <span class="cal-tag c-'+p.cat+'">'+CAT_LABEL[p.cat]+'</span></div><div class="cal-cap">'+escHtml((p.caption||'').slice(0,100))+'</div></div><div class="cal-btns"><button type="button" class="btn sm" data-preview="'+escHtml(p.id)+'">👁 Preview</button><button type="button" class="btn sm" data-jump="'+escHtml(p.id)+'" data-cat="'+p.cat+'">Open card</button></div></div>';
+  }).join(''):'<div class="cal-none">Nothing scheduled this day.</div>';
+  root.innerHTML='<div class="cal-head"><button type="button" class="btn sm" data-calnav="-1" aria-label="Previous month">‹</button><h3>'+title+'</h3><button type="button" class="btn sm" data-calnav="1" aria-label="Next month">›</button><button type="button" class="btn sm quiet" data-calnav="today">Today</button><span class="muted cal-count">'+total+' post'+(total===1?'':'s')+' this month</span></div>'
+    +'<div class="cal-dow">'+dow+'</div><div class="cal-grid">'+cells+'</div><div class="cal-legend">'+legend+'</div>'
+    +'<div class="cal-agenda"><h4>'+selDate+'</h4>'+agenda+'</div>';
+}
+function calNav(v){
+  if(!calYM)renderCalendar();
+  if(v==='today'){calYM=null;calSel=null;}
+  else{var n=calYM[1]+(+v);calYM=[calYM[0]+Math.floor(n/12),((n%12)+12)%12];calSel=null;}
+  renderCalendar();
+}
+function jumpToCard(id,cat){
+  applyTab(cat);
+  var card=$$('.pcard').filter(function(c){return c.dataset.id===id;})[0];
+  if(!card)return;
+  card.scrollIntoView({block:'center',behavior:'smooth'});
+  card.classList.add('flash'); setTimeout(function(){card.classList.remove('flash');},1800);
+}
+
+// ---- stats ordering ----
+var statSortVal='ts';
+function sortStats(key){
+  statSortVal=key||'ts';
+  var list=$('.slist'); if(!list)return;
+  $$('.srow',list).sort(function(a,b){return (b.dataset[statSortVal]-a.dataset[statSortVal]);}).forEach(function(r){list.appendChild(r);});
+  var sel=$('#statSort'); if(sel&&sel.value!==statSortVal)sel.value=statSortVal;
+}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='statSort')sortStats(e.target.value);});
 
 // ---- results panel (connection check / dry run) ----
 function showOut(html){
@@ -864,7 +1127,7 @@ async function postNow(b){
 }
 
 // ---- one delegated click handler, so lists can be swapped in place ----
-var SELECTOR='[data-act],[data-retry],[data-preview],[data-capexpand],[data-copycap],[data-savevideo],[data-filter],[data-dismiss],[data-addlink],[data-markmanual],[data-postnow],[data-outclose]';
+var SELECTOR='[data-act],[data-retry],[data-preview],[data-capexpand],[data-copycap],[data-savevideo],[data-filter],[data-dismiss],[data-addlink],[data-markmanual],[data-postnow],[data-outclose],[data-calday],[data-calnav],[data-jump]';
 document.addEventListener('click',function(e){
   var more=$('#moreTools');
   var el=e.target.closest?e.target.closest(SELECTOR):null;
@@ -876,6 +1139,9 @@ document.addEventListener('click',function(e){
   }
   else if(el.hasAttribute('data-filter'))applyTab(el.dataset.filter);
   else if(el.hasAttribute('data-outclose'))$('#out').hidden=true;
+  else if(el.hasAttribute('data-calday')){calSel=el.dataset.calday;renderCalendar();var ag=$('.cal-agenda');if(ag&&window.matchMedia('(max-width:640px)').matches)ag.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  else if(el.hasAttribute('data-calnav'))calNav(el.dataset.calnav);
+  else if(el.hasAttribute('data-jump'))jumpToCard(el.dataset.jump,el.dataset.cat);
   else if(el.hasAttribute('data-preview'))openPreview(el.dataset.preview);
   else if(el.hasAttribute('data-capexpand')){var w=el.closest('.pcap');w.querySelector('.capshort').hidden=true;w.querySelector('.capfull').hidden=false;}
   else if(el.hasAttribute('data-copycap')){
