@@ -33,6 +33,19 @@ function isoToEasternParts(iso) {
   return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
 }
 function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80); }
+// "Schedule again": a fresh copy of a post for a new date. Same Eastern time of day, one week
+// after the later of the original or now, and ready to go. It gets its own id, so none of the
+// original's published/stats/comment tracking carries over.
+function againOf(post, existingIds) {
+  const { time } = isoToEasternParts(post.publish_at);
+  const base = Math.max(Date.parse(post.publish_at) || 0, Date.now());
+  const date = isoToEasternParts(new Date(base + 7 * 864e5).toISOString()).date;
+  const root = slug(String(post.id).replace(/-again(-\d+)?$/, "") + "-again");
+  let id = root, n = 2;
+  while (existingIds.has(id)) id = `${root}-${n++}`;
+  const copy = { ...post, id, publish_at: easternISO(date, time || "11:00"), status: "ready", _isNew: true, _again: true, _from: post.id };
+  return copy;
+}
 const isVideoUrl = (u) => /\.(mp4|mov)(\?|#|$)/i.test(u);
 const fmt = (iso) => { const t = Date.parse(iso); return Number.isNaN(t) ? "—" : new Date(t).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
 function timeAgo(iso) {
@@ -217,7 +230,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
             <button type="button" className="tl tl-yellow" title="Minimize" aria-label="Minimize" onClick={() => setMinimized(true)}>−</button>
             <button type="button" className="tl tl-green" title={maximized ? "Restore" : "Maximize"} aria-label="Maximize" onClick={() => setMaximized((m) => !m)}>{maximized ? "⤡" : "+"}</button>
           </div>
-          <b>{post._isNew ? "New post" : `Edit · ${post.id}`}</b>
+          <b>{post._again ? "Schedule again" : post._isNew ? "New post" : `Edit · ${post.id}`}</b>
           <div className="historybtns">
             <button type="button" className="mini" disabled={!canUndo} onClick={undo} title="Undo (⌘Z)">↶ Undo</button>
             <button type="button" className="mini" disabled={!canRedo} onClick={redo} title="Redo (⌘⇧Z)">↷ Redo</button>
@@ -225,6 +238,12 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
         </div>
 
         <div className="modalbody">
+          {post._again ? (
+            <div className="againnote">🔁 Posting <b>{post._from}</b> again. Pick the new date and time, and freshen the caption if you like. It starts as <b>Ready</b>, so it goes out at that time.</div>
+          ) : null}
+          {(p.status === "ready" && !p.manual_only && Date.parse(p.publish_at) < Date.now() - 5 * 60000) ? (
+            <div className="warn">That time has already passed, so this would be marked <b>missed</b> instead of posting. Pick a later time, or use Post now on the status page after saving.</div>
+          ) : null}
           <div className="fld">
             <FldHead value={p.id} label="Post ID">Post ID</FldHead>
             <input type="text" value={p.id} onChange={(e) => set({ id: slug(e.target.value) })} />
@@ -409,7 +428,7 @@ function PostModal({ post, onSave, onClose, allCampaigns, hashtagSets, onSaveHas
             <div className="footbtns">
               <button type="button" className="mini" onClick={requestClose}>Cancel</button>
               <button type="button" className="save" disabled={errors.length > 0 || (!changed && !post._isNew)} onClick={submit}>
-                {post._isNew ? "Add to calendar" : "Save post"}
+                {post._again ? "Schedule it" : post._isNew ? "Add to calendar" : "Save post"}
               </button>
             </div>
           </div>
@@ -440,7 +459,7 @@ const timeShort = (iso) => {
 };
 const timeLong = (iso) => { const t = Date.parse(iso); return Number.isNaN(t) ? "" : new Date(t).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit" }); };
 
-function MonthCalendar({ posts, live, onEdit, onDuplicate, onNew }) {
+function MonthCalendar({ posts, live, onEdit, onDuplicate, onAgain, onNew }) {
   const todayKey = isoToEasternParts(new Date().toISOString()).date;
   const [ym, setYm] = useState(() => { const [y, m] = todayKey.split("-").map(Number); return [y, m - 1]; });
   const [sel, setSel] = useState(todayKey);
@@ -505,7 +524,9 @@ function MonthCalendar({ posts, live, onEdit, onDuplicate, onNew }) {
               </div>
               <div className="mc-btns">
                 <button type="button" className="mini" onClick={() => onEdit(p)}>Edit</button>
-                <button type="button" className="mini" onClick={() => onDuplicate(p)}>Duplicate</button>
+                {cat === "published"
+                  ? <button type="button" className="mini again" onClick={() => onAgain(p)}>🔁 Schedule again</button>
+                  : <button type="button" className="mini" onClick={() => onDuplicate(p)}>Duplicate</button>}
               </div>
             </div>
           );
@@ -516,7 +537,7 @@ function MonthCalendar({ posts, live, onEdit, onDuplicate, onNew }) {
 }
 
 /* ---------- the calendar list ---------- */
-export default function SocialCalendar({ schedule, setSchedule, password }) {
+export default function SocialCalendar({ schedule, setSchedule, password, initialRepost, onRepostHandled }) {
   const [editing, setEditing] = useState(null);
   const [toast, setToast] = useState(null); // { msg, undo? }
   const toastTimer = React.useRef(0);
@@ -566,6 +587,16 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
     }
   };
 
+  const startAgain = (post) => setEditing(againOf(post, new Set(posts.map((x) => x.id))));
+  // Arrive from a "Schedule again" link on the status page: /admin?repost=<id>
+  useEffect(() => {
+    if (!initialRepost) return;
+    const found = posts.find((x) => x.id === initialRepost);
+    if (found) startAgain(found);
+    else notify(`Couldn't find "${initialRepost}" in the calendar.`);
+    onRepostHandled?.();
+  }, [initialRepost]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const blankPost = () => ({
     _isNew: true,
     id: "",
@@ -581,16 +612,16 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
 
   const upsert = (post) => {
     const clean = { ...post };
-    delete clean._isNew;
+    delete clean._isNew; delete clean._again; delete clean._from;
     if (!clean.caption_facebook) delete clean.caption_facebook;
     if (!clean.cover) delete clean.cover;
     const byId = new Map(posts.map((x) => [x.id, x]));
     if (editing && !editing._isNew && editing.id !== clean.id) byId.delete(editing.id);
     byId.set(clean.id, clean);
-    const wasNew = !!editing?._isNew;
+    const wasNew = !!editing?._isNew, wasAgain = !!editing?._again;
     setSchedule({ ...schedule, posts: [...byId.values()].sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at)) });
     setEditing(null);
-    notify(wasNew ? "Post added. Save & Deploy when you're ready to publish it." : "Post updated. Save & Deploy when you're ready.");
+    notify(wasAgain ? `Scheduled again for ${fmt(post.publish_at)}. Save & Deploy to lock it in.` : wasNew ? "Post added. Save & Deploy when you're ready to publish it." : "Post updated. Save & Deploy when you're ready.");
   };
 
   const del = (post) => {
@@ -638,6 +669,7 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
           live={live}
           onEdit={(p) => setEditing(p)}
           onDuplicate={(p) => setEditing({ ...p, id: slug(p.id + "-copy"), _isNew: true })}
+          onAgain={startAgain}
           onNew={(date) => setEditing({ ...blankPost(), publish_at: easternISO(date, "11:00") })}
         />
       ) : null}
@@ -684,10 +716,10 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
                     <div className="tracking" key={pl}>
                       {s?.permalink || st.permalink ? <a href={s?.permalink || st.permalink} target="_blank" rel="noopener noreferrer">{pl === "instagram" ? "IG" : "FB"} ↗</a> : <span>{pl === "instagram" ? "IG" : "FB"}</span>}
                       {s?.postedAt ? <span> · posted {timeAgo(s.postedAt)}</span> : null}
+                      {typeof (s?.views ?? s?.plays) === "number" ? <span> · ▶ <b>{(s.views ?? s.plays).toLocaleString()} views</b></span> : null}
                       {typeof s?.likes === "number" ? <span> · ❤️ {s.likes.toLocaleString()}</span> : null}
                       {typeof s?.comments === "number" ? <span> · 💬 {s.comments.toLocaleString()}</span> : null}
                       {typeof s?.reach === "number" ? <span> · 👁 {s.reach.toLocaleString()}</span> : null}
-                      {typeof (s?.views ?? s?.plays) === "number" ? <span> · ▶ {(s.views ?? s.plays).toLocaleString()}</span> : null}
                       {typeof s?.shares === "number" ? <span> · ↗ {s.shares.toLocaleString()}</span> : null}
                       {typeof s?.saved === "number" ? <span> · 🔖 {s.saved.toLocaleString()}</span> : null}
                       {!s ? <span className="muted"> · no stats yet — try Refresh stats</span> : null}
@@ -706,7 +738,9 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
                 ) : null}
                 <div className="caltools">
                   <button type="button" className="mini" onClick={() => setEditing(post)}>Edit</button>
-                  <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>
+                  {calCat(post, liveState) === "published"
+                    ? <button type="button" className="mini again" onClick={() => startAgain(post)}>🔁 Schedule again</button>
+                    : <button type="button" className="mini" onClick={() => setEditing({ ...post, id: slug(post.id + "-copy"), _isNew: true })}>Duplicate</button>}
                   <button type="button" className="mini danger" onClick={() => del(post)}>Delete</button>
                 </div>
               </div>
@@ -737,6 +771,9 @@ export default function SocialCalendar({ schedule, setSchedule, password }) {
 }
 
 export const SOCIAL_CSS = `
+.mini.again{background:#a85a76;color:#fff;}
+.mini.again:hover{background:#8a4560;}
+.againnote{background:rgba(239,232,242,.85);color:#5a3f4e;border-radius:12px;padding:11px 14px;font-size:13px;line-height:1.5;margin:0 0 14px;}
 .viewtoggle{display:inline-flex;border:1px solid #e6ddec;border-radius:100px;background:rgba(255,255,255,.7);padding:3px;gap:2px;}
 .viewtoggle button{border:none;background:none;min-height:38px;padding:0 16px;border-radius:100px;font:inherit;font-size:13px;font-weight:600;color:#6e6172;cursor:pointer;}
 .viewtoggle button.active{background:#413645;color:#fff;}

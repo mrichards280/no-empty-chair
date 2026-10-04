@@ -68,8 +68,8 @@ export default async (req) => {
     }
     if (body.action === "refresh-stats") {
       let links = { matched: [] };
-      try { links = await matchManualLinks({ schedule, store, graph, cfg, force: true }); } catch (e) { links = { matched: [], error: e.message }; }
-      return json({ results: await refreshAllStats({ schedule, store, graph }), manualLinks: links });
+      try { links = await matchManualLinks({ schedule, store, graph, cfg, force: true, onlyId: body.id || undefined }); } catch (e) { links = { matched: [], error: e.message }; }
+      return json({ results: await refreshAllStats({ schedule, store, graph, onlyId: body.id || undefined }), manualLinks: links });
     }
     return json({ error: "unknown action" }, 400);
   }
@@ -113,10 +113,10 @@ function statsHtml(stats) {
   if (!stats) return "";
   const line = `<div class="stats">${[
     stats.postedAt ? `posted ${esc(timeAgo(stats.postedAt))}` : null,
+    num(stats.views ?? stats.plays) !== null ? `▶ <b>${num(stats.views ?? stats.plays)} views</b>` : null,
+    num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
     num(stats.likes) !== null ? `❤️ ${num(stats.likes)}` : null,
     num(stats.comments) !== null ? `💬 ${num(stats.comments)}` : null,
-    num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
-    num(stats.views ?? stats.plays) !== null ? `▶ ${num(stats.views ?? stats.plays)} views` : null,
     num(stats.shares) !== null ? `↗ ${num(stats.shares)} shares` : null,
     num(stats.saved) !== null ? `🔖 ${num(stats.saved)}` : null,
     num(stats.post_impressions) !== null ? `👁 ${num(stats.post_impressions)} impr.` : null,
@@ -152,7 +152,7 @@ function catOf(p) {
 }
 
 // ---- Stats tab ------------------------------------------------------------------------
-const STAT_METRICS = [["likes", "❤️", "Likes"], ["comments", "💬", "Comments"], ["shares", "↗", "Shares"], ["saved", "🔖", "Saves"], ["reach", "👁", "Reach"], ["views", "▶", "Views"]];
+const STAT_METRICS = [["views", "▶", "Views"], ["reach", "👁", "Reach"], ["likes", "❤️", "Likes"], ["comments", "💬", "Comments"], ["shares", "↗", "Shares"], ["saved", "🔖", "Saves"]];
 const metricVal = (s, k) => (k === "views" ? (s.views ?? s.plays) : s[k]);
 const isNum = (n) => typeof n === "number" && Number.isFinite(n);
 
@@ -218,7 +218,7 @@ function statsView(posts, cfg) {
       ? `<details class="scomments"><summary>💬 ${total.toLocaleString("en-US")} comment${total === 1 ? "" : "s"}${comments.length && comments.length < total ? ` · showing latest ${comments.length}` : ""}</summary>${comments.length ? comments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}${c.timestamp ? ` <span class="muted">· ${esc(timeAgo(c.timestamp))}</span>` : ""}${isNum(c.likes) && c.likes ? ` <span class="muted">· ❤️ ${c.likes}</span>` : ""}</div>`).join("") : `<div class="muted">The comment text isn't available yet. Tap Refresh stats.</div>`}</details>`
       : "";
     const unavailable = s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach and saves unavailable: ${esc(String(s.insightsError).slice(0, 120))}</div>` : "";
-    return `<article class="srow" data-ts="${Date.parse(s.postedAt || p.publish_at) || 0}" data-likes="${Number(s.likes) || 0}" data-comments="${Number(s.comments) || 0}" data-shares="${Number(s.shares) || 0}" data-reach="${Number(s.reach) || 0}">
+    return `<article class="srow" data-ts="${Date.parse(s.postedAt || p.publish_at) || 0}" data-likes="${Number(s.likes) || 0}" data-comments="${Number(s.comments) || 0}" data-shares="${Number(s.shares) || 0}" data-reach="${Number(s.reach) || 0}" data-views="${Number(metricVal(s, "views")) || 0}">
       <div class="pthumb">${thumb}</div>
       <div class="sbody">
         <div class="prow1"><b>${esc(fmt(s.postedAt || p.publish_at))}</b><span class="platchip pc-${pl}">${pl === "instagram" ? "IG" : "FB"}</span></div>
@@ -227,6 +227,7 @@ function statsView(posts, cfg) {
         <div class="mgrid">${grid}</div>
         ${growthLine(s)}
         <div class="sline">${extras ? `<span>${esc(extras)}</span>` : ""}${sparkline(s.history, "likes") ? `<span class="sparkwrap" title="Likes over time">${sparkline(s.history, "likes")}<i>likes over time</i></span>` : ""}<span class="muted">updated ${esc(timeAgo(s.fetchedAt) || "just now")}</span></div>
+        <div class="pactions"><button class="btn sm" data-act="refresh-stats" data-id="${esc(p.id)}">↻ Refresh this post</button>${r.pl === "instagram" || p.manual_only ? `<a class="btn sm" href="/admin?repost=${encodeURIComponent(p.id)}">🔁 Schedule again</a>` : ""}</div>
         ${unavailable}
         ${commentBlock}
       </div>
@@ -237,9 +238,10 @@ function statsView(posts, cfg) {
     <p class="sub">Instagram totals across ${ig.length} post${ig.length === 1 ? "" : "s"} · reach adds up per post, so the same person can be counted twice${best ? ` · best so far: <a href="${esc(best.link || "#")}" target="_blank" rel="noopener">${esc(fmt(best.s.postedAt || best.p.publish_at))} ${esc(best.p.type)}</a> (${eng(best).toLocaleString("en-US")} likes, comments, shares and saves)` : ""}</p>
     ${fbLine}
     <div class="statbar"><label class="sub" for="statSort">Sort by</label>
-      <select id="statSort"><option value="ts">Newest</option><option value="likes">Most likes</option><option value="comments">Most comments</option><option value="shares">Most shares</option><option value="reach">Most reach</option></select>
+      <select id="statSort"><option value="ts">Newest</option><option value="views">Most views</option><option value="likes">Most likes</option><option value="comments">Most comments</option><option value="shares">Most shares</option><option value="reach">Most reach</option></select>
       <span class="muted">Last pulled ${esc(newest ? timeAgo(new Date(newest).toISOString()) || "just now" : "never")}</span>
-      <button class="btn sm" data-act="refresh-stats">↻ Refresh</button></div>
+      <button class="btn sm" data-act="refresh-stats">↻ Refresh all now</button></div>
+    <p class="sub">Updates itself: every hour for a post's first day, twice a day through day 7, then daily through day 30. Older posts update when you tap Refresh. Views are whatever Instagram reports for that post (it can lag a little).</p>
     <div class="slist">${cards}</div>
   </section>`;
 }
@@ -316,6 +318,7 @@ function page(d, cfg) {
           <button class="btn sm" data-preview="${esc(p.id)}">👁 Preview</button>
           <button class="btn sm" data-copycap="${esc(p.id)}">📋 Copy caption</button>
           ${isVid && media0 ? `<button class="btn sm" data-savevideo="${src}" data-savename="${esc(p.id)}.mp4">⬇ Save video</button>` : ""}
+          ${cat === "published" ? `<a class="btn sm" href="/admin?repost=${encodeURIComponent(p.id)}">🔁 Schedule again</a>` : ""}
           ${p.manual_only && p.state.manual?.status === "posted" ? `<button class="btn sm quiet" data-markmanual="${esc(p.id)}" data-undo="1">↺ Undo posted</button>` : ""}
         </div>
         <div class="pplatforms">${p.manual_only
@@ -866,7 +869,7 @@ function renderCalendar(){
   var selDate=new Date(calSel+'T12:00:00Z').toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',timeZone:'UTC'});
   var agenda=selList.length?selList.map(function(p){
     var m0=p.media[0], thumb=m0&&!isVid(m0)?'<img src="'+escHtml(m0)+'" alt="">':'<span>'+(TYPE_ICON[p.type]||'')+'</span>';
-    return '<div class="cal-row"><div class="cal-thumb">'+thumb+'</div><div class="cal-info"><div><b>'+etTime.format(new Date(Date.parse(p.publish_at)))+'</b> · '+(TYPE_ICON[p.type]||'')+' '+escHtml(p.type)+' <span class="cal-tag c-'+p.cat+'">'+CAT_LABEL[p.cat]+'</span></div><div class="cal-cap">'+escHtml((p.caption||'').slice(0,100))+'</div></div><div class="cal-btns"><button type="button" class="btn sm" data-preview="'+escHtml(p.id)+'">👁 Preview</button><button type="button" class="btn sm" data-jump="'+escHtml(p.id)+'" data-cat="'+p.cat+'">Open card</button></div></div>';
+    return '<div class="cal-row"><div class="cal-thumb">'+thumb+'</div><div class="cal-info"><div><b>'+etTime.format(new Date(Date.parse(p.publish_at)))+'</b> · '+(TYPE_ICON[p.type]||'')+' '+escHtml(p.type)+' <span class="cal-tag c-'+p.cat+'">'+CAT_LABEL[p.cat]+'</span></div><div class="cal-cap">'+escHtml((p.caption||'').slice(0,100))+'</div></div><div class="cal-btns"><button type="button" class="btn sm" data-preview="'+escHtml(p.id)+'">👁 Preview</button><button type="button" class="btn sm" data-jump="'+escHtml(p.id)+'" data-cat="'+p.cat+'">Open card</button>'+(p.cat==='published'?'<a class="btn sm" href="/admin?repost='+encodeURIComponent(p.id)+'">🔁 Schedule again</a>':'')+'</div></div>';
   }).join(''):'<div class="cal-none">Nothing scheduled this day.</div>';
   root.innerHTML='<div class="cal-head"><button type="button" class="btn sm" data-calnav="-1" aria-label="Previous month">‹</button><h3>'+title+'</h3><button type="button" class="btn sm" data-calnav="1" aria-label="Next month">›</button><button type="button" class="btn sm quiet" data-calnav="today">Today</button><span class="muted cal-count">'+total+' post'+(total===1?'':'s')+' this month</span></div>'
     +'<div class="cal-dow">'+dow+'</div><div class="cal-grid">'+cells+'</div><div class="cal-legend">'+legend+'</div>'
@@ -915,10 +918,11 @@ var ACTIONS={
     await refreshView();
   },
   'refresh-stats':async function(btn){
-    var r=await busy(btn,function(){return api({action:'refresh-stats'});});
+    var one=btn&&btn.dataset?btn.dataset.id:'';
+    var r=await busy(btn,function(){return api({action:'refresh-stats',id:one||undefined});});
     var res=r.results||[]; var okN=res.filter(function(x){return x.ok;}).length, bad=res.length-okN;
     var links=r.manualLinks&&r.manualLinks.matched?r.manualLinks.matched.length:0;
-    var parts=[okN?'Updated '+plural(okN,'post'):'No stats to update'];
+    var parts=[okN?(one?'Updated this post':'Updated '+plural(okN,'post')):'No stats to update'];
     if(links)parts.push('found '+plural(links,'manual link'));
     if(bad)parts.push(bad+" couldn't update");
     toast(parts.join(' · '),{kind:bad?'':'ok'});

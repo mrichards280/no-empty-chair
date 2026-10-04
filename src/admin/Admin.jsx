@@ -191,7 +191,8 @@ export default function Admin() {
   const [contentMsg, setContentMsg] = useState("");
   const [activeSection, setActiveSection] = useState(null);
   const [sectionQuery, setSectionQuery] = useState("");
-  const [tab, setTab] = useState("content");
+  const [repostId, setRepostId] = useState(() => { try { return new URLSearchParams(location.search).get("repost") || ""; } catch { return ""; } });
+  const [tab, setTab] = useState(() => { try { return new URLSearchParams(location.search).get("repost") ? "social" : "content"; } catch { return "content"; } });
   const [savedSnapshot, setSavedSnapshot] = useState(null);
 
   useEffect(() => {
@@ -348,7 +349,13 @@ export default function Admin() {
                     </span>
                   </div>
                 ) : null}
-                <SocialCalendar schedule={schedule} setSchedule={setSchedule} password={password} />
+                <SocialCalendar
+                  schedule={schedule}
+                  setSchedule={setSchedule}
+                  password={password}
+                  initialRepost={repostId}
+                  onRepostHandled={() => { setRepostId(""); try { history.replaceState(null, "", location.pathname); } catch {} }}
+                />
               </>
             )
           ) : loading || !content ? (

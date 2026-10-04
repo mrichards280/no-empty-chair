@@ -743,7 +743,7 @@ export async function fetchStats(graph, platform, st) {
   if (platform === "facebook" && st.postId) {
     // One call. Facebook is secondary here and its Page Insights metrics keep being retired.
     const post = await graph.get(st.postId, { fields: "permalink_url,created_time,reactions.summary(true),comments.summary(true),shares" });
-    return {
+    const out = {
       permalink: post.permalink_url,
       postedAt: post.created_time,
       likes: post.reactions?.summary?.total_count,
@@ -751,6 +751,11 @@ export async function fetchStats(graph, platform, st) {
       shares: post.shares?.count ?? 0,
       fetchedAt: new Date().toISOString(),
     };
+    try { // views: best effort, since Meta keeps renaming Facebook's Page metrics
+      const v = readInsightRows((await graph.get(`${st.postId}/insights`, { metric: "post_media_view" })).data);
+      if (typeof v.post_media_view === "number") out.views = v.post_media_view;
+    } catch { /* leave views blank */ }
+    return out;
   }
   return null;
 }
@@ -772,18 +777,42 @@ export function withHistory(prev, next) {
   return merged;
 }
 
+// How often a post's numbers are re-pulled automatically, by the post's age. New posts move
+// fast, old ones barely at all: hourly for the first day, twice a day through day 7, daily
+// through day 30, then never (a manual refresh still reaches them).
+export function statsIntervalMs(ageMs) {
+  if (ageMs < 0) return Infinity;
+  if (ageMs < DAY_MS) return 60 * 60 * 1000;
+  if (ageMs < 7 * DAY_MS) return 12 * 60 * 60 * 1000;
+  if (ageMs < 30 * DAY_MS) return DAY_MS;
+  return Infinity;
+}
+const STATS_SLACK_MS = 10 * 60 * 1000; // ticks land a few minutes apart; don't let that skip a slot
+
 // Walks every published post/platform in the schedule and refreshes its stats
 // in the blob store in place. Returns a per-post/platform ok/error report.
-export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
+//   tiered   only refresh what is due under statsIntervalMs (the automatic run)
+//   onlyId   refresh a single post (the per-post button)
+//   neither  refresh everything now (the Refresh stats button)
+export async function refreshAllStats({ schedule, store, graph, maxAgeMs, tiered = false, onlyId, now = Date.now() }) {
   const { posts } = validateSchedule(schedule);
   const results = [];
+  const dueFor = (post, stats) => {
+    if (!tiered) return true;
+    const every = statsIntervalMs(now - Date.parse(post.publish_at));
+    if (every === Infinity) return false;
+    return !stats || !stats.fetchedAt || now - Date.parse(stats.fetchedAt) >= every - STATS_SLACK_MS;
+  };
   for (const post of posts) {
+    if (onlyId && post.id !== onlyId) continue;
+    if (tiered && statsIntervalMs(now - Date.parse(post.publish_at)) === Infinity) continue; // too old or not yet live: skip the storage read too
     const state = (await store.get(post.id, { type: "json" })) || {};
     let changed = false;
     for (const platform of post.platforms || []) {
       const st = state[platform];
       if (!st || st.status !== "published") continue;
       if (maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs) continue;
+      if (!dueFor(post, st.stats)) continue;
       try {
         const stats = await fetchStats(graph, platform, st);
         if (stats) {
@@ -795,7 +824,7 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
         results.push({ id: post.id, platform, ok: false, error: e.message });
       }
     }
-    if (state.manual?.mediaId && post.type !== "story" && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs)) {
+    if (state.manual?.mediaId && post.type !== "story" && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs) && dueFor(post, state.manual.stats)) {
       try {
         const stats = await fetchStats(graph, "instagram", { mediaId: state.manual.mediaId, stats: state.manual.stats });
         if (stats) {
