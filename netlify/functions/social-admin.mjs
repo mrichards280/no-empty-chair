@@ -219,7 +219,9 @@ function statsView(posts, cfg) {
       : "";
     const viewsMissing = pl === "instagram" && !isNum(metricVal(s, "views"));
     const why = s.insightsError || s.insightsNote;
-    const unavailable = s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach, saves and views unavailable: ${esc(String(s.insightsError).slice(0, 160))}</div>`
+    const needsPerm = s.insightsError && (/\(#10\)/.test(s.insightsError) || /does not have permission|permission/i.test(s.insightsError));
+    const unavailable = needsPerm ? `<div class="muted permfix">Views, reach and saves are blocked: Instagram says this app doesn't have permission to read insights. The token needs the <b>instagram_manage_insights</b> permission (Business Settings → System Users → generate a new token), then paste it into <b>META_PAGE_TOKEN</b> in Netlify.</div>`
+      : s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach, saves and views unavailable: ${esc(String(s.insightsError).slice(0, 160))}</div>`
       : viewsMissing ? `<div class="muted">No view count yet${s.metricTier === undefined ? " (saved before views were tracked; tap Refresh this post)" : why ? `: Instagram said "${esc(String(why).slice(0, 140))}"` : ": Instagram didn't return one for this post"}.</div>`
       : "";
     return `<article class="srow" data-ts="${Date.parse(s.postedAt || p.publish_at) || 0}" data-likes="${Number(s.likes) || 0}" data-comments="${Number(s.comments) || 0}" data-shares="${Number(s.shares) || 0}" data-reach="${Number(s.reach) || 0}" data-views="${Number(metricVal(s, "views")) || 0}">

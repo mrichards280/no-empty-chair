@@ -669,6 +669,18 @@ export async function verifyConnection(graph, cfg = config()) {
       add("Instagram publishing quota", true, `${d.quota_usage ?? 0} of ${d.config?.quota_total ?? "?"} used in last 24h`);
     } catch (e) { add("Instagram publishing permission", false, e.message); }
   }
+  if (cfg.igUserId) {
+    try { // views, reach and saves need their own permission; likes and comments don't, so test it directly
+      const recent = await graph.get(`${cfg.igUserId}/media`, { fields: "id,media_product_type", limit: 5 });
+      const m = (recent.data || []).find((x) => x.media_product_type !== "STORY") || recent.data?.[0];
+      if (!m) add("Instagram insights (views, reach, saves)", true, "no posts to test yet");
+      else { await graph.get(`${m.id}/insights`, { metric: "reach" }); add("Instagram insights (views, reach, saves)", true, "allowed"); }
+    } catch (e) {
+      add("Instagram insights (views, reach, saves)", false, e.code === 10 || /permission/i.test(e.message || "")
+        ? `${e.message} Add the instagram_manage_insights permission to the token and update META_PAGE_TOKEN.`
+        : e.message);
+    }
+  }
   const u = graph.usage?.();
   if (u?.app) {
     const worst = Math.max(u.app.call_count || 0, u.app.total_cputime || 0, u.app.total_time || 0);
