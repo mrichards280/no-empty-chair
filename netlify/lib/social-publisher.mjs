@@ -724,8 +724,8 @@ export async function fetchStats(graph, platform, st) {
       const metric = tiers[i];
       try {
         Object.assign(out, readInsightRows((await graph.get(`${st.mediaId}/insights`, { metric })).data));
-        delete out.insightsError;
         out.metricTier = i;
+        if (out.insightsError) { out.insightsNote = out.insightsError; delete out.insightsError; } // a smaller bundle worked; remember why the richer one didn't
         break;
       } catch (e) {
         out.insightsError = e.message;
@@ -801,7 +801,9 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs, tiered
     if (!tiered) return true;
     const every = statsIntervalMs(now - Date.parse(post.publish_at));
     if (every === Infinity) return false;
-    return !stats || !stats.fetchedAt || now - Date.parse(stats.fetchedAt) >= every - STATS_SLACK_MS;
+    if (!stats || !stats.fetchedAt) return true;
+    if (stats.metricTier === undefined && stats.permalink && !/facebook\.com/i.test(stats.permalink)) return true; // saved by the older fetcher: re-pull once to get views, shares, saves
+    return now - Date.parse(stats.fetchedAt) >= every - STATS_SLACK_MS;
   };
   for (const post of posts) {
     if (onlyId && post.id !== onlyId) continue;

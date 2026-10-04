@@ -217,7 +217,11 @@ function statsView(posts, cfg) {
     const commentBlock = total || comments.length
       ? `<details class="scomments"><summary>💬 ${total.toLocaleString("en-US")} comment${total === 1 ? "" : "s"}${comments.length && comments.length < total ? ` · showing latest ${comments.length}` : ""}</summary>${comments.length ? comments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}${c.timestamp ? ` <span class="muted">· ${esc(timeAgo(c.timestamp))}</span>` : ""}${isNum(c.likes) && c.likes ? ` <span class="muted">· ❤️ ${c.likes}</span>` : ""}</div>`).join("") : `<div class="muted">The comment text isn't available yet. Tap Refresh stats.</div>`}</details>`
       : "";
-    const unavailable = s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach and saves unavailable: ${esc(String(s.insightsError).slice(0, 120))}</div>` : "";
+    const viewsMissing = pl === "instagram" && !isNum(metricVal(s, "views"));
+    const why = s.insightsError || s.insightsNote;
+    const unavailable = s.insightsError && !isNum(s.reach) ? `<div class="muted">Reach, saves and views unavailable: ${esc(String(s.insightsError).slice(0, 160))}</div>`
+      : viewsMissing ? `<div class="muted">No view count yet${s.metricTier === undefined ? " (saved before views were tracked; tap Refresh this post)" : why ? `: Instagram said "${esc(String(why).slice(0, 140))}"` : ": Instagram didn't return one for this post"}.</div>`
+      : "";
     return `<article class="srow" data-ts="${Date.parse(s.postedAt || p.publish_at) || 0}" data-likes="${Number(s.likes) || 0}" data-comments="${Number(s.comments) || 0}" data-shares="${Number(s.shares) || 0}" data-reach="${Number(s.reach) || 0}" data-views="${Number(metricVal(s, "views")) || 0}">
       <div class="pthumb">${thumb}</div>
       <div class="sbody">
