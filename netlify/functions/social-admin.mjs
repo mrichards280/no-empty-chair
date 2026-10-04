@@ -5,11 +5,12 @@
 //   POST /admin/social  {action: "verify" | "dry-run" | "run" | "retry" | "refresh-stats", id?, platform?}
 import { getStore } from "@netlify/blobs";
 import schedule from "../../public/social/schedule.json" with { type: "json" };
-import { runTick, makeGraph, config as readConfig, validateSchedule, verifyConnection, mediaUrl, refreshAllStats } from "../lib/social-publisher.mjs";
+import { runTick, makeGraph, config as readConfig, validateSchedule, verifyConnection, mediaUrl, refreshAllStats, matchManualLinks, pushNotify } from "../lib/social-publisher.mjs";
+import { hasValidSession } from "../lib/admin-session.mjs";
 
 export default async (req) => {
   const expected = Netlify.env.get("ADMIN_PASSWORD");
-  if (!expected || !authorized(req.headers.get("authorization"), expected)) {
+  if (!expected || !(authorized(req.headers.get("authorization"), expected) || await hasValidSession(req.headers.get("cookie"), expected))) {
     return new Response("Authentication required.", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="No Empty Chair Admin", charset="UTF-8"' } });
   }
   const cfg = readConfig();
@@ -17,6 +18,9 @@ export default async (req) => {
   const graph = makeGraph(cfg);
 
   if (req.method === "POST") {
+    // A cookie session is sent automatically by the browser, so refuse cross-site POSTs.
+    const origin = req.headers.get("origin");
+    if (origin) { let same = false; try { same = new URL(origin).host === new URL(req.url).host; } catch {} if (!same) return json({ error: "cross-site request refused" }, 403); }
     let body = {};
     try { body = await req.json(); } catch {}
     if (body.action === "verify") return json(await verifyConnection(graph, cfg));
@@ -34,14 +38,38 @@ export default async (req) => {
       await store.setJSON("_lastRun", r);
       return json(r);
     }
-    if (body.action === "mark-manual" && body.id) {
+    if (body.action === "dismiss" && body.id && body.platform) {
       const cur = (await store.get(body.id, { type: "json" })) || {};
-      if (body.undo) delete cur.manual;
-      else cur.manual = { status: "posted", postedAt: new Date().toISOString(), ...(body.permalink ? { permalink: body.permalink } : {}) };
+      if (cur[body.platform]) cur[body.platform] = { ...cur[body.platform], dismissed: !body.undo };
       await store.setJSON(body.id, cur);
       return json({ ok: true });
     }
-    if (body.action === "refresh-stats") return json({ results: await refreshAllStats({ schedule, store, graph }) });
+    if (body.action === "mark-manual" && body.id) {
+      const cur = (await store.get(body.id, { type: "json" })) || {};
+      const link = typeof body.permalink === "string" ? body.permalink.trim() : "";
+      if (link && !/^https?:\/\//i.test(link)) return json({ error: "That doesn't look like a link. Paste the full https:// post link." }, 400);
+      if (body.undo) delete cur.manual;
+      else cur.manual = {
+        ...(cur.manual || {}),
+        status: "posted",
+        postedAt: cur.manual?.postedAt || new Date().toISOString(),
+        ...(link ? { permalink: link } : {}),
+      };
+      await store.setJSON(body.id, cur);
+      // Right after marking posted without a link, try to find it on Instagram now.
+      let found = null;
+      if (!body.undo && !cur.manual.permalink) { try { found = (await matchManualLinks({ schedule, store, graph, cfg })).matched.find((m) => m.id === body.id) || null; } catch {} }
+      return json({ ok: true, linkFound: !!found });
+    }
+    if (body.action === "test-push") {
+      const r = await pushNotify(cfg, { title: "✅ Test from No Empty Chair", message: "Phone alerts are working. You'll get one of these when posts publish, fail, or need posting by hand.", tags: ["white_check_mark"], priority: 3 });
+      return json(r.sent ? { ok: true } : { ok: false, error: r.reason || ("ntfy answered " + r.status) }, r.sent ? 200 : 400);
+    }
+    if (body.action === "refresh-stats") {
+      let links = { matched: [] };
+      try { links = await matchManualLinks({ schedule, store, graph, cfg }); } catch (e) { links = { matched: [], error: e.message }; }
+      return json({ results: await refreshAllStats({ schedule, store, graph }), manualLinks: links });
+    }
     return json({ error: "unknown action" }, 400);
   }
 
@@ -51,7 +79,7 @@ export default async (req) => {
   const calToken = Netlify.env.get("CALENDAR_FEED_TOKEN");
   const site = (Netlify.env.get("URL") || "https://noemptychair.co").replace(/\/$/, "");
   const calendarUrl = calToken ? `${site}/social/calendar.ics?key=${encodeURIComponent(calToken)}` : null;
-  const data = { enabled: cfg.enabled, lastRun, problems, posts: rows, calendarUrl };
+  const data = { enabled: cfg.enabled, lastRun, problems, posts: rows, calendarUrl, pushEnabled: !!cfg.ntfyTopic };
   if (new URL(req.url).searchParams.get("format") === "json") return json(data);
   return new Response(page(data, cfg), { headers: { "Content-Type": "text/html; charset=utf-8", "X-Robots-Tag": "noindex", "Cache-Control": "no-store" } });
 };
@@ -79,38 +107,77 @@ function timeAgo(iso) {
 
 const TYPE_ICON = { image: "🖼️", carousel: "🔲", reel: "🎬", story: "📖" };
 
+// Likes/comments/reach line plus the latest comments, for a post's saved stats.
+function statsHtml(stats) {
+  if (!stats) return "";
+  const line = `<div class="stats">${[
+    stats.postedAt ? `posted ${esc(timeAgo(stats.postedAt))}` : null,
+    num(stats.likes) !== null ? `❤️ ${num(stats.likes)}` : null,
+    num(stats.comments) !== null ? `💬 ${num(stats.comments)}` : null,
+    num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
+    num(stats.plays) !== null ? `▶ ${num(stats.plays)} plays` : null,
+    num(stats.saved) !== null ? `🔖 ${num(stats.saved)}` : null,
+    num(stats.post_impressions) !== null ? `👁 ${num(stats.post_impressions)} impr.` : null,
+    num(stats.post_engaged_users) !== null ? `⚡ ${num(stats.post_engaged_users)} engaged` : null,
+  ].filter(Boolean).join(" · ")}<span class="muted"> (as of ${esc(timeAgo(stats.fetchedAt))})</span></div>`;
+  const comments = stats.recentComments?.length
+    ? `<div class="commentlist">${stats.recentComments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}</div>`).join("")}</div>`
+    : "";
+  return line + comments;
+}
+
+// Which tab a post lives in. A post sits in exactly one:
+//   attention = a platform failed/missed (needs a human)    published = all done
+//   needs     = manual post still to be posted by hand      scheduled = auto-publishes on its own
+//   draft     = draft or paused (won't go out until it's set to ready)
+function catOf(p) {
+  const st = p.state || {};
+  const plats = p.platforms || [];
+  if (p.manual_only) {
+    if (st.manual?.status === "posted") return "published";
+  } else {
+    const live = plats.filter((pl) => !st[pl]?.dismissed);
+    const ss = live.map((pl) => st[pl]?.status);
+    if (ss.some((x) => x === "failed" || x === "missed")) return "attention";
+    if (live.length && ss.every((x) => x === "published")) return "published";
+  }
+  const status = p.status || "draft";
+  if (status !== "ready") return "draft";
+  return p.manual_only ? "needs" : "scheduled";
+}
+
 function page(d, cfg) {
   const badge = (st, p, id) => {
     const s = st?.status || "scheduled";
     const link = st?.permalink ? ` <a href="${esc(st.permalink)}" target="_blank" rel="noopener">view ↗</a>` : "";
     const err = st?.error || st?.lastError ? `<div class="err">${esc(st.error || st.lastError)}</div>` : "";
-    const retry = ["failed", "missed"].includes(s) ? ` <button class="mini" data-retry="${esc(id)}" data-platform="${p}">Retry</button>` : "";
-    const stats = st?.stats;
-    const statLine = stats
-      ? `<div class="stats">${[
-          stats.postedAt ? `posted ${esc(timeAgo(stats.postedAt))}` : null,
-          num(stats.likes) !== null ? `❤️ ${num(stats.likes)}` : null,
-          num(stats.comments) !== null ? `💬 ${num(stats.comments)}` : null,
-          num(stats.reach) !== null ? `👁 ${num(stats.reach)} reach` : null,
-          num(stats.plays) !== null ? `▶ ${num(stats.plays)} plays` : null,
-          num(stats.saved) !== null ? `🔖 ${num(stats.saved)}` : null,
-          num(stats.post_impressions) !== null ? `👁 ${num(stats.post_impressions)} impr.` : null,
-          num(stats.post_engaged_users) !== null ? `⚡ ${num(stats.post_engaged_users)} engaged` : null,
-        ].filter(Boolean).join(" · ")}<span class="muted"> (as of ${esc(timeAgo(stats.fetchedAt))})</span></div>`
+    const retry = ["failed", "missed"].includes(s)
+      ? ` <button class="mini" data-retry="${esc(id)}" data-platform="${p}">Retry</button>` + (st?.dismissed
+          ? ` <span class="muted">dismissed</span> <button class="mini" data-dismiss="${esc(id)}" data-platform="${p}" data-undo="1">Undo</button>`
+          : ` <button class="mini" data-dismiss="${esc(id)}" data-platform="${p}">Dismiss</button>`)
       : "";
-    const comments = stats?.recentComments?.length
-      ? `<div class="commentlist">${stats.recentComments.map((c) => `<div class="commentrow"><b>@${esc(c.username || "?")}</b> ${esc(c.text || "")}</div>`).join("")}</div>`
-      : "";
+    const statsBlock = statsHtml(st?.stats);
     const ac = p === "instagram" ? st?.autoComment : null;
     const acLine = ac
       ? ac.status === "pending" ? `<div class="muted">🕐 first comment queued for ${esc(fmt(new Date(ac.dueAt).toISOString()))}</div>`
       : ac.status === "posted" ? `<div class="muted">💬 first comment posted ${esc(timeAgo(ac.postedAt))}</div>`
       : `<div class="err">first comment failed: ${esc(ac.error || "")}</div>`
       : "";
-    return `<div class="platrow"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statLine}${comments}${acLine}</div>`;
+    return `<div class="platrow"><span class="platchip pc-${p}">${p === "instagram" ? "IG" : "FB"}</span> <span class="s s-${s}">${s}</span>${link}${retry}${err}${statsBlock}${acLine}</div>`;
   };
 
   const sorted = d.posts.slice().sort((a, b) => Date.parse(a.publish_at) - Date.parse(b.publish_at));
+  const counts = {};
+  for (const p of sorted) { const c = catOf(p); counts[c] = (counts[c] || 0) + 1; }
+  const tabDefs = [
+    ...(counts.attention ? [{ key: "attention", label: "⚠️ Needs attention" }] : []),
+    { key: "needs", label: "🖐🏾 Needs posting" },
+    { key: "scheduled", label: "🗓 Scheduled" },
+    { key: "draft", label: "📝 Drafts & paused" },
+    { key: "published", label: "✅ Published" },
+    { key: "all", label: "All" },
+  ];
+  const defaultTab = counts.attention ? "attention" : counts.needs ? "needs" : counts.scheduled ? "scheduled" : "all";
   const cards = sorted.map((p) => {
     const media0 = p.media?.[0] || "";
     const isVid = /\.(mp4|mov)(\?|#|$)/i.test(media0);
@@ -127,13 +194,15 @@ function page(d, cfg) {
     const allPublished = !p.manual_only && p.platforms.length && p.platforms.every((pl) => p.state[pl]?.status === "published");
     const canPostNow = !p.manual_only && (p.status || "draft") === "ready" && !allPublished;
     const needsPosting = p.manual_only && (p.status || "draft") === "ready" && p.state.manual?.status !== "posted";
+    const cat = catOf(p);
+    const overdue = cat === "needs" && Date.parse(p.publish_at) < Date.now();
     return `
-    <div class="pcard" data-manual="${p.manual_only ? "1" : "0"}" data-needs-posting="${needsPosting ? "1" : "0"}" data-status="${esc(p.status || "draft")}">
+    <div class="pcard" data-manual="${p.manual_only ? "1" : "0"}" data-needs-posting="${needsPosting ? "1" : "0"}" data-status="${esc(p.status || "draft")}" data-cat="${cat}" data-ts="${Date.parse(p.publish_at) || 0}">
       <a class="pthumb" href="${src || "#"}" target="_blank" rel="noopener">${thumb}</a>
       <div class="pbody">
         <div class="prow1">
           <b>${esc(fmt(p.publish_at))}</b>
-          <span class="pill st-${esc(p.status || "draft")}">${esc(p.status || "draft")}</span>
+          ${overdue ? `<span class="pill st-overdue">overdue</span>` : `<span class="pill st-${esc(p.status || "draft")}">${esc(p.status || "draft")}</span>`}
         </div>
         <div class="ptype">${TYPE_ICON[p.type] || ""} ${esc(p.type)}${p.campaign ? ` <span class="campaign">🏷 ${esc(p.campaign)}</span>` : ""}</div>
         ${capBlock}
@@ -148,7 +217,7 @@ function page(d, cfg) {
         </div>
         <div class="pplatforms">${p.manual_only
           ? (p.state.manual?.status === "posted"
-              ? `<div class="manual posted">✅ Posted ${esc(timeAgo(p.state.manual.postedAt))}${p.state.manual.permalink ? ` · <a href="${esc(p.state.manual.permalink)}" target="_blank" rel="noopener">view ↗</a>` : ` <span class="muted">(no link saved)</span>`}</div>`
+              ? `<div class="manual posted">✅ Posted ${esc(timeAgo(p.state.manual.postedAt))}${p.state.manual.autoDetected ? " <span class=\"muted\">(found on Instagram automatically)</span>" : ""}${p.state.manual.permalink ? ` · <a href="${esc(p.state.manual.permalink)}" target="_blank" rel="noopener">view ↗</a>` : p.type === "story" ? ` <span class="muted">(stories can't be linked automatically; they expire in 24h)</span>` : ` <span class="nolink">⚠ no link yet</span> <span class="muted">(checked automatically every 10 min)</span> <button class="mini" data-addlink="${esc(p.id)}">＋ Add link</button>`}</div>${statsHtml(p.state.manual.stats)}`
               : `<div class="manual">🖐🏾 Manual — needs stickers/polls/sound tag added in-app, post it yourself</div>`)
           : p.platforms.map((pl) => badge(p.state[pl], pl, p.id)).join("")}</div>
       </div>
@@ -254,6 +323,9 @@ button.markdone{background:#dff3e6;color:#1d6b3a;border-color:#bfe6cf}
 button.postnow{background:var(--plum);color:#fff;border-color:var(--plum)}
 button.postnow:disabled{opacity:.6}
 .stats{font-size:11px;color:#5a3f4e}
+.st-overdue{background:#f6e3e3;color:#8c2f2f}
+.nolink{color:#8c2f2f;font-weight:600;font-size:12px}
+.tabempty{margin:10px 0;padding:28px 18px}
 .commentlist{margin-top:4px;padding-left:10px;border-left:2px solid var(--line)}
 .commentrow{font-size:11px;color:#5a3f4e;line-height:1.5}
 .commentrow b{color:var(--plum)}
@@ -302,7 +374,7 @@ button.postnow:disabled{opacity:.6}
   .wrap{padding:18px 14px 50px}
   .pageheader{padding:16px 18px}
   h1{font-size:20px}
-  .actionbar button{flex:1;min-width:0;padding:12px 10px;font-size:12px}
+  .actionbar button{flex:1 1 30%;min-width:0;padding:12px 8px;font-size:12px}
   .pcard{flex-direction:column}
   .pthumb{width:100%;height:auto;aspect-ratio:4/5;max-height:280px}
   .prow2 .mini,.prow2 .mini[href]{flex:1;text-align:center;padding:10px 8px}
@@ -315,6 +387,7 @@ button.postnow:disabled{opacity:.6}
   <h1>📅 Social publisher</h1>
   <p class="sub">Auto-posting is <span class="pill ${d.enabled ? "on" : "off"}">${d.enabled ? "ON" : "PAUSED"}</span>
   · checks every 10 minutes · last run ${d.lastRun ? esc(fmt(d.lastRun.at)) + (d.lastRun.skipped ? " (" + esc(d.lastRun.skipped) + ")" : "") : "never"} · times shown in Eastern</p>
+  <p class="sub">${d.pushEnabled ? "📲 Phone alerts are <b>ON</b> — you'll get a notification when a post publishes, fails, or needs posting by hand." : `📲 Phone alerts are <b>off</b> — add an NTFY_TOPIC env var and subscribe to it in the free ntfy app to get them.`}</p>
   ${d.calendarUrl ? `<p class="sub"><a href="${esc(d.calendarUrl)}">📅 Subscribe to the "needs posting" calendar</a> — add it once in your phone's Calendar app for native reminders. Add this page to your home screen (Share → Add to Home Screen) for one-tap access.</p>` : `<p class="sub muted">Calendar reminders aren't set up yet — add a CALENDAR_FEED_TOKEN env var to enable the subscribe link.</p>`}
 </div>
 <div class="actionbar">
@@ -322,13 +395,13 @@ button.postnow:disabled{opacity:.6}
   <button data-act="dry-run">🧪 Dry run</button>
   <button class="primary" data-act="run">▶ Run now</button>
   <button data-act="refresh-stats">↻ Refresh stats</button>
+  ${d.pushEnabled ? `<button data-act="test-push">📲 Send test alert</button>` : ""}
 </div>
 ${probs}
 ${sorted.length ? `<div class="filterbar">
-  <button class="filterchip active" data-filter="all">All <span>${sorted.length}</span></button>
-  <button class="filterchip" data-filter="manual">🖐🏾 Needs posting <span>${sorted.filter((p) => p.manual_only && (p.status || "draft") === "ready" && p.state.manual?.status !== "posted").length}</span></button>
-  <button class="filterchip" data-filter="ready">Ready <span>${sorted.filter((p) => (p.status || "draft") === "ready").length}</span></button>
-</div>` : ""}
+  ${tabDefs.map((t) => `<button class="filterchip${t.key === defaultTab ? " active" : ""}" data-filter="${t.key}">${t.label} <span>${counts[t.key] ?? sorted.length}</span></button>`).join("")}
+</div>
+<div class="emptystate tabempty" id="tabEmpty" hidden><p>Nothing here right now.</p></div>` : ""}
 ${sorted.length ? `<div class="pgrid">${cards}</div>` : empty}
 <div id="out" class="outbox" hidden></div>
 <div id="previewModal" class="modalbg" hidden><div class="modalbox">
@@ -478,30 +551,62 @@ document.querySelectorAll('[data-savevideo]').forEach(b=>b.onclick=async()=>{
   }
 });
 
-// ---- filter bar (All / Needs posting / Ready) ----
+// ---- tabs: each post lives in exactly one (attention / needs posting / scheduled / drafts / published) ----
 const cardsEls=[...document.querySelectorAll('.pcard')];
-document.querySelectorAll('[data-filter]').forEach(chip=>chip.onclick=()=>{
-  document.querySelectorAll('[data-filter]').forEach(c=>c.classList.remove('active'));
-  chip.classList.add('active');
-  const f=chip.dataset.filter;
+const chipEls=[...document.querySelectorAll('[data-filter]')];
+const TAB_KEY='necSocialTab';
+function applyTab(f){
+  chipEls.forEach(c=>c.classList.toggle('active',c.dataset.filter===f));
+  let shown=0;
   cardsEls.forEach(card=>{
-    const show=f==='all' || (f==='manual' && card.dataset.needsPosting==='1') || (f==='ready' && card.dataset.status==='ready');
+    const show=f==='all' || card.dataset.cat===f;
     card.classList.toggle('filtered-out',!show);
+    if(show)shown++;
   });
+  // Published reads newest-first; everything else soonest-first.
+  const grid=document.querySelector('.pgrid');
+  if(grid)[...cardsEls].sort((a,b)=>f==='published'?b.dataset.ts-a.dataset.ts:a.dataset.ts-b.dataset.ts).forEach(c=>grid.appendChild(c));
+  const empty=document.getElementById('tabEmpty'); if(empty)empty.hidden=shown>0;
+  try{localStorage.setItem(TAB_KEY,f);}catch{}
+}
+chipEls.forEach(chip=>chip.onclick=()=>applyTab(chip.dataset.filter));
+if(chipEls.length){
+  let start=(chipEls.find(c=>c.classList.contains('active'))||chipEls[0]).dataset.filter;
+  try{const saved=localStorage.getItem(TAB_KEY); if(saved && chipEls.some(c=>c.dataset.filter===saved) && saved!=='attention')start=saved; else if(saved==='attention' && chipEls.some(c=>c.dataset.filter==='attention'))start='attention';}catch{}
+  applyTab(start);
+}
+
+// ---- dismiss a failure you've decided to live with (e.g. Facebook won't take video posts) ----
+document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=async()=>{
+  b.classList.add('loading');
+  try{await go({action:'dismiss',id:b.dataset.dismiss,platform:b.dataset.platform,undo:b.dataset.undo?true:undefined});location.reload();}
+  catch{b.classList.remove('loading');}
+});
+
+// ---- add / fix the real post link on a manual post that was marked posted without one ----
+document.querySelectorAll('[data-addlink]').forEach(b=>b.onclick=async()=>{
+  const url=prompt('Paste the full Instagram or Facebook post link:','');
+  if(!url||!url.trim())return;
+  b.classList.add('loading');
+  try{await go({action:'mark-manual',id:b.dataset.addlink,permalink:url.trim()});location.reload();}
+  catch{b.classList.remove('loading');}
 });
 
 // ---- mark a manual post posted / undo, with an optional real permalink for verifiable tracking ----
 document.querySelectorAll('[data-markmanual]').forEach(b=>b.onclick=async()=>{
   const id=b.dataset.markmanual;
-  if(b.dataset.undo){
-    if(!confirm('Undo "posted"? It will show as needing posting again.'))return;
-    await go({action:'mark-manual',id,undo:true});
-  } else {
-    const url=prompt('Optional: paste the real Instagram or Facebook post link, so this is verifiable later (leave blank to skip):','');
-    if(url===null)return; // cancelled
-    await go({action:'mark-manual',id,permalink:url.trim()||undefined});
-  }
-  location.reload();
+  b.classList.add('loading');
+  try{
+    if(b.dataset.undo){
+      if(!confirm('Undo "posted"? It will show as needing posting again.')){b.classList.remove('loading');return;}
+      await go({action:'mark-manual',id,undo:true});
+    } else {
+      const url=prompt('Paste the post link (Instagram app: ••• → Link). Leave blank and I will look for it on Instagram automatically within 10 minutes.','');
+      if(url===null){b.classList.remove('loading');return;} // cancelled
+      await go({action:'mark-manual',id,permalink:url.trim()||undefined});
+    }
+    location.reload();
+  }catch{b.classList.remove('loading');}
 });
 
 // ---- post now: publish one specific ready post immediately, regardless of its scheduled time ----

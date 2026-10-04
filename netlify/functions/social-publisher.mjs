@@ -2,7 +2,7 @@
 // Paused unless SOCIAL_PUBLISHER_ENABLED=true. See social/README.md.
 import { getStore } from "@netlify/blobs";
 import schedule from "../../public/social/schedule.json" with { type: "json" };
-import { runTick, makeGraph, config as readConfig, checkManualReminders, postAutoComments, refreshAllStats } from "../lib/social-publisher.mjs";
+import { runTick, makeGraph, config as readConfig, checkManualReminders, postAutoComments, refreshAllStats, matchManualLinks } from "../lib/social-publisher.mjs";
 
 const STATS_REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // only auto-refresh posts from the last week; older ones are a manual "Refresh stats" click away
 
@@ -13,6 +13,12 @@ export default async () => {
   const report = await runTick({ schedule, store, graph, cfg });
   await store.setJSON("_lastRun", report);
   console.log(JSON.stringify(report));
+  try {
+    const links = await matchManualLinks({ schedule, store, graph, cfg });
+    if (links.matched.length) console.log("manual links found:", JSON.stringify(links.matched));
+  } catch (err) {
+    console.log("manual link check failed:", err.message);
+  }
   try {
     const reminder = await checkManualReminders({ schedule, store, cfg });
     if (reminder.sent) console.log("manual reminder sent:", JSON.stringify(reminder.ids));

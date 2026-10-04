@@ -46,6 +46,8 @@ export function config() {
     maxLateMin: Number(env("SOCIAL_MAX_LATE_MINUTES", "360")),
     notifyTo: env("SOCIAL_NOTIFY_EMAIL", env("LEAD_TO_EMAIL", "hello@noemptychair.co")),
     resendKey: env("RESEND_API_KEY"),
+    ntfyTopic: env("NTFY_TOPIC"),
+    ntfyServer: env("NTFY_SERVER", "https://ntfy.sh"),
     mediaBase: env("SOCIAL_MEDIA_BASE", `${site}/social/media`).replace(/\/$/, ""),
   };
 }
@@ -251,13 +253,69 @@ export async function postAutoComments({ schedule, store, graph, cfg, now = Date
       const r = await graph.post(`${ig.mediaId}/comments`, { message: ig.autoComment.message });
       state.instagram = { ...ig, autoComment: { ...ig.autoComment, status: "posted", postedAt: new Date(now).toISOString(), commentId: r.id } };
       posted.push({ id: post.id, ok: true });
+      await pushNotify(cfg, { title: "💬 First comment posted", message: `${post.type} · ${shortWhen(post.publish_at)}`, tags: ["speech_balloon"], priority: 2, click: ig.permalink });
     } catch (err) {
       state.instagram = { ...ig, autoComment: { ...ig.autoComment, status: "failed", error: err.message } };
       posted.push({ id: post.id, ok: false, error: err.message });
+      await pushNotify(cfg, { title: "⚠️ First comment failed", message: `${post.type} · ${shortWhen(post.publish_at)}\n${String(err.message).slice(0, 150)}`, tags: ["warning"], priority: 4 });
     }
     await store.setJSON(post.id, state);
   }
   return { posted };
+}
+
+// ---------------------------------------------------------------- manual-post link finder
+
+// Manual posts get published by hand in the Instagram app, so the system never sees the
+// result. This closes that loop: it scans your most recent Instagram media and matches
+// each ready manual post (feed/reel/carousel) by caption, then saves the real permalink +
+// media id, and marks it posted if you hadn't yet. Captions are compared after stripping
+// hashtags/emoji/punctuation, so a tweaked hashtag set or trailing emoji still matches.
+// Media already tied to another post (an auto-published copy with the same caption) is
+// never reused. Stories can't be matched this way: the API only exposes them for 24 hours
+// and without captions.
+const normCaption = (s) => String(s || "").toLowerCase().replace(/#[\p{L}\p{N}_]+/gu, " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim().slice(0, 60);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export async function matchManualLinks({ schedule, store, graph, cfg, now = Date.now() }) {
+  const { posts } = validateSchedule(schedule);
+  const claimed = new Set();
+  const cands = [];
+  for (const p of posts) {
+    const state = (await store.get(p.id, { type: "json" })) || {};
+    if (state.instagram?.mediaId) claimed.add(state.instagram.mediaId);
+    if (state.manual?.mediaId) claimed.add(state.manual.mediaId);
+    if (!p.manual_only || p.type === "story" || !p.platforms?.includes("instagram")) continue;
+    if ((p.status || "draft") !== "ready" || state.manual?.permalink) continue;
+    const t = Date.parse(p.publish_at);
+    if (t > now + 3 * DAY_MS || t < now - 21 * DAY_MS) continue;
+    if (!normCaption(p.caption)) continue;
+    cands.push({ p, state, t });
+  }
+  if (!cands.length) return { matched: [] };
+
+  const media = (await graph.get(`${cfg.igUserId}/media`, { fields: "id,caption,permalink,timestamp,media_product_type", limit: 50 })).data || [];
+  const matched = [];
+  for (const { p, state, t } of cands.sort((a, b) => a.t - b.t)) {
+    const want = normCaption(p.caption);
+    const hit = media
+      .filter((m) => !claimed.has(m.id) && normCaption(m.caption) === want && Date.parse(m.timestamp) >= t - 2 * DAY_MS)
+      .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp))[0];
+    if (!hit) continue;
+    claimed.add(hit.id);
+    const wasMarked = state.manual?.status === "posted";
+    await store.setJSON(p.id, {
+      ...state,
+      manual: { ...(state.manual || {}), status: "posted", postedAt: state.manual?.postedAt || hit.timestamp, permalink: hit.permalink, mediaId: hit.id, ...(wasMarked ? {} : { autoDetected: true }) },
+    });
+    matched.push({ id: p.id, permalink: hit.permalink, autoMarked: !wasMarked });
+    await pushNotify(cfg, {
+      title: wasMarked ? "🔗 Link saved for your manual post" : "✅ Found your manual post on Instagram",
+      message: `${p.type} · ${shortWhen(p.publish_at)}${wasMarked ? "" : "\nMarked as posted for you."}`,
+      tags: ["link"], priority: 3, click: hit.permalink,
+    });
+  }
+  return { matched };
 }
 
 function tooSlow(st) {
@@ -387,6 +445,7 @@ export async function runTick({ schedule, store, now = Date.now(), graph, cfg = 
           next.attempts = st.attempts || 0;
           await save(post.id, platform, next, next.status === "failed");
           (next.status === "published" ? report.acted : report.waiting).push({ id: post.id, platform, status: next.status, phase: next.phase, link: next.permalink });
+          if (next.status === "published") report.notices.push({ id: post.id, platform, status: "published", link: next.permalink, type: post.type, publish_at: post.publish_at });
         } catch (err) {
           const attempts = (st.attempts || 0) + 1;
           const give = !(err instanceof GraphError && err.transient) || attempts >= MAX_ATTEMPTS;
@@ -417,17 +476,62 @@ export async function runTick({ schedule, store, now = Date.now(), graph, cfg = 
   }
 }
 
+// Phone push via ntfy (https://ntfy.sh): install the free ntfy app, subscribe to the
+// same topic as NTFY_TOPIC, and every call here lands as a native notification.
+// Never throws: a down push service must never break a publish run. Messages carry
+// post ids/types/times only (no captions) since anyone who knows the topic can read it.
+const ADMIN_URL = "https://noemptychair.co/admin/social";
+export async function pushNotify(cfg, { title, message, tags, priority, click } = {}) {
+  if (!cfg.ntfyTopic) return { sent: false, reason: "no NTFY_TOPIC" };
+  try {
+    const r = await fetch(String(cfg.ntfyServer || "https://ntfy.sh").replace(/\/$/, ""), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic: cfg.ntfyTopic, title, message, tags, priority, click: click || ADMIN_URL }),
+    });
+    return { sent: r.ok, status: r.status };
+  } catch (e) {
+    return { sent: false, reason: e.message };
+  }
+}
+
+const PLAT_LABEL = { instagram: "Instagram", facebook: "Facebook" };
+const shortWhen = (iso) => {
+  try { return new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); } catch { return iso || ""; }
+};
+
+// Turns one tick's notices into phone pushes (grouped per post so IG+FB is one buzz)
+// and emails the failures. Notice shape: { id, platform, status, error?, link?, type?, publish_at? }.
 export async function sendNotice(notices, cfg) {
-  if (!cfg.resendKey || !notices.length) return;
-  const lines = notices.map((n) => `${n.id} (${n.platform}): ${n.status}${n.error ? " - " + n.error : ""}`);
+  if (!notices.length) return;
+
+  const groups = new Map();
+  for (const n of notices) {
+    const key = `${n.id}|${n.status}`;
+    if (!groups.has(key)) groups.set(key, { ...n, platforms: [] });
+    groups.get(key).platforms.push(PLAT_LABEL[n.platform] || n.platform);
+  }
+  const pushes = [...groups.values()].map((g) => {
+    const where = g.platforms.join(" + ");
+    const what = [g.type, g.publish_at ? shortWhen(g.publish_at) : null].filter(Boolean).join(" · ") || g.id;
+    if (g.status === "published") return { title: `✅ Published to ${where}`, message: what, tags: ["white_check_mark"], priority: 3, click: g.link };
+    if (g.status === "missed") return { title: `⏰ Missed on ${where}`, message: `${what}\nNot started in time; it was not posted late.`, tags: ["alarm_clock"], priority: 4 };
+    return { title: `❌ Failed on ${where}`, message: `${what}\n${(g.error || "").slice(0, 180)}`, tags: ["x"], priority: 5 };
+  });
+  for (const p of pushes.slice(0, 4)) await pushNotify(cfg, p);
+  if (pushes.length > 4) await pushNotify(cfg, { title: `+${pushes.length - 4} more updates`, message: "Open the status page for the full list.", priority: 3 });
+
+  const bad = notices.filter((n) => n.status === "failed" || n.status === "missed");
+  if (!cfg.resendKey || !bad.length) return;
+  const lines = bad.map((n) => `${n.id} (${n.platform}): ${n.status}${n.error ? " - " + n.error : ""}`);
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${cfg.resendKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: "No Empty Chair Social <onboarding@resend.dev>",
       to: [cfg.notifyTo],
-      subject: `Social publisher: ${notices.length} post${notices.length > 1 ? "s" : ""} need attention`,
-      text: lines.join("\n") + "\n\nStatus page: https://noemptychair.co/admin/social",
+      subject: `Social publisher: ${bad.length} post${bad.length > 1 ? "s" : ""} need attention`,
+      text: lines.join("\n") + "\n\nStatus page: " + ADMIN_URL,
     }),
   });
 }
@@ -439,7 +543,7 @@ export async function sendNotice(notices, cfg) {
 // post's scheduled time arrives, email a one-time reminder (never repeats — tracked via
 // state.manualReminder.sentAt) unless it's already been marked posted.
 export async function checkManualReminders({ schedule, store, cfg = config(), now = Date.now() }) {
-  if (!cfg.resendKey) return { sent: false, reason: "no RESEND_API_KEY" };
+  if (!cfg.resendKey && !cfg.ntfyTopic) return { sent: false, reason: "no RESEND_API_KEY or NTFY_TOPIC" };
   const { posts } = validateSchedule(schedule);
   const due = [];
   for (const p of posts) {
@@ -453,15 +557,24 @@ export async function checkManualReminders({ schedule, store, cfg = config(), no
   if (!due.length) return { sent: false, reason: "nothing newly due" };
 
   const lines = due.map(({ p }) => `🖐🏾 ${p.type} — ${(p.caption || "").split("\n")[0].slice(0, 80) || "(no caption)"} — due ${p.publish_at}`);
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${cfg.resendKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: "No Empty Chair Social <onboarding@resend.dev>",
-      to: [cfg.notifyTo],
-      subject: `🖐🏾 ${due.length} post${due.length > 1 ? "s" : ""} to post by hand today`,
-      text: lines.join("\n") + "\n\nGrab the caption/media and mark it posted: https://noemptychair.co/admin/social",
-    }),
+  if (cfg.resendKey) {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${cfg.resendKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "No Empty Chair Social <onboarding@resend.dev>",
+        to: [cfg.notifyTo],
+        subject: `🖐🏾 ${due.length} post${due.length > 1 ? "s" : ""} to post by hand today`,
+        text: lines.join("\n") + "\n\nGrab the caption/media and mark it posted: " + ADMIN_URL,
+      }),
+    });
+  }
+  const shown = due.slice(0, 6).map(({ p }) => `• ${p.type} · ${shortWhen(p.publish_at)}`);
+  await pushNotify(cfg, {
+    title: `🖐🏾 ${due.length} post${due.length > 1 ? "s" : ""} to post by hand`,
+    message: shown.join("\n") + (due.length > 6 ? `\n…and ${due.length - 6} more` : ""),
+    tags: ["raised_hand"],
+    priority: 4,
   });
   for (const { p, state } of due) {
     await store.setJSON(p.id, { ...state, manualReminder: { sentAt: new Date(now).toISOString() } });
@@ -576,6 +689,18 @@ export async function refreshAllStats({ schedule, store, graph, maxAgeMs }) {
         }
       } catch (e) {
         results.push({ id: post.id, platform, ok: false, error: e.message });
+      }
+    }
+    if (state.manual?.mediaId && !(maxAgeMs && Date.parse(post.publish_at) < Date.now() - maxAgeMs)) {
+      try {
+        const stats = await fetchStats(graph, "instagram", { mediaId: state.manual.mediaId });
+        if (stats) {
+          state.manual = { ...state.manual, stats };
+          changed = true;
+          results.push({ id: post.id, platform: "manual", ok: true });
+        }
+      } catch (e) {
+        results.push({ id: post.id, platform: "manual", ok: false, error: e.message });
       }
     }
     if (changed) await store.setJSON(post.id, state);
