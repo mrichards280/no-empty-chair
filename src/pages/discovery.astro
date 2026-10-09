@@ -95,7 +95,7 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
        so a spam-flagged Netlify submission never means a silently missed lead.
        Fire-and-forget — the native Netlify submission still proceeds normally. */
     (function () {
-      var f = document.querySelector('form[name="discovery"]');
+      var f = document.querySelector('form[name="discovery"]:not([hidden])');
       if (!f) return;
       f.addEventListener("submit", function () {
         try {

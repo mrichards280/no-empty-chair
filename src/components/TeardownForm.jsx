@@ -9,8 +9,25 @@ function encode(data) {
 
 const EMPTY = {
   name: "", salon: "", email: "", years: "", website: "",
-  instagram: "", "bot-field": "",
+  instagram: "", filled_by: "client", "bot-field": "",
 };
+
+// Pre-fill name/salon/email from the link's query string (?name=...&salon=...
+// or &business=...&email=...) so basics don't have to be retyped here.
+function prefillFromQuery() {
+  if (typeof window === "undefined") return EMPTY;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      ...EMPTY,
+      name: params.get("name") || "",
+      salon: params.get("salon") || params.get("business_name") || params.get("business") || "",
+      email: params.get("email") || "",
+    };
+  } catch {
+    return EMPTY;
+  }
+}
 
 const STEPS = [
   "Send me the basics",
@@ -36,7 +53,7 @@ function ProcessSteps({ activeIndex }) {
 // (exportable/private in the Netlify dashboard). Makayla confirms receipt,
 // requests payment, then delivers the video breakdown.
 export default function TeardownForm() {
-  const [form, setForm] = useState(EMPTY);
+  const [form, setForm] = useState(prefillFromQuery);
   const [status, setStatus] = useState(""); // "", sending, done, error
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -100,6 +117,13 @@ export default function TeardownForm() {
 
             <form className="tform" name="teardown" onSubmit={submit}>
               <input className="tp-hp" aria-hidden="true" type="text" name="bot-field" tabIndex="-1" autoComplete="off" value={form["bot-field"]} onChange={set("bot-field")} />
+
+              <label>Who's filling this out?
+                <select value={form.filled_by} onChange={set("filled_by")}>
+                  <option value="client">I'm filling this out myself</option>
+                  <option value="makayla">Makayla's filling this out with me (call or in person)</option>
+                </select>
+              </label>
 
               <div className="tp-row">
                 <label>Your name<input required type="text" value={form.name} onChange={set("name")} /></label>

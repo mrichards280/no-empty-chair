@@ -37,6 +37,13 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../
         <input type="hidden" name="form-name" value="teardown-questionnaire" />
         <input class="tp-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
 
+        <label>Who's filling this out?
+          <select name="filled_by">
+            <option value="client">I'm filling this out myself</option>
+            <option value="makayla">Makayla's filling this out with me (call or in person)</option>
+          </select>
+        </label>
+
         <div class="disc-sec">
           <div class="disc-sec-h"><span class="disc-num">1</span>Confirm It's You</div>
           <div class="tp-row">
@@ -104,11 +111,31 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../
     .disc-free{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:100px;background:rgba(168,90,118,.12);color:#a85a76;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
   </style>
   <script is:inline>
+    /* Pre-fill from the link's query string (?name=...&salon=...&email=...) so
+       a client's basics from an earlier step don't have to be retyped here. */
+    (function () {
+      try {
+        var params = new URLSearchParams(location.search);
+        var map = { name: ["name"], salon: ["salon", "business_name", "business"], email: ["email"] };
+        var form = document.querySelector('form[name="teardown-questionnaire"]:not([hidden])');
+        if (!form) return;
+        Object.keys(map).forEach(function (field) {
+          var input = form.querySelector('[name="' + field + '"]');
+          if (!input || input.value) return;
+          for (var i = 0; i < map[field].length; i++) {
+            var v = params.get(map[field][i]);
+            if (v) { input.value = v; break; }
+          }
+        });
+      } catch (e) {}
+    })();
+  </script>
+  <script is:inline>
     /* Backup notifier: on submit, also POST to a function that emails you directly,
        so a spam-flagged Netlify submission never means a silently missed lead.
        Fire-and-forget — the native Netlify submission still proceeds normally. */
     (function () {
-      var f = document.querySelector('form[name="teardown-questionnaire"]');
+      var f = document.querySelector('form[name="teardown-questionnaire"]:not([hidden])');
       if (!f) return;
       f.addEventListener("submit", function () {
         try {
