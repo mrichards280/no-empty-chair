@@ -198,12 +198,23 @@ const jsonLd = {
       <input type="text" name="years" />
       <input type="text" name="website" />
       <input type="text" name="instagram" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <!-- Stage 2 of the Teardown: the deep-dive sent manually once payment's
+         confirmed. Field names must match src/pages/teardown/questionnaire.astro. -->
+    <form name="teardown-questionnaire" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="text" name="name" />
+      <input type="text" name="salon" />
+      <input type="email" name="email" />
       <input type="text" name="socials" />
       <input type="text" name="stats" />
       <input type="text" name="voice" />
       <input type="text" name="issue" />
       <input type="text" name="audience" />
       <input type="text" name="vision" />
+      <input type="text" name="platform" />
+      <input type="text" name="access_notes" />
       <input type="text" name="bot-field" />
     </form>
 

@@ -1,0 +1,132 @@
+---
+import Base from "../../layouts/Base.astro";
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../lib/logoPaths.js";
+---
+<Base
+  title="Teardown Questionnaire | No Empty Chair"
+  description="The full deep-dive questionnaire for your $200 Teardown, plus how to get me temporary access to your site and accounts."
+  canonical="https://noemptychair.co/teardown/questionnaire"
+  noindex={true}>
+  <main id="main" class="disc-page">
+    <header class="tp-head">
+      <a href="/" class="tp-logo">No Empty <span>Chair</span></a>
+    </header>
+
+    <div class="tp-wrap disc-wrap">
+      <div class="tp-mark">
+        <svg width="40" height="50.5" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="img" aria-label="No Empty Chair mark">
+          <g fill="#413645" stroke="none"><g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g></g>
+          <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill="#a85a76" /></g>
+        </svg>
+      </div>
+
+      <div class="tp-intro">
+        <div class="disc-kick">$200 Teardown <span class="disc-free">Step 3 of 4</span></div>
+        <h1>Let's get into it.</h1>
+        <p>Thanks for taking care of the $200. Now I actually dig in. Give this 15 to 20 minutes, the more detail you give me, the sharper the teardown.</p>
+      </div>
+
+      <form
+        class="tform disc-form"
+        name="teardown-questionnaire"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/teardown-questionnaire-thanks"
+      >
+        <input type="hidden" name="form-name" value="teardown-questionnaire" />
+        <input class="tp-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">1</span>Confirm It's You</div>
+          <div class="tp-row">
+            <label>Your name<input required type="text" name="name" placeholder="First & last" /></label>
+            <label>Salon / business name<input required type="text" name="salon" placeholder="Same as your first form" /></label>
+          </div>
+          <label>Best email<input required type="email" name="email" placeholder="you@email.com" /></label>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">2</span>Your Numbers &amp; Voice</div>
+          <label>Other social handles<input type="text" name="socials" placeholder="TikTok, Facebook, YouTube, Pinterest, whatever you're on" /></label>
+          <label style="margin-top:14px">Your numbers, if you have them
+            <span class="hint">Followers and reach/views over the last 30, 60, 90 days, and the past year if you can. Rough is fine, even screenshots you can send after.</span>
+            <textarea name="stats" rows="3" placeholder="e.g. IG: 2,400 followers · ~18k views/30d · ~50k/90d · reels do best…"></textarea>
+          </label>
+          <label style="margin-top:14px">Your current voice / branding
+            <span class="hint">Do you have a look or vibe already? Colors, fonts, how you talk to clients, or "totally starting over."</span>
+            <textarea name="voice" rows="3"></textarea>
+          </label>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">3</span>Problem &amp; Vision</div>
+          <label>Your #1 problem with your brand right now
+            <span class="hint">The one thing that bugs you most, or that you think is costing you clients.</span>
+            <textarea required name="issue" rows="3"></textarea>
+          </label>
+          <label style="margin-top:14px">The audience you want to attract
+            <span class="hint">Who's your dream client? Type of service, price point, the vibe of person you want in your chair.</span>
+            <textarea name="audience" rows="3"></textarea>
+          </label>
+          <label style="margin-top:14px">Anything else, your vision
+            <span class="hint">Optional. Where you want this to go, styles you love, or à la carte pieces you're curious about.</span>
+            <textarea name="vision" rows="3"></textarea>
+          </label>
+        </div>
+
+        <div class="disc-sec">
+          <div class="disc-sec-h"><span class="disc-num">4</span>Temporary Access</div>
+          <p class="tp-fine" style="text-align:left;margin:0 0 14px">To actually click through everything myself, I need temporary access to your site and main social accounts for 48 to 72 hours. Add <b>hello@noemptychair.co</b> as a collaborator wherever that's possible: Instagram under Settings → Business tools → Collaborators (or just share a login if it's a personal account), Facebook as a Page partner, and your website as an admin, editor, or staff account on whatever it's built on. Pull my access once the teardown's done, totally fine.</p>
+          <label>What's your website built on?
+            <select name="platform">
+              <option value="">Choose one…</option>
+              <option>Wix</option>
+              <option>Squarespace</option>
+              <option>Shopify</option>
+              <option>WordPress</option>
+              <option>Something else</option>
+              <option>Don't have a site yet</option>
+            </select>
+          </label>
+          <label style="margin-top:14px">Anything about getting me access I should know?
+            <span class="hint">Optional. A heads up on who to loop in, a site that's not live yet, whatever's worth flagging.</span>
+            <textarea name="access_notes" rows="3"></textarea>
+          </label>
+        </div>
+
+        <button class="btn" type="submit">Send it over →</button>
+        <p class="tp-fine">Goes straight to me, I'll confirm I've got it and get started.</p>
+      </form>
+    </div>
+  </main>
+  <style>
+    .disc-free{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:100px;background:rgba(168,90,118,.12);color:#a85a76;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
+  </style>
+  <script is:inline>
+    /* Backup notifier: on submit, also POST to a function that emails you directly,
+       so a spam-flagged Netlify submission never means a silently missed lead.
+       Fire-and-forget — the native Netlify submission still proceeds normally. */
+    (function () {
+      var f = document.querySelector('form[name="teardown-questionnaire"]');
+      if (!f) return;
+      f.addEventListener("submit", function () {
+        try {
+          var data = { _form: "teardown-questionnaire" };
+          new FormData(f).forEach(function (v, k) {
+            if (k === "bot-field" || k === "form-name") return;
+            if (data[k] !== undefined) data[k] = [].concat(data[k], v);
+            else data[k] = v;
+          });
+          fetch("/.netlify/functions/lead-notify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            keepalive: true,
+          }).catch(function () {});
+        } catch (e) {}
+        /* no preventDefault — let Netlify capture it too */
+      });
+    })();
+  </script>
+</Base>

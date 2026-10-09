@@ -9,8 +9,7 @@ function encode(data) {
 
 const EMPTY = {
   name: "", salon: "", email: "", years: "", website: "",
-  instagram: "", socials: "", stats: "", voice: "", issue: "",
-  audience: "", vision: "", "bot-field": "",
+  instagram: "", "bot-field": "",
 };
 
 const STEPS = [
@@ -91,7 +90,7 @@ export default function TeardownForm() {
               <div className="tp-mark"><ChairMark size={50} /></div>
               <div className="eyebrow" style={{ color: "var(--rose)", letterSpacing: 3, textTransform: "uppercase", fontSize: 12, marginBottom: 14 }}>The $200 Glow-Up Teardown</div>
               <h1>Let's find what's costing you bookings.</h1>
-              <p>Start here. It takes about 5 to 7 minutes, then here's exactly what happens next.</p>
+              <p>Start here. It only takes a couple minutes, then here's exactly what happens next.</p>
               <ProcessSteps activeIndex={0} />
               <p className="tp-fine" style={{ marginTop: -8, marginBottom: 20 }}>The $200 credits toward any package if you decide to build with me.</p>
               <p className="tp-cross" style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 10 }}>
@@ -114,32 +113,6 @@ export default function TeardownForm() {
                 <label>Website or Linktree<input type="text" placeholder="paste the link, or 'none yet'" value={form.website} onChange={set("website")} /></label>
                 <label>Instagram handle<input type="text" placeholder="@yoursalon" value={form.instagram} onChange={set("instagram")} /></label>
               </div>
-              <label>Other social handles<input type="text" placeholder="TikTok, Facebook, YouTube, Pinterest, whatever you're on" value={form.socials} onChange={set("socials")} /></label>
-
-              <label>Your numbers, if you have them
-                <span className="hint">Followers and reach/views over the last 30, 60, 90 days, and the past year if you can. Rough is fine, even screenshots you can send after.</span>
-                <textarea value={form.stats} onChange={set("stats")} placeholder="e.g. IG: 2,400 followers · ~18k views/30d · ~50k/90d · reels do best…" />
-              </label>
-
-              <label>Your current voice / branding
-                <span className="hint">Do you have a look or vibe already? Colors, fonts, how you talk to clients, or "totally starting over."</span>
-                <textarea value={form.voice} onChange={set("voice")} />
-              </label>
-
-              <label>Your #1 problem with your brand right now
-                <span className="hint">The one thing that bugs you most, or that you think is costing you clients.</span>
-                <textarea required value={form.issue} onChange={set("issue")} />
-              </label>
-
-              <label>The audience you want to attract
-                <span className="hint">Who's your dream client? Type of service, price point, the vibe of person you want in your chair.</span>
-                <textarea value={form.audience} onChange={set("audience")} />
-              </label>
-
-              <label>Anything else, your vision
-                <span className="hint">Optional. Where you want this to go, styles you love, or à la carte pieces you're curious about.</span>
-                <textarea value={form.vision} onChange={set("vision")} />
-              </label>
 
               <button className="btn" type="submit" disabled={status === "sending"}>
                 {status === "sending" ? "Sending…" : "Send my teardown request →"}

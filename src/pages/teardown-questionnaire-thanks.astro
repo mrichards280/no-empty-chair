@@ -1,0 +1,28 @@
+---
+import Base from "../layouts/Base.astro";
+import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib/logoPaths.js";
+---
+<Base
+  title="Got it | No Empty Chair"
+  description="Thanks for filling out your teardown questionnaire."
+  canonical="https://noemptychair.co/teardown-questionnaire-thanks"
+  noindex={true}>
+  <main id="main" class="disc-page">
+    <header class="tp-head">
+      <a href="/" class="tp-logo">No Empty <span>Chair</span></a>
+    </header>
+    <div class="tp-wrap">
+      <div class="tp-done">
+        <div class="tp-mark">
+          <svg width="44" height="55.6" viewBox={LOGO_VIEWBOX} preserveAspectRatio="xMidYMid meet" role="img" aria-label="No Empty Chair mark">
+            <g fill="#413645" stroke="none"><g transform={LOGO_INNER_TRANSFORM}><path d={CHAIR_PATH} /></g></g>
+            <g transform={LOGO_INNER_TRANSFORM}><path d={ORB_PATH} fill="#a85a76" /></g>
+          </svg>
+        </div>
+        <h1>Got it, I'm on it.</h1>
+        <p>Your full questionnaire just landed with Makayla. Once your access comes through, she gets to work on your teardown, a short, honest video on exactly what's costing you bookings.</p>
+        <a href="/" class="tp-back-link">← Back to the site</a>
+      </div>
+    </div>
+  </main>
+</Base>
