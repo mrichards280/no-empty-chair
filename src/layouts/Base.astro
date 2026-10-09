@@ -222,6 +222,20 @@ const jsonLd = {
       <input type="text" name="bot-field" />
     </form>
 
+    <!-- Same as "discovery" above, but for non-beauty leads submitted from
+         /discovery/general. Field names must match that page. -->
+    <form name="discovery-general" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="text" name="name" />
+      <input type="text" name="business_name" />
+      <input type="text" name="trade" />
+      <input type="text" name="city" />
+      <input type="text" name="instagram" />
+      <input type="text" name="anything_else" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="text" name="bot-field" />
+    </form>
+
     <slot />
     <!-- Layout "Arrange" tool: only appears with ?edit or when enabled from /admin -->
     <script src="/demos/_tinker.js" defer></script>
