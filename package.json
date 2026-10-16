@@ -11,7 +11,8 @@
     "astro": "astro",
     "social:import": "node scripts/social-import.mjs",
     "social:check": "node scripts/social-import.mjs --check",
-    "meta:token": "node scripts/meta-token.mjs"
+    "meta:token": "node scripts/meta-token.mjs",
+    "social:voiceovers": "node scripts/social-voiceovers.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.2.1",

@@ -7,6 +7,10 @@ import { getStore } from "@netlify/blobs";
 import schedule from "../../public/social/schedule.json" with { type: "json" };
 import { runTick, makeGraph, config as readConfig, validateSchedule, verifyConnection, mediaUrl, refreshAllStats, matchManualLinks, pushNotify } from "../lib/social-publisher.mjs";
 import { hasValidSession } from "../lib/admin-session.mjs";
+import voiceovers from "../lib/voiceovers.mjs";
+
+// "2026-10-r05" -> voiceover script for reel R05, when there is one
+const voiceoverFor = (id) => voiceovers[String(id).match(/-(r\d+)$/i)?.[1]?.toLowerCase()] || null;
 
 export default async (req) => {
   const expected = Netlify.env.get("ADMIN_PASSWORD");
@@ -323,6 +327,7 @@ function page(d, cfg) {
           ${canPostNow ? `<button class="btn sm primary" data-postnow="${esc(p.id)}">▶ Post now</button>` : ""}
           <button class="btn sm" data-preview="${esc(p.id)}">👁 Preview</button>
           <button class="btn sm" data-copycap="${esc(p.id)}">📋 Copy caption</button>
+          ${voiceoverFor(p.id) ? `<button class="btn sm" data-script="${esc(p.id)}">Voiceover script</button>` : ""}
           ${isVid && media0 ? `<button class="btn sm" data-savevideo="${src}" data-savename="${esc(p.id)}.mp4">⬇ Save video</button>` : ""}
           ${cat === "published" ? `<a class="btn sm" href="/admin?repost=${encodeURIComponent(p.id)}">🔁 Schedule again</a>` : ""}
           ${p.manual_only && p.state.manual?.status === "posted" ? `<button class="btn sm quiet" data-markmanual="${esc(p.id)}" data-undo="1">↺ Undo posted</button>` : ""}
@@ -351,6 +356,7 @@ function page(d, cfg) {
       caption: p.caption || "",
       caption_facebook: p.caption_facebook ?? p.caption ?? "",
       media: (p.media || []).map((m) => mediaUrl(m, cfg)),
+      voiceover: voiceoverFor(p.id),
     }))
   ).replace(/<\//g, "<\\/");
 
@@ -522,6 +528,17 @@ details.moretools>summary::-webkit-details-marker{display:none}
 /* preview modal */
 .modalbg{position:fixed;inset:0;background:rgba(40,32,42,.55);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
 .modalbg[hidden]{display:none}
+.scriptbox{max-width:520px}
+.scripttext p{margin:0 0 12px;line-height:1.5}
+.scripttext .scn{display:block;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#9c4e69;margin-bottom:2px}
+#karaokeVideo{width:100%;max-height:46vh;border-radius:16px;background:#000;display:block}
+.karaokectl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}
+.karaokemute{font-size:13px;display:inline-flex;gap:5px;align-items:center}
+.karaokelines{list-style:none;padding:0;margin:0;max-height:34vh;overflow-y:auto}
+.karaokelines li{padding:8px 10px;border-radius:12px;cursor:pointer;color:#8a7f8c;transition:background .2s,color .2s;line-height:1.45}
+.karaokelines li .t{font-size:11px;font-variant-numeric:tabular-nums;margin-right:6px}
+.karaokelines li.on{background:#f8dde5;color:#413645;font-size:1.08em}
+.karaokelines li.done{color:#b9afbb}
 .modalbox{background:#fff;border-radius:24px;max-width:420px;width:100%;padding:18px;position:relative;box-shadow:0 20px 60px rgba(40,32,42,.35)}
 .modalclose{position:absolute;top:6px;right:6px;border:none;background:#f1ebf3;color:var(--plum);width:44px;height:44px;border-radius:100px;cursor:pointer;font-size:16px;line-height:1;z-index:2}
 .modaltabs{display:flex;gap:8px;margin:0 0 14px;padding-right:46px}
@@ -651,6 +668,7 @@ details.moretools>summary::-webkit-details-marker{display:none}
   .sheetbg{align-items:flex-end;padding:0}
   .sheet{border-radius:24px 24px 0 0;width:100%;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
   .modalbox{max-width:100%;padding:16px}
+  .scriptbox{max-width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style></head><body><div class="wrap">
@@ -693,6 +711,26 @@ ${sorted.length ? `<section id="calView" hidden aria-label="Calendar"></section>
   <div id="previewTabs"></div>
   <div id="previewMeta" class="modalmeta"></div>
   <div id="previewBody"></div>
+</div></div>
+<div id="scriptModal" class="modalbg" hidden><div class="modalbox scriptbox">
+  <button class="modalclose" id="scriptClose" aria-label="Close script">✕</button>
+  <div class="modaltabs"><button class="modaltab active" data-smode="read">Script</button><button class="modaltab" data-smode="karaoke">Karaoke</button></div>
+  <div id="scriptMeta" class="modalmeta"></div>
+  <div id="scriptRead">
+    <div id="scriptText" class="scripttext"></div>
+    <div class="sheetbtns"><button class="btn primary" id="scriptCopy" type="button">Copy script</button></div>
+  </div>
+  <div id="scriptKaraoke" hidden>
+    <video id="karaokeVideo" playsinline preload="metadata"></video>
+    <div class="karaokectl">
+      <button class="btn sm primary" id="karaokePlay" type="button">Play</button>
+      <button class="btn sm" id="karaokeRestart" type="button">Restart</button>
+      <label class="karaokemute"><input type="checkbox" id="karaokeMute" checked> Mute reel</label>
+      <span id="karaokeClock" class="muted"></span>
+    </div>
+    <ol id="karaokeLines" class="karaokelines"></ol>
+    <p class="hint">Lines light up on the reel's scene timing. Mute the reel and read along to record, or tap a line to jump to it.</p>
+  </div>
 </div></div>
 <div id="sheet" class="sheetbg" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet">
   <h3 id="sheetTitle"></h3>
@@ -1026,6 +1064,73 @@ async function copyText(text){
   try{var ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);return ok;}catch(e){return false;}
 }
 
+// ---- voiceover script + karaoke ----
+var sModal=$('#scriptModal'), kVideo=$('#karaokeVideo'), kLines=$('#karaokeLines'), sPost=null, sMode='read';
+function fmtSec(t){t=Math.max(0,t||0);return Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');}
+function scriptPlain(v){return v.scenes.map(function(s){return s.text;}).join('\\n\\n');}
+function openScript(id){
+  sPost=POSTS.find(function(p){return p.id===id;}); if(!sPost||!sPost.voiceover)return;
+  var v=sPost.voiceover;
+  $('#scriptMeta').textContent=v.title+' · about '+Math.round(v.length)+' seconds · '+v.scenes.length+' lines';
+  $('#scriptText').innerHTML=v.scenes.map(function(s){return '<p><span class="scn">'+escHtml(s.name)+'</span>'+escHtml(s.text)+'</p>';}).join('');
+  kLines.innerHTML=v.scenes.map(function(s,i){return '<li data-i="'+i+'"><span class="t">'+fmtSec(s.start)+'</span>'+escHtml(s.text)+'</li>';}).join('');
+  var src=(sPost.media||[]).filter(isVid)[0]||'';
+  if(kVideo.getAttribute('src')!==src){if(src)kVideo.setAttribute('src',src);else kVideo.removeAttribute('src');}
+  kVideo.hidden=!src; kVideo.muted=$('#karaokeMute').checked;
+  setMode('read'); sModal.hidden=false;
+}
+function setMode(m){
+  sMode=m;
+  $$('[data-smode]',sModal).forEach(function(b){b.classList.toggle('active',b.dataset.smode===m);});
+  $('#scriptRead').hidden=m!=='read'; $('#scriptKaraoke').hidden=m!=='karaoke';
+  if(m!=='karaoke')kVideo.pause();
+  tick();
+}
+// with no video, karaoke runs on its own clock
+var kClock={t:0,playing:false,last:0,raf:0};
+function now(){return kVideo.hidden?kClock.t:kVideo.currentTime;}
+function playing(){return kVideo.hidden?kClock.playing:!kVideo.paused;}
+function tick(){
+  if(!sPost)return;
+  var v=sPost.voiceover, t=now(), cur=-1;
+  v.scenes.forEach(function(s,i){if(t>=s.start)cur=i;});
+  if(t>=v.length&&kVideo.hidden){kClock.playing=false;}
+  $$('li',kLines).forEach(function(li,i){
+    var on=i===cur&&t<v.length; li.classList.toggle('on',on); li.classList.toggle('done',i<cur||t>=v.length);
+    if(on&&li.dataset.shown!=='1'){li.dataset.shown='1';li.scrollIntoView({block:'nearest',behavior:'smooth'});} else if(!on)li.dataset.shown='';
+  });
+  $('#karaokeClock').textContent=fmtSec(t)+' / '+fmtSec(v.length);
+  $('#karaokePlay').textContent=playing()?'Pause':'Play';
+}
+function loop(ts){
+  if(kClock.playing){kClock.t+=(ts-kClock.last)/1000;kClock.last=ts;}
+  tick();
+  if(!sModal.hidden&&playing())kClock.raf=requestAnimationFrame(loop);
+}
+function startLoop(){cancelAnimationFrame(kClock.raf);kClock.last=performance.now();kClock.raf=requestAnimationFrame(loop);}
+function seek(t){if(kVideo.hidden)kClock.t=t;else kVideo.currentTime=t;tick();}
+$('#karaokePlay').onclick=function(){
+  if(kVideo.hidden){if(kClock.t>=sPost.voiceover.length)kClock.t=0;kClock.playing=!kClock.playing;}
+  else if(kVideo.paused)kVideo.play().catch(function(){toast("Couldn't play the reel here.",{kind:'err'});});
+  else kVideo.pause();
+  startLoop();
+};
+$('#karaokeRestart').onclick=function(){seek(0);};
+$('#karaokeMute').onchange=function(){kVideo.muted=this.checked;};
+kVideo.addEventListener('play',startLoop); kVideo.addEventListener('pause',tick); kVideo.addEventListener('seeked',tick);
+kLines.addEventListener('click',function(e){var li=e.target.closest('li');if(li)seek(sPost.voiceover.scenes[+li.dataset.i].start+0.01);});
+$$('[data-smode]',sModal).forEach(function(b){b.onclick=function(){setMode(b.dataset.smode);};});
+$('#scriptCopy').onclick=function(){
+  var b=this; copyText(scriptPlain(sPost.voiceover)).then(function(ok){
+    if(!ok){toast("Couldn't copy. Press and hold the script to copy it by hand.",{kind:'err'});return;}
+    b.textContent='Copied'; setTimeout(function(){b.textContent='Copy script';},1400);
+  });
+};
+function closeScript(){sModal.hidden=true;kVideo.pause();kClock.playing=false;}
+$('#scriptClose').onclick=closeScript;
+sModal.addEventListener('click',function(e){if(e.target===sModal)closeScript();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!sModal.hidden)closeScript();});
+
 // ---- save video ----
 // A plain <a download> is ignored for cross-origin files (Cloudinary) in Safari and some
 // Chromium builds, so the video is fetched as a blob first.
@@ -1137,7 +1242,7 @@ async function postNow(b){
 }
 
 // ---- one delegated click handler, so lists can be swapped in place ----
-var SELECTOR='[data-act],[data-retry],[data-preview],[data-capexpand],[data-copycap],[data-savevideo],[data-filter],[data-dismiss],[data-addlink],[data-markmanual],[data-postnow],[data-outclose],[data-calday],[data-calnav],[data-jump]';
+var SELECTOR='[data-act],[data-retry],[data-preview],[data-capexpand],[data-copycap],[data-script],[data-savevideo],[data-filter],[data-dismiss],[data-addlink],[data-markmanual],[data-postnow],[data-outclose],[data-calday],[data-calnav],[data-jump]';
 document.addEventListener('click',function(e){
   var more=$('#moreTools');
   var el=e.target.closest?e.target.closest(SELECTOR):null;
@@ -1153,6 +1258,7 @@ document.addEventListener('click',function(e){
   else if(el.hasAttribute('data-calnav'))calNav(el.dataset.calnav);
   else if(el.hasAttribute('data-jump'))jumpToCard(el.dataset.jump,el.dataset.cat);
   else if(el.hasAttribute('data-preview'))openPreview(el.dataset.preview);
+  else if(el.hasAttribute('data-script'))openScript(el.dataset.script);
   else if(el.hasAttribute('data-capexpand')){var w=el.closest('.pcap');w.querySelector('.capshort').hidden=true;w.querySelector('.capfull').hidden=false;}
   else if(el.hasAttribute('data-copycap')){
     var post=POSTS.filter(function(p){return p.id===el.dataset.copycap;})[0]; if(!post)return;
