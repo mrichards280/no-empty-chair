@@ -10,6 +10,8 @@
   node_bundler = "esbuild"
 [functions."save-schedule"]
   node_bundler = "esbuild"
+[functions."social-recent"]
+  node_bundler = "esbuild"
 
 [build.environment]
   NODE_VERSION = "20"
