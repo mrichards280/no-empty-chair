@@ -90,3 +90,52 @@ those secrets.
 helper. A true visual page-builder (drag blocks on a grid, resize, mixed content
 types) is a separate project — the right fit is a git-based block editor like
 **Puck** or **TinaCMS**, not extending the Arrange tool.
+
+## UI/UX rules (apply to every build)
+
+**Interactive elements are real elements.** Anything clickable is a `<button>`
+or `<a>`, never a styled `<div>`/`<span>` — every time that got skipped (the
+barber.html menu items, Poppi's tiles, the toggle switches) it broke on text
+wrap or failed keyboard/screen-reader use and had to be retrofitted. Every
+interactive element gets a visible `:focus-visible` state.
+
+**Overlays trap focus properly.** Any modal/sheet (booking sheet, checkout,
+radar popup): focus the first element on open, Tab wraps inside it, Esc
+closes it, focus returns to the trigger on close.
+
+**Layout fills the real viewport.** `.wrap` is 1240px max-width so it reads
+full on a laptop, not a narrow center column (the teardown page's mistaken
+720px cap was the one exception, and it read cramped). Mobile-safe always: no
+horizontal overflow at 390px, gutters via `clamp()`, test every surface at
+phone width before calling it done. Fixed-height containers are a trap for
+variable-length text — let content drive height.
+
+**The flow matches the real business process, not a generic template.** A
+salon books by appointment (modal: service → stylist → date → time →
+confirm); a barber orders like a menu (build-a-check) — don't reuse one
+business's flow for a different kind of business. Break a long ask into
+stages instead of one giant form (the Teardown's quick-intake-now /
+deep-questionnaire-after-payment split). Don't make people retype what's
+already known (URL-param prefill on handoff links). Design for who's
+actually at the keyboard, not just an idealized single user (the "who's
+filling this out" field — these forms get filled out live with clients as
+often as solo).
+
+**CSS discipline.** Scope class names in shared stylesheets — a generic
+`.logo` meant for the nav silently broke an unrelated `.logo` in the admin
+panel; that's what global CSS + generic names does. Respect
+`prefers-reduced-motion` wherever something auto-animates.
+
+**Shared engine, unique skin.** The guided tour and booking sheet
+(`_tour.js`/`_booking.js`) are one system every demo inlines, but palette,
+fonts and icons are different per demo — never a reskinned template (see
+Demo design system, above). Client-facing copy stays brand → customer; "why
+this matters for your business" belongs in the tour/admin layer, never the
+visible page (see On-page copy vs the tour, above).
+
+**Verify for real.** Test against a production build (`npm run build` +
+`npm run preview`), not dev mode — the dev toolbar alone produced several
+false-positive "bugs" earlier in this project. Accessibility (labels, ARIA,
+live regions) is cheaper built in than retrofitted — this project did a full
+audit pass fixing it after the fact, which cost more than doing it inline
+would have.
