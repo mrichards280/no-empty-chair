@@ -32,7 +32,7 @@ function prefillFromQuery() {
 const STEPS = [
   "Send me the basics",
   "I send your $200 payment link",
-  "Full questionnaire + I get temporary access to your site & accounts",
+  "Welcome packet + I get temporary access to your site & accounts",
   "You get your teardown video",
 ];
 

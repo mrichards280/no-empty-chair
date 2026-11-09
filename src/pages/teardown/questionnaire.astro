@@ -22,8 +22,8 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../
 
       <div class="tp-intro">
         <div class="disc-kick">$200 Teardown <span class="disc-free">Step 3 of 4</span></div>
-        <h1>Let's get into it.</h1>
-        <p>Thanks for taking care of the $200. Now I actually dig in. Give this 15 to 20 minutes, the more detail you give me, the sharper the teardown.</p>
+        <h1>You're in. Here's what's next.</h1>
+        <p>Thanks for taking care of the $200. You don't need to fill out a worksheet about your own numbers, I pull all of that myself once I'm in. This page is two things: what I'm actually going to look at, and how to get me access so I can start.</p>
       </div>
 
       <form
@@ -54,37 +54,20 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../
         </div>
 
         <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">2</span>Your Numbers &amp; Voice</div>
-          <label>Other social handles<input type="text" name="socials" placeholder="TikTok, Facebook, YouTube, Pinterest, whatever you're on" /></label>
-          <label style="margin-top:14px">Your numbers, if you have them
-            <span class="hint">Followers and reach/views over the last 30, 60, 90 days, and the past year if you can. Rough is fine, even screenshots you can send after.</span>
-            <textarea name="stats" rows="3" placeholder="e.g. IG: 2,400 followers · ~18k views/30d · ~50k/90d · reels do best…"></textarea>
-          </label>
-          <label style="margin-top:14px">Your current voice / branding
-            <span class="hint">Do you have a look or vibe already? Colors, fonts, how you talk to clients, or "totally starting over."</span>
-            <textarea name="voice" rows="3"></textarea>
-          </label>
+          <div class="disc-sec-h"><span class="disc-num">2</span>What I'm Pulling, and What It Means</div>
+          <ul class="otc-pull">
+            <li><b>Your numbers</b> (followers, reach, views over the last 30/60/90 days) — tells me whether your content is actually reaching people, or just sitting there.</li>
+            <li><b>Your current content and voice</b> — tells me what's already working, what's inconsistent, and where the brand feels unclear.</li>
+            <li><b>Your booking flow</b> — tells me exactly where people drop off before they book.</li>
+            <li><b>Your site and profile setup</b> — tells me what's quietly costing you visibility: SEO, bio links, contact info, load speed.</li>
+          </ul>
+          <p class="tp-fine" style="text-align:left;margin:10px 0 0">I pull all of this myself once I'm in, that's the whole point of the access below.</p>
         </div>
 
         <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">3</span>Problem &amp; Vision</div>
-          <label>Your #1 problem with your brand right now
-            <span class="hint">The one thing that bugs you most, or that you think is costing you clients.</span>
-            <textarea required name="issue" rows="3"></textarea>
-          </label>
-          <label style="margin-top:14px">The audience you want to attract
-            <span class="hint">Who's your dream client? Type of service, price point, the vibe of person you want in your chair.</span>
-            <textarea name="audience" rows="3"></textarea>
-          </label>
-          <label style="margin-top:14px">Anything else, your vision
-            <span class="hint">Optional. Where you want this to go, styles you love, or à la carte pieces you're curious about.</span>
-            <textarea name="vision" rows="3"></textarea>
-          </label>
-        </div>
-
-        <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">4</span>Temporary Access</div>
+          <div class="disc-sec-h"><span class="disc-num">3</span>Temporary Access</div>
           <p class="tp-fine" style="text-align:left;margin:0 0 14px">To actually click through everything myself, I need temporary access to your site and main social accounts for 48 to 72 hours. Add <b>hello@noemptychair.co</b> as a collaborator wherever that's possible: Instagram under Settings → Business tools → Collaborators (or just share a login if it's a personal account), Facebook as a Page partner, and your website as an admin, editor, or staff account on whatever it's built on. Pull my access once the teardown's done, totally fine.</p>
+          <div class="otc-tip">Don't want to hand out an actual password? Set up a shared vault in a password manager (1Password and Bitwarden both do this) and share it with me there instead. It's safer than texting a password, and you can revoke it in one click when we're done.</div>
           <label>What's your website built on?
             <select name="platform">
               <option value="">Choose one…</option>
@@ -109,6 +92,10 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../../
   </main>
   <style>
     .disc-free{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:100px;background:rgba(168,90,118,.12);color:#a85a76;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
+    .otc-pull{margin:0;padding-left:20px;display:grid;gap:10px;}
+    .otc-pull li{font-size:14px;color:#4b4149;line-height:1.5;}
+    .otc-pull b{color:#2a232e;}
+    .otc-tip{margin:0 0 16px;padding:12px 14px;background:rgba(168,90,118,.08);border:1px solid rgba(168,90,118,.25);border-radius:10px;font-size:13px;color:#4b4149;line-height:1.5;}
   </style>
   <script is:inline>
     /* Pre-fill from the link's query string (?name=...&salon=...&email=...) so
