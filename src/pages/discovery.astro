@@ -22,8 +22,8 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
 
       <div class="tp-intro">
         <div class="disc-kick">No Empty Chair <span class="disc-free">Free · 15 minutes</span></div>
-        <h1>Let's talk shop</h1>
-        <p>Just enough for me to know who you are before we hop on a quick call. No homework, no deep dive, that part's what the <a href="/teardown" style="color:var(--rose);font-weight:600;border-bottom:1px solid rgba(168,90,118,.4)">$200 Teardown</a> is for. Fill this in and I'll reach out to grab 15 minutes.</p>
+        <h1>Let's grab 15 minutes</h1>
+        <p>This isn't the deep dive, that's the <a href="/teardown" style="color:var(--rose);font-weight:600;border-bottom:1px solid rgba(168,90,118,.4)">$200 Teardown</a>. And it's not just a message that sits in an inbox either. It's a real phone call. Answer a few quick questions and I'll text you to pick a time this week.</p>
       </div>
 
       <form
@@ -37,48 +37,37 @@ import { LOGO_VIEWBOX, LOGO_INNER_TRANSFORM, CHAIR_PATH, ORB_PATH } from "../lib
         <input type="hidden" name="form-name" value="discovery" />
         <input class="tp-hp" aria-hidden="true" type="text" name="bot-field" tabindex="-1" autocomplete="off" />
 
-        <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">1</span>The Basics</div>
-          <div class="tp-row">
-            <label>Your name<input type="text" name="name" placeholder="First & last" /></label>
-            <label>Business / brand name<input type="text" name="business_name" placeholder="What do you go by?" /></label>
-          </div>
-          <div class="tp-row">
-            <label>What kind of work do you do?
-              <select name="trade">
-                <option value="">Choose one…</option>
-                <option>Hair / stylist</option>
-                <option>Braider / loctician</option>
-                <option>Barber</option>
-                <option>Nails</option>
-                <option>Lashes &amp; brows</option>
-                <option>Esthetician / skin</option>
-                <option>Spa / massage</option>
-                <option>Makeup</option>
-                <option>Product / beauty brand</option>
-                <option>Other beauty &amp; wellness</option>
-              </select>
-            </label>
-            <label>What city are you in?<input type="text" name="city" placeholder="Atlanta, GA" /></label>
-          </div>
+        <div class="tp-row">
+          <label>Your name<input type="text" name="name" placeholder="First & last" /></label>
+          <label>Business / brand name<input type="text" name="business_name" placeholder="What do you go by?" /></label>
+        </div>
+        <div class="tp-row">
+          <label>What kind of work do you do?
+            <select name="trade">
+              <option value="">Choose one…</option>
+              <option>Hair / stylist</option>
+              <option>Braider / loctician</option>
+              <option>Barber</option>
+              <option>Nails</option>
+              <option>Lashes &amp; brows</option>
+              <option>Esthetician / skin</option>
+              <option>Spa / massage</option>
+              <option>Makeup</option>
+              <option>Product / beauty brand</option>
+              <option>Other beauty &amp; wellness</option>
+            </select>
+          </label>
+          <label>What city are you in?<input type="text" name="city" placeholder="Atlanta, GA" /></label>
+        </div>
+        <label>Instagram handle, if you have one<input type="text" name="instagram" placeholder="@yourhandle, so I can peek at your work" /></label>
+        <label>Anything you want me to know before we talk?<textarea name="anything_else" rows="3" placeholder="Optional, what made you reach out, what's on your mind, anything at all"></textarea></label>
+        <div class="tp-row">
+          <label>Best email<input required type="email" name="email" placeholder="you@email.com" /></label>
+          <label>Best cell (for the call)<input type="tel" name="phone" placeholder="(404) 555-0123" /></label>
         </div>
 
-        <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">2</span>Where To Find You</div>
-          <label>Instagram handle, if you have one<input type="text" name="instagram" placeholder="@yourhandle, so I can peek at your work" /></label>
-          <label style="margin-top:14px">Anything you want me to know before we talk?<textarea name="anything_else" rows="3" placeholder="Optional, what made you reach out, what's on your mind, anything at all"></textarea></label>
-        </div>
-
-        <div class="disc-sec">
-          <div class="disc-sec-h"><span class="disc-num">3</span>How To Reach You</div>
-          <div class="tp-row">
-            <label>Best email<input required type="email" name="email" placeholder="you@email.com" /></label>
-            <label>Best cell (for a quick call)<input type="tel" name="phone" placeholder="(404) 555-0123" /></label>
-          </div>
-        </div>
-
-        <button class="btn" type="submit">Send my answers →</button>
-        <p class="tp-fine">Goes straight to me, I'll reach out to grab 15 minutes on the phone.</p>
+        <button class="btn" type="submit">Book my 15 minutes →</button>
+        <p class="tp-fine">Goes straight to me. I'll text or call within a day to lock in a time.</p>
       </form>
 
       <p class="disc-cross">Already know you want the real deep-dive? Skip ahead to the <a href="/teardown">$200 Teardown →</a></p>

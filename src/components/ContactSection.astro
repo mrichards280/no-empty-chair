@@ -7,7 +7,10 @@ const { contact } = Astro.props;
     <div class="kicker">{contact.kicker}</div>
     <h2>{contact.title}</h2>
     <p>{contact.sub}</p>
-    <a href="/teardown" class="btn">{contact.teardownCtaLabel || "Book my $200 teardown"}</a>
+    <div class="cta-btns">
+      <a href="/teardown" class="btn">{contact.teardownCtaLabel || "Book my $200 teardown"}</a>
+      <a href="/discovery" class="btn dark">{contact.discoveryCtaLabel || "Book a free 15-min chat"}</a>
+    </div>
     <p style="margin-top:24px;font-size:14px">
       Or DM <a href={contact.ig} target="_blank" rel="noopener noreferrer" style="color:var(--rose-deep);font-weight:600">{contact.igLabel}</a> on Instagram
     </p>

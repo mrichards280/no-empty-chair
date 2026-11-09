@@ -364,15 +364,16 @@
   "contact": {
     "kicker": "Ready?",
     "title": "Let's make your salon the one everyone wants.",
-    "sub": "Start with a $200 teardown: a clear, expert look at exactly what's holding your bookings back, and the first step of every project. It credits toward another service.",
+    "sub": "Not sure where to start? Grab a free 15-minute call to talk it through, or jump straight into the $200 Teardown for the deep dive, it credits toward any service.",
     "email": "hello@noemptychair.co",
     "bookingEmail": "hello@noemptychair.co",
     "teardownCtaLabel": "Book my $200 teardown",
     "ig": "https://instagram.com/noemptychair",
     "igLabel": "@noemptychair",
     "location": "Atlanta, GA",
-    "formHeading": "Or send a note",
-    "formButton": "Send"
+    "formHeading": "Prefer email? Send a note",
+    "formButton": "Send",
+    "discoveryCtaLabel": "Book a free 15-min chat"
   },
   "footer": {
     "tagline": "Brand & Content Studio · Atlanta, GA",
