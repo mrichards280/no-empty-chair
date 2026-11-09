@@ -25,7 +25,7 @@ const packages = content.packages?.items || [];
       <div class="tp-intro">
         <div class="disc-kick">No Empty Chair <span class="disc-free">Free · 15 minutes</span></div>
         <h1>Let's grab 15 minutes</h1>
-        <p>This isn't the deep dive, that's the <a href="/teardown" style="color:var(--rose);font-weight:600;border-bottom:1px solid rgba(168,90,118,.4)">$200 Teardown</a>. And it's not just a message that sits in an inbox either. It's a real phone call. Tell me what you want to ask me and I'll text you to pick a time this week.</p>
+        <p>This isn't the deep dive, that's the <a href="/teardown" style="color:var(--rose);font-weight:600;border-bottom:1px solid rgba(168,90,118,.4)">$200 Teardown</a>. And it's not a message that just sits in an inbox either, it's a real phone call. Let me know what you want to cover and I'll text you to pick a time this week.</p>
       </div>
 
       <div class="disc-offers">
@@ -40,7 +40,7 @@ const packages = content.packages?.items || [];
             <div class="disc-offer">
               <div class="disc-offer-name">{pkg.name}</div>
               <div class="disc-offer-price">{pkg.from}</div>
-              <div class="disc-offer-desc">{pkg.bullets?.[0]}</div>
+              <div class="disc-offer-desc">{pkg.bullets?.[1] || pkg.bullets?.[0]}</div>
             </div>
           ))}
         </div>
@@ -61,7 +61,7 @@ const packages = content.packages?.items || [];
           <label>Your name<input type="text" name="name" placeholder="First & last" /></label>
           <label>Business / brand name<input type="text" name="business_name" placeholder="What do you go by?" /></label>
         </div>
-        <label>What do you want to ask me on our call?<textarea name="questions" rows="4" placeholder="What's on your mind, what you're weighing, anything you want to walk in already knowing about"></textarea></label>
+        <label>What do you want to ask me on our call?<textarea name="questions" rows="4" placeholder="Pricing, timeline, whether this is even the right fit, anything"></textarea></label>
         <div class="tp-row">
           <label>Best email<input required type="email" name="email" placeholder="you@email.com" /></label>
           <label>Best cell (for the call)<input type="tel" name="phone" placeholder="(404) 555-0123" /></label>
